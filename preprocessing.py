@@ -48,11 +48,23 @@ def CONVERT_BOOL_TO_BINARY(df, str_datecol='dtmStampCreation__app', logger=None)
 	return df
 
 # define function to get list of cols with threshold nan
-def GET_LIST_THRESHOLD_NAN(df, flt_threshold=0.5, logger=None):
-	# get series of columns and proportion missing
-	ser_propna = df.isnull().sum() / df.shape[0]
-	# subset to >= flt_threshold
-	list_columns = list(ser_propna[ser_propna >= flt_threshold].index)
+def GET_LIST_THRESHOLD_NAN(df, flt_threshold=0.5, logger=None, bool_low_memory=True):
+	# empty list
+	list_columns = []
+	# logic
+	if bool_low_memory:
+		for a, col in enumerate(df.columns):
+			# print message
+			print(f'Evaluating column {a+1}/{df.shape[1]}')
+			flt_propna = df[col].isnull().sum() / df.shape[0]
+			# logic
+			if flt_propna >= flt_threshold:
+				list_columns.append(col)
+	else:
+		# get series of columns and proportion missing
+		ser_propna = df.isnull().sum() / df.shape[0]
+		# subset to >= flt_threshold
+		list_columns = list(ser_propna[ser_propna >= flt_threshold].index)
 	# if using logger
 	if logger:
 		logger.warning(f'{len(list_columns)} columns with prop nan >= {flt_threshold}')

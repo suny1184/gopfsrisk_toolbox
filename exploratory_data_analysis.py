@@ -268,7 +268,7 @@ class DistributionAnalysis:
 				# make distribution plot
 				fig, ax = plt.subplots(figsize=tpl_figsize)
 				# title
-				ax.set_title(f'{col}')
+				ax.set_title(f'{col} - Train > Test')
 				# plot train
 				sns.distplot(df_col['train'], kde=True, color="r", ax=ax)
 				# plot valid
@@ -293,7 +293,7 @@ class DistributionAnalysis:
 					# make distribution plot
 					fig, ax = plt.subplots(figsize=tpl_figsize)
 					# title
-					ax.set_title(f'{col}')
+					ax.set_title(f'{col} Valid > Train')
 					# plot train
 					sns.distplot(df_col['train'], kde=True, color="r", ax=ax)
 					# plot valid
@@ -318,7 +318,7 @@ class DistributionAnalysis:
 				# make distribution plot
 				fig, ax = plt.subplots(figsize=tpl_figsize)
 				# title
-				ax.set_title(f'{col}')
+				ax.set_title(f'{col} - Train > Test')
 				# plot train
 				sns.distplot(df_col['train'], kde=True, color="r", ax=ax)
 				# plot valid
@@ -343,7 +343,7 @@ class DistributionAnalysis:
 					# make distribution plot
 					fig, ax = plt.subplots(figsize=tpl_figsize)
 					# title
-					ax.set_title(f'{col}')
+					ax.set_title(f'{col} - Test > Train')
 					# plot train
 					sns.distplot(df_col['train'], kde=True, color="r", ax=ax)
 					# plot valid
@@ -368,7 +368,7 @@ class DistributionAnalysis:
 				# make distribution plot
 				fig, ax = plt.subplots(figsize=tpl_figsize)
 				# title
-				ax.set_title(f'{col}')
+				ax.set_title(f'{col} - Valid > Test')
 				# plot train
 				sns.distplot(df_col['train'], kde=True, color="r", ax=ax)
 				# plot valid
@@ -391,7 +391,7 @@ class DistributionAnalysis:
 					# make distribution plot
 					fig, ax = plt.subplots(figsize=tpl_figsize)
 					# title
-					ax.set_title(f'{col}')
+					ax.set_title(f'{col} - Test > Valid')
 					# plot train
 					sns.distplot(df_col['train'], kde=True, color="r", ax=ax)
 					# plot valid
