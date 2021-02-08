@@ -1,159 +1,376 @@
-# functions
-import logging
-import os
-import pickle
-import time
-from pandas.api.types import is_numeric_dtype
+# feature selection
 import numpy as np
-from sklearn.metrics import average_precision_score
-from scipy.special import expit
 import pandas as pd
-from prestige.algorithms import fit_catboost_model
+from .algorithms import FIT_CATBOOST_MODEL
+from .general import GET_NUMERIC_AND_NONNUMERIC
 import ast
-import matplotlib.pyplot as plt
-from sklearn.utils.class_weight import compute_class_weight
+import pickle
+from sklearn.metrics import f1_score
+from scipy.special import expit
 
-# define function for logging
-def LOG_EVENTS(str_filename='./logs/db_pull.log'):
-	# set logging format
-	FORMAT = '%(name)s:%(levelname)s:%(asctime)s:%(message)s'
-	# get logger
-	logger = logging.getLogger(__name__)
-	# try making log
-	try:
-		# reset any other logs
-		handler = logging.FileHandler(str_filename, mode='w')
-	except FileNotFoundError:
-		os.mkdir('./logs')
-		# reset any other logs
-		handler = logging.FileHandler(str_filename, mode='w')
-	# change to append
-	handler = logging.FileHandler(str_filename, mode='a')
-	# set the level to info
-	handler.setLevel(logging.INFO)
-	# set format
-	formatter = logging.Formatter(FORMAT)
-	# format the handler
-	handler.setFormatter(formatter)
-	# add handler
-	logger.addHandler(handler)
-	# return logger
-	return logger
 
-# define function for loadin#g from pickle
-def LOAD_FROM_PICKLE(logger=None, str_filename='../06_preprocessing/output/dict_imputations.pkl'):
-	# get file
-	pickled_file = pickle.load(open(str_filename, 'rb'))
-	# if using logger
-	if logger:
-		# log it
-		logger.warning(f'Imported file from {str_filename}')
-	# return
-	return pickled_file
 
-# define function to read csv
-def CSV_TO_DF(logger=None, str_filename='../output_data/df_raw.csv', list_usecols=None, list_parse_dates=None):
-	# start timer
-	time_start = time.perf_counter()
-	# read json file
-	df = pd.read_csv(str_filename, parse_dates=list_parse_dates, usecols=list_usecols)
-	# if we are using a logger
-	if logger:
-		# log it
-		logger.warning(f'Data imported from {str_filename} in {(time.perf_counter()-time_start)/60:0.4} min.')
-	# return
-	return df
-
-# define function to log df shape
-def LOG_DF_SHAPE(df, logger=None):
-	# get rows
-	int_nrows = df.shape[0]
-	# get columns
-	int_ncols = df.shape[1]
-	# if logging
-	if logger:
-		logger.warning(f'df: {int_nrows} rows, {int_ncols} columns')
-
-# define function for columns to keep
-def GET_COLS_TO_KEEP(df, list_bad_strings, logger=None):
+# define function for iterative feature selection
+def ITERATIVE_FEAT_SELECTION(X_train, y_train, X_valid, y_valid, list_non_numeric, 
+							 list_class_weights, int_n_models=50,
+							 int_iterations=1000, int_early_stopping_rounds=100,
+							 str_eval_metric='F1', int_random_state=42,
+							 str_filename='./output/list_bestfeats.pkl',
+							 logger=None):
 	# instantiate empty list
-	list_col_keep = []
-	# iterate through column names
-	for col in df.columns:
-		# lower
-		col_lower = col.lower()
-		# iterate through list_bad_strings
-		counter = 0
-		for str_ in list_bad_strings:
-			if str_ in col_lower:
-				counter += 1
-		if counter == 0:
-			list_col_keep.append(col)
+	list_empty = []
+	# build n models
+	for a in range(int_n_models):
+		# print message
+		print(f'Fitting model {a+1}/{int_n_models}')
+		# fit model
+		model = FIT_CATBOOST_MODEL(X_train=X_train, 
+								   y_train=y_train, 
+					               X_valid=X_valid, 
+					               y_valid=y_valid, 
+					               list_non_numeric=list_non_numeric, 
+					               int_iterations=int_iterations, 
+					               str_eval_metric=str_eval_metric, 
+					               int_early_stopping_rounds=int_early_stopping_rounds, 
+					               str_task_type='GPU', 
+					               bool_classifier=True,
+					               list_class_weights=list_class_weights,
+					               int_random_state=int_random_state)
+		# get model features
+		list_model_features = model.feature_names_
+		# get importance
+		list_feature_importance = list(model.feature_importances_)
+		# put in df
+		df_imp = pd.DataFrame({'feature': list_model_features,
+		                       'importance': list_feature_importance})
+		# subset to > 0
+		list_imp_feats = list(df_imp[df_imp['importance']>0]['feature'])
+		# append new feats to list_empty
+		for feat in list_imp_feats:
+			if feat not in list_empty:
+				list_empty.append(feat)
+		# pickle list
+		pickle.dump(list_empty, open(str_filename, 'wb'))
 	# if using logger
 	if logger:
-		logger.warning(f'{len(list_col_keep)} columns to keep for feature selection')
-	# return
-	return list_col_keep
+		logger.warning(f'Completed iterative feature selection after fitting {int_n_models} models.')
+		logger.warning(f'List of features pickled to {str_filename}')
 
-# define function to subset data frames
-def SUBSET_TRAIN_VALID(df_train, df_valid, list_columns, logger=None):
-	# subset train
-	df_train = df_train[list_columns]
-	# subset valid
-	df_valid = df_valid[list_columns]
-	# if using logger
-	if logger:
-		logger.warning(f'Train and validation dfs subset to {len(list_columns)} features')
-	# return
-	return df_train, df_valid
+# define function for feature selection
+def STEPWISE_SENSITIVITY_SELECTION(X_train, y_train, X_valid, y_valid, list_feats_all, str_task_type='GPU',
+	                               str_eval_metric='F1', list_non_numeric=None, list_class_weights=None, 
+	                               int_iterations=10000, int_early_stopping_rounds=1000, str_dirname='./output', 
+	                               int_n_rounds_no_increase=10, bool_skip_bl_sens=False, int_counter_start=0, 
+	                               int_random_state=None, logger=None):
+	# try importng df_feats.csv
+	try:
+		# import as df_empty
+		df_empty = pd.read_csv(f'{str_dirname}/df_feats.csv')
+		# if using logger
+		if logger:
+			logger.warning('df_feats.csv found, importing and continuing analysis...')
+	# if the file is not in the directory
+	except FileNotFoundError:
+		# create a df for which to append
+		df_empty = pd.DataFrame()
+		# if using logger
+		if logger:
+			logger.warning('df_feats.csv not found, creating empty df and continuing analysis...')
+	
+	# instantiate a counter
+	counter = int_counter_start
+	# while True
+	while True:
+		# only if we don't want to skip the first sensititivty analysis
+		if not bool_skip_bl_sens:
+			# -----------------------------------------------------------------------------
+			# SENSITIVITY ANALYSIS
+			# -----------------------------------------------------------------------------
+			# create message
+			str_message = f'Beginning sensitivity analysis {counter+1}'
+			# if using logger
+			if logger:
+				# log it
+				logger.warning(str_message)
+			# print message
+			print(str_message)
 
-# define function to split into X and y
-def SPLIT_TRAIN_VALID_X_Y(df_train, df_valid, str_target='TARGET', logger=None):
-	# train
-	y_train = df_train[str_target]
-	df_train.drop(str_target, axis=1, inplace=True)
-	# valid
-	y_valid = df_valid[str_target]
-	df_valid.drop(str_target, axis=1, inplace=True)
-	# if using logger
-	if logger:
-		logger.warning(f'Split df_train and df_valid into X (features) and y ({str_target})')
-	# return
-	return df_train, y_train, df_valid, y_valid
-
-# define function to get numeric and non-numeric cols
-def GET_NUMERIC_AND_NONNUMERIC(df, list_columns, logger=None):
-	# instantiate empty lists
-	list_numeric = []
-	list_non_numeric = []
-	# iterate through list_columns
-	for col in list_columns:
-		# if its numeric
-		if is_numeric_dtype(df[col]):
-			# append to list_numeric
-			list_numeric.append(col)
+			# iterate through each feature, removing them 1 by 1 and getting f1
+			list_flt_evalmetric_sensitivity = []
+			for a, feat in enumerate(list_feats_all):
+				# print message
+				print(f'Dropping {feat} and fitting model - {a+1}/{len(list_feats_all)}')
+				# copy list
+				list_feats_all_copy = list_feats_all[:]
+				# remove feat
+				list_feats_all_copy.remove(feat)
+				# get the non_numeric features
+				list_non_numeric_copy = GET_NUMERIC_AND_NONNUMERIC(df=X_train, 
+												   				   list_columns=list_feats_all_copy)[1]
+				# fit cb model
+				model = FIT_CATBOOST_MODEL(X_train=X_train[list_feats_all_copy], 
+				                           y_train=y_train, 
+				                           X_valid=X_valid[list_feats_all_copy], 
+				                           y_valid=y_valid, 
+				                           list_non_numeric=list_non_numeric_copy, 
+				                           int_iterations=int_iterations, 
+				                           str_eval_metric=str_eval_metric, 
+				                           int_early_stopping_rounds=int_early_stopping_rounds, 
+				                           str_task_type=str_task_type, 
+				                           bool_classifier=True,
+				                           list_class_weights=list_class_weights,
+				                           int_random_state=int_random_state)
+				# get eval metric
+				flt_evalmetric_sensitivity = f1_score(y_true=y_valid, y_pred=model.predict(X_valid[list_feats_all_copy]))
+				# create dictionary
+				dict_ = {'list_feats': model.feature_names_,
+				         'eval_metric': flt_evalmetric_sensitivity,
+				         'analysis_type': 'sensitivity',
+				         'counter': counter,
+				         'n_feats': len(model.feature_names_),
+				         'model_number': a+1,
+				         'random_state': int_random_state,
+				         'n_iterations': int_iterations,
+				         'n_early_stopping': int_early_stopping_rounds}
+				# append to df_empty
+				df_empty = df_empty.append(dict_, ignore_index=True)
+				# write to csv
+				df_empty.to_csv(f'{str_dirname}/df_feats.csv', index=False)
+				# print message
+				print(f'After dropping {feat}, {str_eval_metric} = {flt_evalmetric_sensitivity:0.4}')
+				# append to list_flt_evalmetric_sensitivity
+				list_flt_evalmetric_sensitivity.append(flt_evalmetric_sensitivity)
+			# put features and eval metric into df_sensitivity
+			df_sensitivity = pd.DataFrame({'feature':list_feats_all,
+			                               'eval_metric':list_flt_evalmetric_sensitivity}).sort_values(by='eval_metric',
+			                                                                                           ascending=True)
+			# save df_sensitivity
+			df_sensitivity.to_csv(f'{str_dirname}/df_sensitivity__{counter+1}.csv', index=False)
 		else:
-			# append to list_non_numeric
-			list_non_numeric.append(col)
-	# if using logger
-	if logger:
-		logger.warning(f'{len(list_numeric)} numeric columns identified, {len(list_non_numeric)} non-numeric columns identified')
-	# return both lists
-	return list_numeric, list_non_numeric
+			# create message
+			str_message = f'Loading sensitivity analysis {counter+1} from file'
+			# print message
+			print(str_message)
+			# if using logger
+			if logger:
+				logger.warning(str_message)
+			# load in df_sensitivity
+			df_sensitivity = pd.read_csv(f'{str_dirname}/df_sensitivity__{counter+1}.csv')
+			# set bool_skip_bl_sens = False so the sensitivity analysis will continue in the next iteration
+			bool_skip_bl_sens = False
 
-# define function for computing list of class weights
-def GET_LIST_CLASS_WEIGHTS(y_train, logger=None):
-	# get list of class weights
-	list_class_weights = list(compute_class_weight(class_weight='balanced', 
-	                                               classes=np.unique(y_train), 
-	                                               y=y_train))
+		# -----------------------------------------------------------------------------
+		# STEPWISE FEATURE SELECTION
+		# -----------------------------------------------------------------------------
+		# create message
+		str_message = f'Beginning stepwise feature selection {counter+1}'
+		# print message
+		print(str_message)
+		# if using logger
+		if logger:
+			logger.warning(str_message)
+		# instantiate empty lists
+		list_feats_stepwise = []
+		list_list_feats_stepwise = []
+		list_flt_evalmetric_stepwise = []
+		# stepwise add each feature 1 by 1 from df_sensitivity
+		for a, feat in enumerate(df_sensitivity['feature']):
+			# print message
+			print(f'Adding {feat} and fitting model {a+1}/{len(df_sensitivity["feature"])}')
+			# append to list_feats_stepwise
+			list_feats_stepwise.append(feat)
 
+			# get the non_numeric features
+			list_non_numeric_copy = GET_NUMERIC_AND_NONNUMERIC(df=X_train, 
+												   			   list_columns=list_feats_stepwise)[1]
+			# fit cb model
+			model = FIT_CATBOOST_MODEL(X_train=X_train[list_feats_stepwise], 
+			                           y_train=y_train, 
+			                           X_valid=X_valid[list_feats_stepwise], 
+			                           y_valid=y_valid, 
+			                           list_non_numeric=list_non_numeric_copy, 
+			                           int_iterations=int_iterations, 
+			                           str_eval_metric=str_eval_metric, 
+			                           int_early_stopping_rounds=int_early_stopping_rounds, 
+			                           str_task_type=str_task_type, 
+			                           bool_classifier=True,
+			                           list_class_weights=list_class_weights,
+			                           int_random_state=int_random_state)
+			# append list of model feats to list_list_feats_stepwise
+			list_list_feats_stepwise.append(model.feature_names_)
+			# get eval metric
+			flt_evalmetric_stepwise = f1_score(y_true=y_valid, y_pred=model.predict(X_valid[list_feats_stepwise]))
+			# create dictionary
+			dict_ = {'list_feats': model.feature_names_,
+			         'eval_metric': flt_evalmetric_stepwise,
+			         'analysis_type': 'stepwise',
+			         'counter': counter,
+			         'n_feats': len(model.feature_names_),
+			         'model_number': a+1,
+			         'random_state': int_random_state,
+			         'n_iterations': int_iterations,
+				     'n_early_stopping': int_early_stopping_rounds}
+			# append to df_empty
+			df_empty = df_empty.append(dict_, ignore_index=True)
+			# write to csv
+			df_empty.to_csv(f'{str_dirname}/df_feats.csv', index=False)
+			# print message
+			print(f'After adding {feat}, {str_eval_metric} = {flt_evalmetric_stepwise:0.4}')
+			# append flt_evalmetric_stepwise to list
+			list_flt_evalmetric_stepwise.append(flt_evalmetric_stepwise)
+
+			# if we are on first iteration
+			if a == 0:
+				# assign flt_evalmetric_stepwise to flt_evalmetric_stepwise_currmax
+				flt_evalmetric_stepwise_currmax = flt_evalmetric_stepwise
+				# set counter_n_rounds_no_increase to 0
+				counter_n_rounds_no_increase = 0
+			# if we are not on first iteration and latest flt_evalmetric_stepwise > flt_evalmetric_stepwise_currmax
+			elif (a > 0) and (flt_evalmetric_stepwise > flt_evalmetric_stepwise_currmax):
+				# assign flt_evalmetric_stepwise to flt_evalmetric_stepwise_currmax
+				flt_evalmetric_stepwise_currmax = flt_evalmetric_stepwise
+				# reset counter_n_rounds_no_increase
+				counter_n_rounds_no_increase = 0
+			# if we are not on the firs iteration and there was no improvemment
+			elif (a > 0) and (flt_evalmetric_stepwise <= flt_evalmetric_stepwise_currmax):
+				# increase counter_n_rounds_no_increase by 1
+				counter_n_rounds_no_increase += 1
+				# print message
+				print(f'No improvement in {counter_n_rounds_no_increase} rounds')
+
+			# if we have gone int_n_rounds_no_increase with no increase
+			if counter_n_rounds_no_increase == int_n_rounds_no_increase:
+				# break inside loop and continue outer loop
+				break
+
+		# put lists into a df
+		df_stepwise = pd.DataFrame({'list_feats':list_list_feats_stepwise,
+		                            'eval_metric':list_flt_evalmetric_stepwise})
+		# create a feature depicting number of items in each list of features
+		df_stepwise['n_feats'] = df_stepwise['list_feats'].apply(lambda x: len(x))
+		# sort by eval metric (decending) and n_feats (ascending)
+		df_stepwise = df_stepwise.sort_values(by=['eval_metric', 'n_feats'], ascending=[False, True])
+		# save df_stepwise
+		df_stepwise.to_csv(f'{str_dirname}/df_stepwise__{counter+1}.csv', index=False)
+		# get best score
+		flt_evalmetric_max_stepwise = df_stepwise['eval_metric'].iloc[0]
+
+		# if we are on the first iteration
+		if counter == 0:
+			# save flt_evalmetric_max_stepwise as our baseline
+			flt_eval_metric_baseline = flt_evalmetric_max_stepwise
+			# create message
+			str_message = f'Baseline {str_eval_metric} established: {flt_eval_metric_baseline:0.4}'
+			# log it
+			logger.warning(str_message)
+			# print it
+			print(str_message)
+			# save best list of features as list_feats_all so loop will continue to sensitivity analysis
+			list_feats_all = df_stepwise['list_feats'].iloc[0]
+		# if we are not on the first iteration and flt_evalmetric_max_stepwise improved from previous round
+		elif (counter > 0) and (flt_evalmetric_max_stepwise > flt_eval_metric_baseline):
+			# save flt_evalmetric_max_stepwise as our baseline
+			flt_eval_metric_baseline = flt_evalmetric_max_stepwise
+			# create message
+			str_message = f'Max {str_eval_metric} from stepwise ({flt_evalmetric_max_stepwise:0.4}) is greater than {str_eval_metric} from baseline ({flt_eval_metric_baseline:0.4}), loop will continue'
+			# print it
+			print(str_message)
+			# if using logger
+			if logger:
+				logger.warning(str_message)
+			# save best list of features as list_feats_all so loop will continue to sensitivity analysis
+			list_feats_all = df_stepwise['list_feats'].iloc[0]
+		# if we are not on the first iteration and flt_evalmetric_max_stepwise did not improve from previous round
+		elif (counter > 0) and (flt_evalmetric_max_stepwise <= flt_eval_metric_baseline):
+			# create message
+			str_message = f'Max {str_eval_metric} from stepwise ({flt_evalmetric_max_stepwise:0.4}) is not greater than PR-AUC from baseline ({flt_eval_metric_baseline:0.4}), loop will not continue'
+			# print it
+			print(str_message)
+			# if using logger
+			if logger:
+				logger.warning(str_message)
+			# end function
+			return df_empty
+		# increase counter by 1 because we are starting another round
+		counter += 1
+	# return
+	return df_empty
+
+# define function to load df_feats.csv and convert string lists to lists
+def LOAD_DF_FEATS(logger=None, str_filename='./output/df_feats.csv'):
+	# load in df_feats
+	df_feats = pd.read_csv(str_filename)
+	# if each list is a string
+	if type(df_feats['list_feats'].iloc[0]) == str:
+		# convert them to lists
+		df_feats['list_feats'] = df_feats['list_feats'].apply(lambda x: ast.literal_eval(x))
 	# if using logger
 	if logger:
 		# log it
-		logger.warning(f'List of class weights {list_class_weights} computed')
+		logger.warning('df_feats.csv loaded to generate plot')
 	# return
-	return list_class_weights
+	return df_feats
+
+# define function for plotting f1 by features
+def PLOT_METRIC_BY_LIST_FEATURES(logger, df_feats, str_evalname='PR-AUC', tpl_figsize=(20,10), str_filename='./output/plt_fwd_prauc.png'):
+	# subset df_feats to only stepwise
+	df_feats = df_feats[df_feats['analysis_type']=='stepwise']
+	# get max eval_metric
+	flt_max_f1 = np.max(df_feats['eval_metric'])  
+	# get number of feats in best model
+	int_n_feats = df_feats[df_feats['eval_metric']==flt_max_f1]['n_feats'].iloc[0]
+	# create axis
+	fig, ax = plt.subplots(figsize=tpl_figsize)
+	# title
+	ax.set_title(f'Highest {str_evalname} ({flt_max_f1:0.4}) using {int_n_feats} features')
+	# x label
+	ax.set_xlabel('Iteration')
+	# y label
+	ax.set_ylabel(str_evalname)
+	# plot
+	ax.plot([str(x) for x in df_feats.index], df_feats['eval_metric'], label='F1')
+	# plot max 
+	ax.plot([str(x) for x in df_feats.index], [flt_max_f1 for x in df_feats.index], linestyle=':', label='Max F1')
+	# remove x tick labels
+	ax.set_xticklabels([])
+	# legend
+	ax.legend()
+	# save plot
+	plt.savefig(str_filename, bbox_inches='tight')
+	# if using logger
+	if logger:
+		# log it
+		logger.warning(f'Plot of {str_evalname} by feature list saved to {str_filename}')
+	# return
+	return fig
+
+# define function for getting list of best features
+def GET_LIST_BEST_FEATURES_FROM_FEATS(df_feats, logger=None, str_filename='./output/list_bestfeats.pkl'):
+	# get number of features in each list
+	df_feats['n_feats'] = df_feats['list_feats'].apply(lambda x: len(x))
+	# sort descending by eval metric and ascending by n_feats
+	df_feats_sorted = df_feats.sort_values(by=['eval_metric','n_feats'], 
+	                                       ascending=[False, True])
+	# get top list
+	list_feats = df_feats_sorted['list_feats'].iloc[0]
+	# make sure it is a list and not a string
+	if type(list_feats) == str:
+		list_feats = ast.literal_eval(list_feats)
+	# pickle the list
+	with open(str_filename, 'wb') as file_out:
+		pickle.dump(list_feats, file_out)
+	# if using logger
+	if logger:
+		# log it
+		logger.warning(f'List of best features pickled to {str_filename}')
+	# return
+	return list_feats
+
+
+
+
+
+
 
 # define pr-AUC custom eval metric
 class PrecisionRecallAUC:
@@ -190,49 +407,3 @@ class PrecisionRecallAUC:
 	def get_final_error(self, error, weight):
 		# return error
 		return error
-
-# define function for iterative feature selection
-def ITERATIVE_FEAT_SELECTION(X_train, y_train, X_valid, y_valid, list_non_numeric, 
-							 list_class_weights, int_n_models=50,
-							 int_iterations=1000, int_early_stopping_rounds=100,
-							 str_eval_metric='F1', int_random_state=42,
-							 str_filename='./output/list_bestfeats.pkl',
-							 logger=None):
-	# instantiate empty list
-	list_empty = []
-	# build n models
-	for a in range(int_n_models):
-		# print message
-		print(f'Fitting model {a+1}/{int_n_models}')
-		# fit model
-		model = fit_catboost_model(X_train=X_train, 
-								   y_train=y_train, 
-					               X_valid=X_valid, 
-					               y_valid=y_valid, 
-					               list_non_numeric=list_non_numeric, 
-					               int_iterations=int_iterations, 
-					               str_eval_metric=str_eval_metric, 
-					               int_early_stopping_rounds=int_early_stopping_rounds, 
-					               str_task_type='GPU', 
-					               bool_classifier=True,
-					               list_class_weights=list_class_weights,
-					               int_random_state=int_random_state)
-		# get model features
-		list_model_features = model.feature_names_
-		# get importance
-		list_feature_importance = list(model.feature_importances_)
-		# put in df
-		df_imp = pd.DataFrame({'feature': list_model_features,
-		                       'importance': list_feature_importance})
-		# subset to > 0
-		list_imp_feats = list(df_imp[df_imp['importance']>0]['feature'])
-		# append new feats to list_empty
-		for feat in list_imp_feats:
-			if feat not in list_empty:
-				list_empty.append(feat)
-		# pickle list
-		pickle.dump(list_empty, open(str_filename, 'wb'))
-	# if using logger
-	if logger:
-		logger.warning(f'Completed iterative feature selection after fitting {int_n_models} models.')
-		logger.warning(f'List of features pickled to {str_filename}')

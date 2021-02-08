@@ -7,8 +7,10 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from ast import literal_eval
 from itertools import chain
-from sklearn.metrics import (precision_recall_curve, auc,
-	                         roc_auc_score, roc_curve, f1_score)
+from sklearn.metrics import roc_auc_score, roc_curve
+from sklearn.metrics import (accuracy_score, fowlkes_mallows_score, precision_score,
+                             recall_score, f1_score, roc_auc_score, average_precision_score,
+                             log_loss, brier_score_loss)
 
 # define function to get binary eval metrics
 def BIN_CLASS_EVAL_METRICS(model_classifier, X, y, logger=None):

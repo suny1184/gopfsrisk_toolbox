@@ -1,71 +1,10 @@
-# functions
-import logging
-import os
-import pickle
+# final model
 import pandas as pd
-import numpy as np
-from sklearn.utils.class_weight import compute_class_weight
-from pandas.api.types import is_numeric_dtype
+from .algorithms import FIT_CATBOOST_MODEL
+import pickle
 from sklearn.metrics import f1_score, average_precision_score, precision_score, recall_score
-from prestige.algorithms import fit_catboost_model
 import matplotlib.pyplot as plt
-
-# define function for logging
-def LOG_EVENTS(str_filename='./logs/db_pull.log'):
-	# set logging format
-	FORMAT = '%(name)s:%(levelname)s:%(asctime)s:%(message)s'
-	# get logger
-	logger = logging.getLogger(__name__)
-	# try making log
-	try:
-		# reset any other logs
-		handler = logging.FileHandler(str_filename, mode='w')
-	except FileNotFoundError:
-		os.mkdir('./logs')
-		# reset any other logs
-		handler = logging.FileHandler(str_filename, mode='w')
-	# change to append
-	handler = logging.FileHandler(str_filename, mode='a')
-	# set the level to info
-	handler.setLevel(logging.INFO)
-	# set format
-	formatter = logging.Formatter(FORMAT)
-	# format the handler
-	handler.setFormatter(formatter)
-	# add handler
-	logger.addHandler(handler)
-	# return logger
-	return logger
-
-# define function for splitting into X and y
-def X_Y_SPLIT(df_train, df_valid, df_test, logger=None, str_targetname='TARGET__app'):
-	# train
-	y_train = df_train[str_targetname]
-	del df_train[str_targetname]
-	# valid
-	y_valid = df_valid[str_targetname]
-	del df_valid[str_targetname]
-	# test
-	y_test = df_test[str_targetname]
-	del df_test[str_targetname]
-	# if using logger
-	if logger:
-		# log it
-		logger.warning('Train, valid, and test dfs split into X and y')
-	# return
-	return df_train, y_train, df_valid, y_valid, df_test, y_test
-
-# define function for loading list of best features
-def GET_LIST_OF_BEST_FEATURES(logger=None, str_filename='../09_fitting_models/aaron/output/list_bestfeats.pkl'):
-	# load in list of features
-	with open(str_filename, 'rb') as file_in:
-		list_features = pickle.load(file_in)
-	# if using logger
-	if logger:
-		# log it
-		logger.warning(f'List of features loaded from {str_filename}')
-	# return
-	return list_features
+import numpy as np
 
 # define function for combining train and valid
 def COMBINE_TRAIN_AND_VALID(X_train, X_valid, y_train, y_valid, logger=None):
@@ -78,40 +17,6 @@ def COMBINE_TRAIN_AND_VALID(X_train, X_valid, y_train, y_valid, logger=None):
 		logger.warning('Training and validation data combined')
 	# return
 	return X_train, y_train
-
-# define function for computing list of class weights
-def GET_LIST_CLASS_WEIGHTS(y_train, logger=None):
-	# get list of class weights
-	list_class_weights = list(compute_class_weight(class_weight='balanced', 
-	                                               classes=np.unique(y_train), 
-	                                               y=y_train))
-
-	# if using logger
-	if logger:
-		# log it
-		logger.warning('List of class weights computed')
-	# return
-	return list_class_weights
-
-# define function to get numeric and non-numeric cols
-def GET_NUMERIC_AND_NONNUMERIC(df, list_columns, logger=None):
-	# instantiate empty lists
-	list_numeric = []
-	list_non_numeric = []
-	# iterate through list_columns
-	for col in list_columns:
-		# if its numeric
-		if is_numeric_dtype(df[col]):
-			# append to list_numeric
-			list_numeric.append(col)
-		else:
-			# append to list_non_numeric
-			list_non_numeric.append(col)
-	# if using logger
-	if logger:
-		logger.warning(f'{len(list_numeric)} numeric columns identified, {len(list_non_numeric)} non-numeric columns identified')
-	# return both lists
-	return list_numeric, list_non_numeric
 
 # define function to fit models iterating through random state
 def ITERATIVE_MODEL_FITTING(X_train, y_train, X_valid, y_valid, list_class_weights, list_feats, list_non_numeric, 
@@ -140,7 +45,7 @@ def ITERATIVE_MODEL_FITTING(X_train, y_train, X_valid, y_valid, list_class_weigh
 		# print message
 		print(f'Fitting model {int_random_state+1}/{int_n_randstate}')
 		# fit cb model
-		model = fit_catboost_model(X_train=X_train[list_feats], 
+		model = FIT_CATBOOST_MODEL(X_train=X_train[list_feats], 
 		                           y_train=y_train, 
 		                           X_valid=X_valid[list_feats], 
 		                           y_valid=y_valid, 
