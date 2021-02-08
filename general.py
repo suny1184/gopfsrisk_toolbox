@@ -4,6 +4,7 @@ import time
 import pandas as pd
 import pickle
 from pandas.api.types import is_numeric_dtype
+import json
 
 # define function for logging
 def LOG_EVENTS(str_filename='./logs/db_pull.log'):
@@ -105,3 +106,25 @@ def PICKLE_TO_FILE(item_to_pickle, str_filename='./output/transformer.pkl', logg
 	if logger:
 		# log it
 		logger.warning(f'Pickled {item_to_pickle.__class__.__name__} to {str_filename}')
+
+# write dictionary to text
+def DICT_TO_TEXT(dict_, str_filename='./output/dict_evalmetrics.txt', logger=None):
+	# write dictionary to text
+	with open(str_filename, 'w') as file:
+		file.write(json.dumps(dict_))
+	# if using logger
+	if logger:
+		logger.warning(f'Wrote dictionary to {str_filename}')
+
+# define function for computing list of class weights
+def GET_LIST_CLASS_WEIGHTS(y_train, logger=None):
+	# get list of class weights
+	list_class_weights = list(compute_class_weight(class_weight='balanced', 
+	                                               classes=np.unique(y_train), 
+	                                               y=y_train))
+	# if using logger
+	if logger:
+		# log it
+		logger.warning('List of class weights computed')
+	# return
+	return list_class_weights

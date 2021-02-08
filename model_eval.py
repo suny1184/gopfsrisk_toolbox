@@ -10,32 +10,71 @@ from itertools import chain
 from sklearn.metrics import (precision_recall_curve, auc,
 	                         roc_auc_score, roc_curve, f1_score)
 
-# define function for logging
-def LOG_EVENTS(str_filename='./logs/db_pull.log'):
-	# set logging format
-	FORMAT = '%(name)s:%(levelname)s:%(asctime)s:%(message)s'
-	# get logger
-	logger = logging.getLogger(__name__)
-	# try making log
+# define function to get binary eval metrics
+def BIN_CLASS_EVAL_METRICS(model_classifier, X, y, logger=None):
+	# generate predicted class
+	y_hat_class = model_classifier.predict(X)
+	# generate predicted probabilities
+	y_hat_proba = model_classifier.predict_proba(X)[:,1]
+	# metrics
+	# accuracy
+	accuracy = accuracy_score(y_true=y, y_pred=y_hat_class)
+	# geometric mean
+	geometric_mean = fowlkes_mallows_score(labels_true=y, labels_pred=y_hat_class)
+	# precision
+	precision = precision_score(y_true=y, y_pred=y_hat_class)
+	# recall
+	recall = recall_score(y_true=y, y_pred=y_hat_class)
+	# f1
+	f1 = f1_score(y_true=y, y_pred=y_hat_class)
+	# roc auc
+	roc_auc = roc_auc_score(y_true=y, y_score=y_hat_proba)
+	# precision recall auc
+	pr_auc = average_precision_score(y_true=y, y_score=y_hat_proba)
+	# log loss
+	log_loss_ = log_loss(y_true=y, y_pred=y_hat_proba)
+	# brier 
+	brier = brier_score_loss(y_true=y, y_prob=y_hat_proba)
+	# put into dictionary
+	dict_ = {'accuracy': accuracy,
+	         'geometric_mean': geometric_mean,
+	         'precision': precision,
+	         'recall': recall,
+	         'f1': f1,
+	         'roc_auc': roc_auc,
+	         'pr_auc': pr_auc,
+	         'log_loss': log_loss_,
+	         'brier': brier}
+	# if using logger
+	if logger:
+		logger.warning('Dictionary of binary eval metrics generated')
+	# return dict_
+	return dict_
+
+# define function to get feat imp
+def SAVE_FEAT_IMP(model, str_filename='./output/df_featimp.csv', logger=None):
+	# get model features
+	list_model_features = model.feature_names_
+	# get importance
+	list_feature_importance = list(model.feature_importances_)
+	# put in df
+	df_imp = pd.DataFrame({'feature': list_model_features,
+	                       'importance': list_feature_importance})
+	# sort descending
+	df_imp.sort_values(by='importance', ascending=False, inplace=True)
+	# try saving it
 	try:
-		# reset any other logs
-		handler = logging.FileHandler(str_filename, mode='w')
+		# save it
+		df_imp.to_csv(str_filename, index=False)
 	except FileNotFoundError:
-		os.mkdir('./logs')
-		# reset any other logs
-		handler = logging.FileHandler(str_filename, mode='w')
-	# change to append
-	handler = logging.FileHandler(str_filename, mode='a')
-	# set the level to info
-	handler.setLevel(logging.INFO)
-	# set format
-	formatter = logging.Formatter(FORMAT)
-	# format the handler
-	handler.setFormatter(formatter)
-	# add handler
-	logger.addHandler(handler)
-	# return logger
-	return logger
+		# make output directory
+		os.mkdir('./output')
+		# save it
+		df_imp.to_csv(str_filename, index=False)
+	# if using logger
+	if logger:
+		# log it
+		logger.warning(f'Feature importance saved to {str_filename}')
 
 # define function for splitting into X and y
 def X_Y_SPLIT(df_train, df_valid, df_test, logger=None, str_targetname='TARGET__app'):
@@ -67,32 +106,7 @@ def COMBINE_TRAIN_AND_VALID(X_train, X_valid, y_train, y_valid, logger=None):
 	# return
 	return X_train, y_train
 
-# define function to get feat imp
-def GET_FEAT_IMP(model, str_filename='./output/df_featimp.csv', logger=None):
-	# get model features
-	list_model_features = model.feature_names_
-	# get importance
-	list_feature_importance = list(model.feature_importances_)
-	# put in df
-	df_imp = pd.DataFrame({'feature': list_model_features,
-	                       'importance': list_feature_importance})
-	# sort descending
-	df_imp.sort_values(by='importance', ascending=False, inplace=True)
-	# try saving it
-	try:
-		# save it
-		df_imp.to_csv(str_filename, index=False)
-	except FileNotFoundError:
-		# make output directory
-		os.mkdir('./output')
-		# save it
-		df_imp.to_csv(str_filename, index=False)
-	# if using logger
-	if logger:
-		# log it
-		logger.warning(f'Feature importance saved to {str_filename}')
-	# return
-	return df_imp
+
 
 # define function for PR Curve
 def PR_CURVE(y_true, y_hat_prob, y_hat_class, tpl_figsize=(10,10), logger=None, str_filename='./output/plt_prcurve.png'):
