@@ -1,10 +1,12 @@
-# functions
+# general
 import logging
 import time
 import pandas as pd
 import pickle
 from pandas.api.types import is_numeric_dtype
 import json
+from sklearn.utils.class_weight import compute_class_weight
+import numpy as np
 
 # define function for logging
 def LOG_EVENTS(str_filename='./logs/db_pull.log'):
