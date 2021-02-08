@@ -1,5 +1,4 @@
 # functions
-import logging
 import os
 import pandas as pd
 from pandas.api.types import is_numeric_dtype
@@ -7,33 +6,7 @@ import pickle
 import time
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
-
-# define function for logging
-def LOG_EVENTS(str_filename='./logs/db_pull.log'):
-	# set logging format
-	FORMAT = '%(name)s:%(levelname)s:%(asctime)s:%(message)s'
-	# get logger
-	logger = logging.getLogger(__name__)
-	# try making log
-	try:
-		# reset any other logs
-		handler = logging.FileHandler(str_filename, mode='w')
-	except FileNotFoundError:
-		os.mkdir('./logs')
-		# reset any other logs
-		handler = logging.FileHandler(str_filename, mode='w')
-	# change to append
-	handler = logging.FileHandler(str_filename, mode='a')
-	# set the level to info
-	handler.setLevel(logging.INFO)
-	# set format
-	formatter = logging.Formatter(FORMAT)
-	# format the handler
-	handler.setFormatter(formatter)
-	# add handler
-	logger.addHandler(handler)
-	# return logger
-	return logger
+import seaborn as sns
 
 # define function to read csv
 def CSV_TO_DF(logger=None, str_filename='../output_data/df_raw.csv', list_usecols=None, list_parse_dates=None):
@@ -49,13 +22,28 @@ def CSV_TO_DF(logger=None, str_filename='../output_data/df_raw.csv', list_usecol
 	return df
 
 # define function to log df info
-def LOG_DF_INFO(df, str_dflogname='df_train', str_datecol='dtmStampCreation__app', str_bin_target='TARGET__app', logger=None):
+def LOG_DF_INFO(df, str_dflogname='df_train', str_datecol='dtmStampCreation__app', str_bin_target='TARGET__app', 
+	            logger=None, bool_low_memory=True):
 	# get rows
 	int_nrows = df.shape[0]
 	# get columns
 	int_ncols = df.shape[1]
-	# get proportion NaN
-	flt_prop_nan = np.sum(df.isnull().sum())/(int_nrows*int_ncols)
+	# logic
+	if bool_low_memory:
+		int_n_missing_all = 0
+		# iterate through cols
+		for a, col in enumerate(df.columns):
+			# print message
+			print(f'Checking NaN: {a+1}/{int_ncols}')
+			# get number missing per col
+			int_n_missing_col = df[col].isnull().sum()
+			# add to int_n_missing_all
+			int_n_missing_all += int_n_missing_col
+		# get proportion NaN
+		flt_prop_nan = int_n_missing_all/(int_nrows*int_ncols)
+	else:
+		# get proportion NaN
+		flt_prop_nan = np.sum(df.isnull().sum())/(int_nrows*int_ncols)
 	# get min str_datecol
 	min_ = np.min(df[str_datecol])
 	# get max dtmstampCreation__app
@@ -69,6 +57,124 @@ def LOG_DF_INFO(df, str_dflogname='df_train', str_datecol='dtmStampCreation__app
 		logger.warning(f'{str_dflogname}: Min {str_datecol} = {min_}')
 		logger.warning(f'{str_dflogname}: Max {str_datecol} = {max_}')
 		logger.warning(f'{str_dflogname}: Target Proportion = {flt_prop_delinquent:0.4}')
+
+# define function to save proportion NaN by column
+def SAVE_NAN_BY_COL(df, str_filename='./output/df_propna.csv', logger=None, bool_low_memory=True):
+	# logic
+	if bool_low_memory:
+		# empty list
+		list_empty = []
+		# iterate through cols
+		for a, col in enumerate(df.columns):
+			# print message
+			print(f'Checking NaN: {a+1}/{df.shape[1]}')
+			# get prop missing
+			flt_prop_nan = df[col].isnull().sum()/len(df[col])
+			# create dict
+			dict_ = {'column': col,
+			         'prop_nan': flt_prop_nan}
+			# append to list_empty
+			list_empty.append(dict_)
+		# make df
+		df = pd.DataFrame(list_empty)
+	else:
+		# get proportion missing by col
+		ser_propna = df.isnull().sum()/df.shape[0]
+		# put into df
+		df = pd.DataFrame({'column': ser_propna.index,
+	                       'prop_nan': ser_propna})
+	# sort
+	df.sort_values(by='prop_nan', ascending=False, inplace=True)
+	# save to csv
+	df.to_csv(str_filename, index=False)
+	# if using logger
+	if logger:
+		logger.warning(f'csv file of proportion NaN by column generated and saved to {str_filename}')
+
+# define function to convert date col to datetime and sort
+def SORT_DF(df, str_colname='dtmStmpCreation__app', logger=None, bool_dropcol=False):
+	# get series of str_colname
+	ser_ = df[str_colname]
+	# sort ascending
+	ser_sorted = ser_.sort_values(ascending=True)
+	# get the index as a list
+	list_ser_sorted_index = list(ser_sorted.index)
+	# order df
+	df = df.reindex(list_ser_sorted_index)
+	# if dropping str_colname
+	if bool_dropcol:
+		# drop str_colname
+		del df[str_colname]
+	# if using a logger
+	if logger:
+		# log it
+		logger.warning(f'df sorted ascending by {str_colname}.')
+	# return df
+	return df
+
+# define function to get training only
+def CHRON_GET_TRAIN(df, flt_prop_train=0.5, logger=None):
+	# get n_rows in df
+	n_rows_df = df.shape[0]
+	# get last row in df_train
+	n_row_end_train = math.floor(n_rows_df * flt_prop_train)
+	# get training data
+	df = df.iloc[:n_row_end_train, :]
+	# if using logger
+	if logger:
+		# log it
+		logger.warning(f'Subset df to first {flt_prop_train} rows for training')
+	# return
+	return df
+
+# define class to find/drop features with 100% NaN
+class DropAllNaN(BaseEstimator, TransformerMixin):
+	# initialize
+	def __init__(self, list_cols, bool_low_memory=True):
+		self.list_cols = list_cols
+		self.bool_low_memory = bool_low_memory
+	# fit
+	def fit(self, X, y=None):
+		# logic
+		if self.bool_low_memory:
+			# empty list
+			list_cols_allnan = []
+			# iterate through cols
+			for a, col in enumerate(X[self.list_cols]):
+				# print message
+				print(f'Checking NaN: {a+1}/{len(self.list_cols)}')
+				# get proportion nan
+				flt_prop_nan = X[col].isnull().sum()/X.shape[0]
+				# logic
+				if flt_prop_nan == 1:
+					# append to list
+					list_cols_allnan.append(flt_prop_nan)
+		else:
+			# get proportion missing per column
+			ser_propna = X[self.list_cols].isnull().sum()/X.shape[0]
+			# subset to 1.0
+			list_cols_allnan = list(ser_propna[ser_propna==1.0].index)
+		# save into object
+		self.list_cols_allnan = list_cols_allnan
+		# return object
+		return self
+	# transform
+	def transform(self, X):
+		# drop features
+		for col in self.list_cols_allnan:
+			del X[col]
+			# print message
+			print(f'Dropped {col}')
+
+# define function to log df shape
+def LOG_DF_SHAPE(df, logger=None):
+	# get rows
+	int_nrows = df.shape[0]
+	# get columns
+	int_ncols = df.shape[1]
+	# if logging
+	if logger:
+		logger.warning(f'df: {int_nrows} rows, {int_ncols} columns')
 
 # define DropNoVariance
 class DropNoVariance(BaseEstimator, TransformerMixin):
@@ -87,15 +193,14 @@ class DropNoVariance(BaseEstimator, TransformerMixin):
 				# print message
 				print(f'Checking col {a+1}/{len(self.list_cols)}')
 				# get number of unique
-				n_unique = len(set(X[col]))
+				n_unique = len(pd.value_counts(X[col]))
 				# logic to identify no variance cols
 				if n_unique == 1:
 					list_novar.append(col)
 		else:
 			# define helper function
 			def GET_NUNIQUE(ser_):
-				n_unique = len(set(ser_))
-				#n_unique = len(pd.value_counts(ser_))
+				n_unique = len(pd.value_counts(ser_))
 				return n_unique
 			# apply function to every column
 			ser_nunique = X[self.list_cols].apply(lambda x: GET_NUNIQUE(ser_=x), axis=0)
@@ -112,8 +217,6 @@ class DropNoVariance(BaseEstimator, TransformerMixin):
 			del X[col]
 			# print message
 			print(f'Dropped {col}')
-		# return X
-		return X
 
 # define class
 class DropRedundantFeatures(BaseEstimator, TransformerMixin):
@@ -196,7 +299,7 @@ class DistributionAnalysis:
 		else:
 			self.df_test_sub = X.sample(n=self.int_nrows, random_state=self.int_random_state)
 	# compare each col
-	def compare_columns(self, flt_thresh_upper=0.95):
+	def compare_columns(self, flt_thresh_upper=0.95, tpl_figsize=(10,10), str_dirname='./output/distplots'):
 		# iterate through cols
 		list_sig_diff = []
 		for a, col in enumerate(self.list_cols):
@@ -217,6 +320,18 @@ class DistributionAnalysis:
 				print(f'Significant difference in {col} between train and valid')
 				# append to list
 				list_sig_diff.append(col)
+				# make dustribution plot
+				fig, ax = plt.subplots(figsize=tpl_figsize)
+				# title
+				ax.set_title(f'{col}')
+				# plot train
+				sns.distplot(df_col['train'], kde=True, color="r", ax=ax)
+				# plot valid
+				sns.distplot(df_col['valid'], kde=True, color="g", ax=ax)
+				# plot test
+				sns.distplot(df_col['test'], kde=True, color="b", ax=ax)
+				# save plot
+				plt.savefig(f'{str_dirname}/{col}.png', bbox_inches='tight')
 				# move to next col
 				continue
 			else:
@@ -287,77 +402,3 @@ def PICKLE_TO_FILE(item_to_pickle, str_filename='./output/transformer.pkl', logg
 	if logger:
 		# log it
 		logger.warning(f'Pickled {item_to_pickle.__class__.__name__} to {str_filename}')
-
-
-"""
-# define class for getting medians
-class GetMedians:
-	# initialize class
-	def __init__(self, list_cols):
-		self.list_cols = list_cols
-		self.list_df_medians = []
-	# calculate medians
-	def calculate_medians(self, X):
-		# create series of medians
-		ser_medians = X[self.list_cols].apply(lambda x: np.median(x), axis=0)
-		# save to object
-		self.ser_medians = ser_medians
-		# return self
-		return self
-	# create a df
-	def create_df(self, str_colname='mdn_train'):
-		# create df
-		df_medians = pd.DataFrame(self.ser_medians, columns=[str_colname])
-		# save to object
-		self.df_medians = df_medians
-		# return self
-		return self
-	# append to list of dfs
-	def append_df_to_list(self):
-		# append to list
-		self.list_df_medians.append(self.df_medians)
-		# return self
-		return self
-	# concatenate dfs
-	def concatenate_dfs(self):
-		# concatenate dfs by index
-		df_medians = pd.concat(self.list_df_medians, axis=1)
-		# create feature col from index and reset index
-		df_medians = df_medians.rename_axis('feature').reset_index()
-		# save to object
-		self.df_medians = df_medians
-		# return self
-		return self
-	# write to csv
-	def write_to_csv(self, str_filename='./output/df_medians.csv'):
-		# write to csv
-		self.df_medians.to_csv(str_filename, index=False)
-"""
-
-"""
-# define function to plot 
-def DISTPLOTS(df, tpl_figsize=(10,10), logger=None, str_dirname='./output/distplots'):
-	# convert df to list of dictionaries
-	list_dict_df = df.to_dict(orient='records')
-	# iterate through list_dict_df
-	for a, dict_ in enumerate(list_dict_df):
-		# print message
-		print(f'Generating plot {a+1}/{len(list_dict_df)}')
-		# create canvas
-		fig, ax = plt.subplots(figsize=tpl_figsize)
-		# title
-		ax.set_title(f'Medians for {dict_["feature"]}')
-		# x axis
-		ax.set_xlabel('Data Set: Train-Valid-Test')
-		# y label
-		ax.set_ylabel('Median')
-		# generate plot
-		ax.bar(['Train', 'Valid', 'Test'], [dict_['mdn_train'], dict_['mdn_valid'], dict_['mdn_test']])
-		# save fig
-		plt.savefig(f'{str_dirname}/{dict_["feature"]}', bbox_inches='tight')
-		# close plot
-		plt.close()
-		# if using logger
-		if logger:
-			logger.warning(f'Distribution plots generated and saved to {str_dirname}')
-"""
