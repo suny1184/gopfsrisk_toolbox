@@ -10,95 +10,6 @@ from pandas.api.types import is_numeric_dtype
 import pickle
 import math
 
-# define function for logging
-def LOG_EVENTS(str_filename='./logs/db_pull.log'):
-	# set logging format
-	FORMAT = '%(name)s:%(levelname)s:%(asctime)s:%(message)s'
-	# get logger
-	logger = logging.getLogger(__name__)
-	# try making log
-	try:
-		# reset any other logs
-		handler = logging.FileHandler(str_filename, mode='w')
-	except FileNotFoundError:
-		os.mkdir('./logs')
-		# reset any other logs
-		handler = logging.FileHandler(str_filename, mode='w')
-	# change to append
-	handler = logging.FileHandler(str_filename, mode='a')
-	# set the level to info
-	handler.setLevel(logging.INFO)
-	# set format
-	formatter = logging.Formatter(FORMAT)
-	# format the handler
-	handler.setFormatter(formatter)
-	# add handler
-	logger.addHandler(handler)
-	# return logger
-	return logger
-
-# define function for loadin#g from pickle
-def LOAD_FROM_PICKLE(logger=None, str_filename='../06_preprocessing/output/dict_imputations.pkl'):
-	# import pickled_file
-	with open(str_filename, 'rb') as f:
-		pickled_file = pickle.load(f)
-	# if using logger
-	if logger:
-		# log it
-		logger.warning(f'Imported file from {str_filename}')
-	# return
-	return pickled_file
-
-# define function to read csv
-def CSV_TO_DF(logger=None, str_filename='../output_data/df_raw.csv', list_usecols=None, list_parse_dates=None):
-	# start timer
-	time_start = time.perf_counter()
-	# read json file
-	df = pd.read_csv(str_filename, parse_dates=list_parse_dates, usecols=list_usecols)
-	# if we are using a logger
-	if logger:
-		# log it
-		logger.warning(f'Data imported from {str_filename} in {(time.perf_counter()-time_start)/60:0.4} min.')
-	# return
-	return df
-
-# define function to convert true/false columns to 1 0
-def CONVERT_BOOL_TO_BINARY(df, str_datecol='dtmStampCreation__app', logger=None):
-	# save str_datecol as a list
-	list_ = list(df[str_datecol])
-	# drop str_datecol
-	del df[str_datecol]
-	# multiply df by 1
-	df = df * 1
-	# put list_ into df
-	df[str_datecol] = list_
-	# if using logger
-	if logger:
-		logger.warning('True and False converted into 1 and 0, respectively')
-	# return df
-	return df
-
-# define function to convert date col to datetime and sort
-def SORT_DF(df, str_colname='dtmStmpCreation__app', logger=None, bool_dropcol=False):
-	# get series of str_colname
-	ser_ = df[str_colname]
-	# sort ascending
-	ser_sorted = ser_.sort_values(ascending=True)
-	# get the index as a list
-	list_ser_sorted_index = list(ser_sorted.index)
-	# order df
-	df = df.reindex(list_ser_sorted_index)
-	# if dropping str_colname
-	if bool_dropcol:
-		# drop str_colname
-		del df[str_colname]
-	# if using a logger
-	if logger:
-		# log it
-		logger.warning(f'df sorted ascending by {str_colname}.')
-	# return df
-	return df
-
 # define function for chronological split
 def CHRON_TRAIN_VALID_TEST_SPLIT(df, flt_prop_train=0.5, flt_prop_valid=0.25, logger=None):
 	# get n_rows in df
@@ -120,19 +31,21 @@ def CHRON_TRAIN_VALID_TEST_SPLIT(df, flt_prop_train=0.5, flt_prop_valid=0.25, lo
 	# return
 	return df_train, df_valid, df_test
 
-# define function to log df info
-def LOG_DF_INFO(df, logger=None):
-	# get rows
-	int_nrows = df.shape[0]
-	# get columns
-	int_ncols = df.shape[1]
-	# get min dtmStampCreation__app
-	min_ = np.min(df['dtmStampCreation__app'])
-	# get max dtmstampCreation__app
-	max_ = np.max(df['dtmStampCreation__app'])
-	# if logging
+# define function to convert true/false columns to 1 0
+def CONVERT_BOOL_TO_BINARY(df, str_datecol='dtmStampCreation__app', logger=None):
+	# save str_datecol as a list
+	list_ = list(df[str_datecol])
+	# drop str_datecol
+	del df[str_datecol]
+	# multiply df by 1
+	df = df * 1
+	# put list_ into df
+	df[str_datecol] = list_
+	# if using logger
 	if logger:
-		logger.warning(f'df: {int_nrows} rows, {int_ncols} columns, min dtmStampCreation__app {min_}, max dtmStampCreation__app {max_}')
+		logger.warning('True and False converted into 1 and 0, respectively')
+	# return df
+	return df
 
 # define function to get list of cols with threshold nan
 def GET_LIST_THRESHOLD_NAN(df, flt_threshold=0.5, logger=None):
@@ -169,15 +82,6 @@ class Binaritizer(BaseEstimator, TransformerMixin):
 		X_bin.index = X.index
 		# concatenate and return
 		return pd.concat([X, X_bin], axis=1, sort=False)
-
-# define function for writing to pickle
-def PICKLE_TO_FILE(item_to_pickle, str_filename='./output/transformer.pkl', logger=None):
-	# pickle file
-	pickle.dump(item_to_pickle, open(str_filename, 'wb'))
-	# if using logger
-	if logger:
-		# log it
-		logger.warning(f'Pickled {item_to_pickle.__class__.__name__} to {str_filename}')
 
 # define function to get list of non-numeric rvlr cols
 def GET_NONNUMERIC_RVLR_COLS(df, logger=None):
@@ -233,26 +137,6 @@ def PROP_RTI(df, list_str_rti_rvlr_col, bool_drop_col=True, logger=None):
 				logger.warning(f'{col} has been dropped from df.')
 	# return df
 	return df
-
-# define function to get numeric and non-numeric cols
-def GET_NUMERIC_AND_NONNUMERIC(df, list_columns, logger=None):
-	# instantiate empty lists
-	list_numeric = []
-	list_non_numeric = []
-	# iterate through list_columns
-	for col in list_columns:
-		# if its numeric
-		if is_numeric_dtype(df[col]):
-			# append to list_numeric
-			list_numeric.append(col)
-		else:
-			# append to list_non_numeric
-			list_non_numeric.append(col)
-	# if using logger
-	if logger:
-		logger.warning(f'{len(list_numeric)} numeric columns identified, {len(list_non_numeric)} non-numeric columns identified')
-	# return both lists
-	return list_numeric, list_non_numeric
 
 # create median imputer
 class ImputerNumeric(BaseEstimator, TransformerMixin):

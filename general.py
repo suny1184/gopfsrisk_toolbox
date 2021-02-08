@@ -32,6 +32,17 @@ def LOG_EVENTS(str_filename='./logs/db_pull.log'):
 	# return logger
 	return logger
 
+# define function for loadin#g from pickle
+def LOAD_FROM_PICKLE(logger=None, str_filename='../06_preprocessing/output/dict_imputations.pkl'):
+	# get file
+	pickled_file = pickle.load(open(str_filename, 'rb'))
+	# if using logger
+	if logger:
+		# log it
+		logger.warning(f'Imported file from {str_filename}')
+	# return
+	return pickled_file
+
 # define function to read csv
 def CSV_TO_DF(logger=None, str_filename='../output_data/df_raw.csv', list_usecols=None, list_parse_dates=None):
 	# start timer
