@@ -13,7 +13,9 @@ Directions:
 4. Install all requirements:
 - ```pip install -r requirements.txt```
 5. Add/adjust functions as needed throughout project (*Important*: **DO NOT DELETE** any functions!)
-6. At the conclusion of the project, increase version (above) by 0.0.1
+6. At the conclusion of the project:
+- Regenerate new ```requirements.txt``` using ```pipreqs --force``` as a command in the terminal of the root directory
+- Increase version (above) by 0.0.1
 7. Push changes to the remote repo (*Note*: pushing changes **SHOULD BE DONE FREQUENTLY** throughout project):
 - ```git pull```
 - ```git status```
