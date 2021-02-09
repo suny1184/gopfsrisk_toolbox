@@ -7,10 +7,13 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from ast import literal_eval
 from itertools import chain
-from sklearn.metrics import roc_auc_score, roc_curve
 from sklearn.metrics import (accuracy_score, fowlkes_mallows_score, precision_score,
                              recall_score, f1_score, roc_auc_score, average_precision_score,
-                             log_loss, brier_score_loss)
+                             log_loss, brier_score_loss, precision_recall_curve, auc,
+	                         roc_auc_score, roc_curve)
+from .general import GET_NUMERIC_AND_NONNUMERIC
+from scipy.stats import zscore
+
 
 # define function to get binary eval metrics
 def BIN_CLASS_EVAL_METRICS(model_classifier, X, y, logger=None):
@@ -266,3 +269,56 @@ def SENSITIVITY_PLOT(df_feats, str_eval_metric='PR-AUC', str_filename='./output/
 		logger.warning(f'Sensitivity analysis plot saved to {str_filename}')
 	# return
 	return fig
+
+# define function for pd plots
+def PARTIAL_DEPENDENCE_PLOTS(model, X_train, y_train, list_cols, tpl_figsize=(15,10), 
+	                         str_dirname='./output/pd_plots', logger=None):
+	# generate predicted probabilities
+	y_hat_train = model.predict_proba(X_train)[:,1]
+	# create dataframe
+	X_train['predicted'] = y_hat_train
+	X_train['actual'] = y_train
+	# generate plots
+	for a, col in enumerate(list_cols):
+		# print meessage
+		print(f'Creating plot {a+1}/{len(list_cols)}')
+		# group df
+		X_train_grouped = X_train.groupby(by=col, as_index=False).agg({'predicted': 'mean',
+	                                                                   'actual': 'mean'})
+		# sort
+		X_train_grouped = X_train_grouped.sort_values(by=col, ascending=True)
+		# make z score col name
+		str_z_col = '{0}_z'.format(col)
+		# get z score
+		X_train_grouped[str_z_col] = zscore(X_train_grouped[col])
+		# subset to only those with z >= 3 and <= -3 (i.e., remove outliers)
+		X_train_grouped = X_train_grouped[(X_train_grouped[str_z_col] < 3) & (X_train_grouped[str_z_col] > -3)]
+		# calculate trendlines
+		# predicted
+		z_pred = np.polyfit(X_train_grouped[col], X_train_grouped['predicted'], 1)
+		p_pred = np.poly1d(z_pred)
+		# actual
+		z_act = np.polyfit(X_train_grouped[col], X_train_grouped['actual'], 1)
+		p_act = np.poly1d(z_act)
+		# create ax
+		fig, ax = plt.subplots(figsize=tpl_figsize)
+		# plot trendline
+		# predicted
+		ax.plot(X_train_grouped[col], p_pred(X_train_grouped[col]), color='green', label='Trend - Predicted')
+		# actual
+		ax.plot(X_train_grouped[col], p_act(X_train_grouped[col]), color='orange', label='Trend - Actual')
+		# plot it
+		ax.set_title(col)
+		# predicted
+		ax.plot(X_train_grouped[col], X_train_grouped['predicted'], color='blue', label='Predicted')
+		# actual
+		ax.plot(X_train_grouped[col], X_train_grouped['actual'], color='red', linestyle=':', label='Actual')
+		# legend
+		ax.legend(loc='upper right')
+		# save fig
+		plt.savefig(f'{str_dirname}/{col}.png', bbox_inches='tight')
+		# close plot
+		plt.close()
+	# if logging
+	if logger:
+		logger.warning(f'{len(list_cols)} partial dependence plots generate and saved to {str_dirname}')
