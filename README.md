@@ -2,7 +2,7 @@
 
 v.1.0.0
 
-Purpose: Centralize functions.
+Purpose: Centralize functions. Use/adapt functions to create **efficient**, **versitile**, **transparent**, **dynamic**, **documented** scripts.
 
 How to use: 
 
