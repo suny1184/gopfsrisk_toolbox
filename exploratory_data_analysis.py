@@ -270,11 +270,13 @@ class DistributionAnalysis:
 				# title
 				ax.set_title(f'{col} - Train > Test')
 				# plot train
-				sns.distplot(df_col['train'], kde=True, color="r", ax=ax)
+				sns.distplot(df_col['train'], kde=True, color="r", ax=ax, label='Train')
 				# plot valid
-				sns.distplot(df_col['valid'], kde=True, color="g", ax=ax)
+				sns.distplot(df_col['valid'], kde=True, color="g", ax=ax, label='Valid')
 				# plot test
-				sns.distplot(df_col['test'], kde=True, color="b", ax=ax)
+				sns.distplot(df_col['test'], kde=True, color="b", ax=ax, label='Test')
+				# legend
+				plt.legend()
 				# save plot
 				plt.savefig(f'{str_dirname}/{col}.png', bbox_inches='tight')
 				# close plot
@@ -295,11 +297,13 @@ class DistributionAnalysis:
 					# title
 					ax.set_title(f'{col} Valid > Train')
 					# plot train
-					sns.distplot(df_col['train'], kde=True, color="r", ax=ax)
+					sns.distplot(df_col['train'], kde=True, color="r", ax=ax, label='Train')
 					# plot valid
-					sns.distplot(df_col['valid'], kde=True, color="g", ax=ax)
+					sns.distplot(df_col['valid'], kde=True, color="g", ax=ax, label='Valid')
 					# plot test
-					sns.distplot(df_col['test'], kde=True, color="b", ax=ax)
+					sns.distplot(df_col['test'], kde=True, color="b", ax=ax, label='Test')
+					# legend
+					plt.legend()
 					# save plot
 					plt.savefig(f'{str_dirname}/{col}.png', bbox_inches='tight')
 					# close plot
@@ -320,11 +324,13 @@ class DistributionAnalysis:
 				# title
 				ax.set_title(f'{col} - Train > Test')
 				# plot train
-				sns.distplot(df_col['train'], kde=True, color="r", ax=ax)
+				sns.distplot(df_col['train'], kde=True, color="r", ax=ax, label='Train')
 				# plot valid
-				sns.distplot(df_col['valid'], kde=True, color="g", ax=ax)
+				sns.distplot(df_col['valid'], kde=True, color="g", ax=ax, label='Valid')
 				# plot test
-				sns.distplot(df_col['test'], kde=True, color="b", ax=ax)
+				sns.distplot(df_col['test'], kde=True, color="b", ax=ax, label='Test')
+				# legend
+				plt.legend()
 				# save plot
 				plt.savefig(f'{str_dirname}/{col}.png', bbox_inches='tight')
 				# close plot
@@ -345,11 +351,13 @@ class DistributionAnalysis:
 					# title
 					ax.set_title(f'{col} - Test > Train')
 					# plot train
-					sns.distplot(df_col['train'], kde=True, color="r", ax=ax)
+					sns.distplot(df_col['train'], kde=True, color="r", ax=ax, label='Train')
 					# plot valid
-					sns.distplot(df_col['valid'], kde=True, color="g", ax=ax)
+					sns.distplot(df_col['valid'], kde=True, color="g", ax=ax, label='Valid')
 					# plot test
-					sns.distplot(df_col['test'], kde=True, color="b", ax=ax)
+					sns.distplot(df_col['test'], kde=True, color="b", ax=ax, label='Test')
+					# legend
+					plt.legend()
 					# save plot
 					plt.savefig(f'{str_dirname}/{col}.png', bbox_inches='tight')
 					# close plot
@@ -370,11 +378,13 @@ class DistributionAnalysis:
 				# title
 				ax.set_title(f'{col} - Valid > Test')
 				# plot train
-				sns.distplot(df_col['train'], kde=True, color="r", ax=ax)
+				sns.distplot(df_col['train'], kde=True, color="r", ax=ax, label='Train')
 				# plot valid
-				sns.distplot(df_col['valid'], kde=True, color="g", ax=ax)
+				sns.distplot(df_col['valid'], kde=True, color="g", ax=ax, label='Valid')
 				# plot test
-				sns.distplot(df_col['test'], kde=True, color="b", ax=ax)
+				sns.distplot(df_col['test'], kde=True, color="b", ax=ax, label='Test')
+				# legend
+				plt.legend()
 				# save plot
 				plt.savefig(f'{str_dirname}/{col}.png', bbox_inches='tight')
 				# close plot
@@ -393,11 +403,13 @@ class DistributionAnalysis:
 					# title
 					ax.set_title(f'{col} - Test > Valid')
 					# plot train
-					sns.distplot(df_col['train'], kde=True, color="r", ax=ax)
+					sns.distplot(df_col['train'], kde=True, color="r", ax=ax, label='Train')
 					# plot valid
-					sns.distplot(df_col['valid'], kde=True, color="g", ax=ax)
+					sns.distplot(df_col['valid'], kde=True, color="g", ax=ax, label='Valid')
 					# plot test
-					sns.distplot(df_col['test'], kde=True, color="b", ax=ax)
+					sns.distplot(df_col['test'], kde=True, color="b", ax=ax, label='Test')
+					# legend
+					plt.legend()
 					# save plot
 					plt.savefig(f'{str_dirname}/{col}.png', bbox_inches='tight')
 					# close plot
