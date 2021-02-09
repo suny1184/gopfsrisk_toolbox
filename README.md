@@ -2,9 +2,9 @@
 
 v.1.0.0
 
-Purpose: Centralize functions. Use/adapt functions to create **efficient**, **versitile**, **transparent**, **dynamic**, **documented** scripts.
+**Purpose**: Centralize functions. Use/adapt functions to create **efficient**, **versitile**, **transparent**, **dynamic**, **documented** scripts.
 
-How to use: 
+Directions: 
 
 1. Open terminal of root directory of existing project repo
 2. Clone this repo into the root directory (*Note*: you **MUST HAVE GIT INSTALLED** for this to work):
