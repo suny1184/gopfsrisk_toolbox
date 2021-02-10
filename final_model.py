@@ -7,20 +7,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # define function for combining train and valid
-def COMBINE_TRAIN_AND_VALID(X_train, X_valid, y_train, y_valid, logger=None):
-	# combine train and valid dfs
-	X_train = pd.concat([X_train, X_valid])
-	y_train = pd.concat([y_train, y_valid])
+def COMBINE_TRAIN_AND_VALID(df_train, df_valid, logger=None):
 	# if using logger
 	if logger:
 		# log it
 		logger.warning('Training and validation data combined')
 	# return
-	return X_train, y_train
+	return pd.concat([df_train, df_valid])
 
 # define function to fit models iterating through random state
-def ITERATIVE_MODEL_FITTING(X_train, y_train, X_valid, y_valid, list_class_weights, list_feats, list_non_numeric, 
-	                        int_n_randstate=50, int_iterations=10000, int_early_stopping_rounds=1000,
+def ITERATIVE_MODEL_FITTING(train_pool, valid_pool, X_valid, y_valid, list_class_weights, int_n_randstate=50, 
+	                        int_iterations=10000, int_early_stopping_rounds=1000,
 		                    str_filename='./output/df_randstates.csv', int_randstate_start=0, logger=None,
 		                    str_eval_metric='F1', str_task_type='GPU'):
 	# create message
@@ -45,30 +42,28 @@ def ITERATIVE_MODEL_FITTING(X_train, y_train, X_valid, y_valid, list_class_weigh
 		# print message
 		print(f'Fitting model {int_random_state+1}/{int_n_randstate}')
 		# fit cb model
-		model = FIT_CATBOOST_MODEL(X_train=X_train[list_feats], 
-		                           y_train=y_train, 
-		                           X_valid=X_valid[list_feats], 
-		                           y_valid=y_valid, 
-		                           list_non_numeric=list_non_numeric, 
+		model = FIT_CATBOOST_MODEL(train_pool=train_pool,
+			                       valid_pool=valid_pool, 
 		                           int_iterations=int_iterations, 
 		                           str_eval_metric=str_eval_metric, 
 		                           int_early_stopping_rounds=int_early_stopping_rounds, 
 		                           str_task_type=str_task_type, 
 		                           bool_classifier=True,
 		                           list_class_weights=list_class_weights,
-		                           int_random_state=int_random_state)
+		                           int_random_state=int_random_state,
+		                           bool_pool=False)
 		
 		# logic
 		if str_eval_metric == 'F1':
 			# get eval metric
-			flt_evalmetric = average_precision_score(y_true=y_valid, y_score=model.predict_proba(X_valid[list_feats])[:,1])
-			#flt_evalmetric = f1_score(y_true=y_valid, y_pred=model.predict(X_valid[list_feats]))
+			#flt_evalmetric = average_precision_score(y_true=y_valid, y_score=model.predict_proba(X_valid)[:,1])
+			flt_evalmetric = f1_score(y_true=y_valid, y_pred=model.predict(X_valid))
 		elif str_eval_metric == 'Precision':
 			# get eval metric
-			flt_evalmetric = precision_score(y_true=y_valid, y_pred=model.predict(X_valid[list_feats]))
+			flt_evalmetric = precision_score(y_true=y_valid, y_pred=model.predict(X_valid))
 		elif str_eval_metric == 'Recall':
 			# get eval metric
-			flt_eval_metric = recall_score(y_true=y_valid, y_pred=model.predict(X_valid[list_feats]))
+			flt_eval_metric = recall_score(y_true=y_valid, y_pred=model.predict(X_valid))
 
 		# if we are on first iteration
 		if counter == 0:
