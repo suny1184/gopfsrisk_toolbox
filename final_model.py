@@ -95,7 +95,8 @@ def ITERATIVE_MODEL_FITTING(train_pool, valid_pool, X_valid, y_valid, list_class
 	return df_empty
 
 # define function for plotting df_randstates
-def PLOT_DF_RANDSTATES(logger, df_randstates, tpl_figsize=(15,10), str_filename='./output/plt_randstates.png'):
+def PLOT_DF_RANDSTATES(logger, df_randstates, tpl_figsize=(15,10), 
+	                   str_filename='./output/plt_randstates.png', str_eval_metric='F1'):
 	# find max eval_metric
 	flt_max = np.max(df_randstates['eval_metric'])
 	# find corresponding random_state
@@ -104,15 +105,15 @@ def PLOT_DF_RANDSTATES(logger, df_randstates, tpl_figsize=(15,10), str_filename=
 	# create ax
 	fig, ax = plt.subplots(figsize=tpl_figsize)
 	# title
-	ax.set_title(f'Best F1 ({flt_max:0.4}) at Random State {int_rand_state}')
+	ax.set_title(f'Best {str_eval_metric} ({flt_max:0.4}) at Random State {int_rand_state}')
 	# plot it
-	ax.plot(df_randstates['random_state'], df_randstates['eval_metric'], label='F1')
+	ax.plot(df_randstates['random_state'], df_randstates['eval_metric'], label=str_eval_metric)
 	# plot the maximum eval metric
-	ax.plot(df_randstates['random_state'], [flt_max for x in df_randstates['random_state']], linestyle=':', label='Max F1')
+	ax.plot(df_randstates['random_state'], [flt_max for x in df_randstates['random_state']], linestyle=':', label=f'Max {str_eval_metric}')
 	# xlabel
 	ax.set_xlabel('Random State')
 	# ylabel
-	ax.set_ylabel('F1')
+	ax.set_ylabel(str_eval_metric)
 	# legend
 	ax.legend()
 	# save
