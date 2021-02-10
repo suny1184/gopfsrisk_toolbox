@@ -261,11 +261,11 @@ class DistributionAnalysis:
 			int_len_sample = int(self.int_nrows/100) # always doing 100 samples
 			# create list to use for sample
 			list_empty = []
-				for b in range(100): # always doing 100 samples
-					# create list containing value for b the same length as a samplel
-					list_ = list(itertools.repeat(b, int_len_sample))
-					# extend list_empty
-					list_empty.extend(list_)
+			for b in range(100): # always doing 100 samples
+				# create list containing value for b the same length as a samplel
+				list_ = list(itertools.repeat(b, int_len_sample))
+				# extend list_empty
+				list_empty.extend(list_)
 			# create a dictionary to use for grouping
 			dict_ = dict(zip(list(df_col.columns), ['median' for col in list(df_col.columns)]))
 			# make list_empty into a column in df_col
