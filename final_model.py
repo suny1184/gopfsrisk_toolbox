@@ -117,7 +117,9 @@ def PLOT_DF_RANDSTATES(logger, df_randstates, tpl_figsize=(15,10), str_filename=
 	ax.legend()
 	# save
 	plt.savefig(str_filename, bbox_inches='tight')
-	# log it
-	logger.warning(f'Plot of df_randstates.csv saved to {str_filename}')
+	# if logging
+	if logger:
+		# log it
+		logger.warning(f'Plot of df_randstates.csv saved to {str_filename}')
 	# return
 	return fig
