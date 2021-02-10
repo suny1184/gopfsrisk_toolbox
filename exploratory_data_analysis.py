@@ -6,6 +6,7 @@ import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 import matplotlib.pyplot as plt
 import seaborn as sns
+import itertools
 
 # define function to log df info
 def LOG_DF_INFO(df, str_dflogname='df_train', str_datecol='dtmStampCreation__app', str_bin_target='TARGET__app', 
