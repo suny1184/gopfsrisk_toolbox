@@ -256,6 +256,21 @@ class DistributionAnalysis:
 			df_col = pd.DataFrame({'train': list(self.df_train_sub[col]),
 				                   'valid': list(self.df_valid_sub[col]),
 				                   'test': list(self.df_test_sub[col])})
+			# get number of rows per sample
+			int_len_sample = int(self.int_nrows/100) # always doing 100 samples
+			# create list to use for sample
+			list_empty = []
+				for b in range(100): # always doing 100 samples
+					# create list containing value for b the same length as a samplel
+					list_ = list(itertools.repeat(b, int_len_sample))
+					# extend list_empty
+					list_empty.extend(list_)
+			# create a dictionary to use for grouping
+			dict_ = dict(zip(list(df_col.columns), ['median' for col in list(df_col.columns)]))
+			# make list_empty into a column in df_col
+			df_col['sample'] = list_empty
+			# group df_col by sample and get median for each of 100 samples
+			df_col = df_col.groupby('sample', as_index=False).agg(dict_)
 			# TRAIN VS. VALID
 			# first test (train > valid)
 			flt_avg = np.mean(df_col.apply(lambda x: 1 if x['train'] > x['valid'] else 0, axis=1))
