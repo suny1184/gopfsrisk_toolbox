@@ -54,7 +54,7 @@ def ITERATIVE_FEAT_SELECTION(X_train, y_train, X_valid, y_valid, list_non_numeri
 	# if using logger
 	if logger:
 		logger.warning(f'Completed iterative feature selection after fitting {int_n_models} models.')
-		logger.warning(f'List of features pickled to {str_filename}')
+		logger.warning(f'List of {len(list_empty)} features pickled to {str_filename}')
 
 # define function for feature selection
 def STEPWISE_SENSITIVITY_SELECTION(X_train, y_train, X_valid, y_valid, list_feats_all, str_task_type='GPU',
