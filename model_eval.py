@@ -1,5 +1,4 @@
-# functions
-import logging
+# model eval
 import os
 import pandas as pd
 import numpy as np
@@ -10,10 +9,10 @@ from itertools import chain
 from sklearn.metrics import (accuracy_score, fowlkes_mallows_score, precision_score,
                              recall_score, f1_score, roc_auc_score, average_precision_score,
                              log_loss, brier_score_loss, precision_recall_curve, auc,
-	                         roc_auc_score, roc_curve)
-from .general import GET_NUMERIC_AND_NONNUMERIC
+	                         roc_curve)
 from scipy.stats import zscore
-
+from .general import GET_NUMERIC_AND_NONNUMERIC
+from .algorithms import FIT_CATBOOST_MODEL
 
 # define function to get binary eval metrics
 def BIN_CLASS_EVAL_METRICS(model_classifier, X, y, logger=None):
@@ -110,8 +109,6 @@ def COMBINE_TRAIN_AND_VALID(X_train, X_valid, y_train, y_valid, logger=None):
 		logger.warning('Training and validation data combined')
 	# return
 	return X_train, y_train
-
-
 
 # define function for PR Curve
 def PR_CURVE(y_true, y_hat_prob, y_hat_class, tpl_figsize=(10,10), logger=None, str_filename='./output/plt_prcurve.png'):
@@ -234,7 +231,7 @@ def GET_SENSITIVITY_INFO(str_filename='../../09_feature_selection/aaron/output/d
 	return df_feats
 
 # define function for sensitivity plot
-def SENSITIVITY_PLOT(df_feats, str_eval_metric='PR-AUC', str_filename='./output/plt_sensitivity.png', logger=None):
+def SENSITIVITY_PLOT(df, str_eval_metric='PR-AUC', str_filename='./output/plt_sensitivity.png', logger=None):
 	# get min
 	flt_min_eval_metric = np.min(df_feats['eval_metric'])
 	# get max
@@ -322,3 +319,84 @@ def PARTIAL_DEPENDENCE_PLOTS(model, X_train, y_train, list_cols, tpl_figsize=(15
 	# if logging
 	if logger:
 		logger.warning(f'{len(list_cols)} partial dependence plots generate and saved to {str_dirname}')
+
+# define function for sensitivity analysis
+def SENSITIVITY_ANALYSIS(X_train, X_valid, y_train, y_valid, list_cols, list_class_weights=None, 
+	                     str_filename_df='./output/df_sensitivity.csv', str_evalmetric='F1',
+	                     logger=None, int_iterations=1000, int_early_stopping_rounds=100,
+	                     str_task_type='GPU', bool_classifier=True):
+	try:
+		# import df
+		df_sensitivity = pd.read_csv(str_filename_df)
+	except FileNotFoundError:
+		# create file
+		df_sensitivity = pd.DataFrame(columns=['feature_removed', str_evalmetric])
+		df_sensitivity.to_csv(str_filename_df, index=False)
+    
+	# get number of rows in df_sensitivity
+	int_begin_iter = df_sensitivity.shape[0]
+    
+	# iterate through list_cols
+	for a, col in enumerate(list_cols[int_begin_iter:]):
+		# print message
+		print(f'Feature {list_str_cols.index(col)+1}/{len(list_str_cols)}')
+		# get non-numeric feats
+		list_non_numeric = GET_NUMERIC_AND_NONNUMERIC(df=X_train, 
+			                                          list_columns=[x for x in X_train.columns if x != col], 
+			                                          logger=None)[1]
+		# fit cb model
+		model = FIT_CATBOOST_MODEL(X_train=X_train[[x for x in X_train.columns if x != col]],
+	                       		   y_train=y_train,
+	                       		   X_valid=X_valid[[x for x in X_train.columns if x != col]],
+	                       		   y_valid=y_valid,
+	                       		   list_non_numeric=list_non_numeric,
+	                       		   int_iterations=int_iterations,
+	                       		   str_eval_metric=str_eval_metric,
+	                       		   int_early_stopping_rounds=int_early_stopping_rounds,
+	                       		   str_task_type=str_task_type,
+	                       		   bool_classifier=bool_classifier,
+	                       		   list_class_weights=list_class_weights)
+		# get eval metric
+		metric_ = BIN_CLASS_EVAL_METRICS(model_classifier=model,
+	                                     X=X_valid[[x for x in X_train.columns if x != col]],
+	                                     y=y_valid).get(str_eval_metric.lower()) # this could cause bugs in the future
+		# create dictionary
+		dict_ = {'feature_removed':col, str_eval_metric:metric_}
+		# append dict_ to df_sensitivity
+		df_sensitivity = df_sensitivity.append(dict_, ignore_index=True)
+		# write to csv
+		df_sensitivity.to_csv(str_filename_df, index=False)
+	# if using logger
+	if logger:
+		logger.warning(f'Sensitivity analysis complete, output saved to {str_filename_df}')
+
+"""
+# define function for sensitivity plot
+def SENSITIVITY_PLOT(x, y, int_n_feats=30, str_filename='./img/plt_sensitivity.png'):
+	# create x_new
+	x_new = x[:int_n_feats]
+	# create y_new
+	y_new = y[:int_n_feats]
+
+	# create axis
+	fig, ax = plt.subplots(figsize=(int_n_feats,10))
+	# title
+	ax.set_title(f'F-1 by Removed Feature: Top {int_n_feats} Only')
+	# xlabel
+	ax.set_xlabel('Removed Feature')
+	# ylabel
+	ax.set_ylabel('F-1')
+
+	# line plot of sensitivity analysis
+	ax.plot(x_new, y_new, color='red', label='Sensitivity Analysis')
+	# line plot of median
+	ax.plot(x_new, [np.median(y) for x in y_new], color='black', linestyle=':', label='Median')
+	# rotate xticks 90 degrees
+	plt.xticks(rotation=90)
+	# legend
+	plt.legend()
+	# save figure
+	plt.savefig(str_filename)
+	# return
+	return fig
+"""
