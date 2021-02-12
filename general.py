@@ -127,6 +127,6 @@ def GET_LIST_CLASS_WEIGHTS(y_train, logger=None):
 	# if using logger
 	if logger:
 		# log it
-		logger.warning('List of class weights computed')
+		logger.warning(f'List of class weights {list_class_weights} computed')
 	# return
 	return list_class_weights
