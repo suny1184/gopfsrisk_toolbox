@@ -364,6 +364,8 @@ def SENSITIVITY_ANALYSIS(X_train, X_valid, y_train, y_valid, list_cols, list_cla
 		dict_ = {'feature_removed':col, str_eval_metric:metric_}
 		# append dict_ to df_sensitivity
 		df_sensitivity = df_sensitivity.append(dict_, ignore_index=True)
+		# sort it
+		df_sensitivity.sort_values(by=str_eval_metric, ascending=True, inplace=True)
 		# write to csv
 		df_sensitivity.to_csv(str_filename_df, index=False)
 	# if using logger
