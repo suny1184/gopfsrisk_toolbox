@@ -316,38 +316,33 @@ def PARTIAL_DEPENDENCE_PLOTS(model, X_train, y_train, list_cols, tpl_figsize=(15
 		plt.savefig(f'{str_dirname}/{col}.png', bbox_inches='tight')
 		# close plot
 		plt.close()
+	# delete the predicted and actual columns
+	del X_train['predicted'], X_train['actual']
 	# if logging
 	if logger:
 		logger.warning(f'{len(list_cols)} partial dependence plots generate and saved to {str_dirname}')
 
 # define function for sensitivity analysis
 def SENSITIVITY_ANALYSIS(X_train, X_valid, y_train, y_valid, list_cols, list_class_weights=None, 
-	                     str_filename_df='./output/df_sensitivity.csv', str_evalmetric='F1',
+	                     str_filename_df='./output/df_sensitivity.csv', str_eval_metric='F1',
 	                     logger=None, int_iterations=1000, int_early_stopping_rounds=100,
-	                     str_task_type='GPU', bool_classifier=True):
-	try:
-		# import df
-		df_sensitivity = pd.read_csv(str_filename_df)
-	except FileNotFoundError:
-		# create file
-		df_sensitivity = pd.DataFrame(columns=['feature_removed', str_evalmetric])
-		df_sensitivity.to_csv(str_filename_df, index=False)
-    
-	# get number of rows in df_sensitivity
-	int_begin_iter = df_sensitivity.shape[0]
-    
-	# iterate through list_cols
-	for a, col in enumerate(list_cols[int_begin_iter:]):
+	                     str_task_type='GPU', bool_classifier=True): 
+	# create empty df
+	df_sensitivity = pd.DataFrame(columns=['feature_removed', str_eval_metric]) 
+	# iterate through columns in X_train
+	for a, col in enumerate(list_cols):
 		# print message
-		print(f'Feature {list_str_cols.index(col)+1}/{len(list_str_cols)}')
+		print(f'Feature {a+1}/{len(list_cols)}')
+		# create list of columns
+		list_columns = [x for x in list_cols if x != col]
 		# get non-numeric feats
 		list_non_numeric = GET_NUMERIC_AND_NONNUMERIC(df=X_train, 
-			                                          list_columns=[x for x in X_train.columns if x != col], 
+			                                          list_columns=list_columns, 
 			                                          logger=None)[1]
 		# fit cb model
-		model = FIT_CATBOOST_MODEL(X_train=X_train[[x for x in X_train.columns if x != col]],
+		model = FIT_CATBOOST_MODEL(X_train=X_train[list_columns],
 	                       		   y_train=y_train,
-	                       		   X_valid=X_valid[[x for x in X_train.columns if x != col]],
+	                       		   X_valid=X_valid[list_columns],
 	                       		   y_valid=y_valid,
 	                       		   list_non_numeric=list_non_numeric,
 	                       		   int_iterations=int_iterations,
@@ -358,7 +353,7 @@ def SENSITIVITY_ANALYSIS(X_train, X_valid, y_train, y_valid, list_cols, list_cla
 	                       		   list_class_weights=list_class_weights)
 		# get eval metric
 		metric_ = BIN_CLASS_EVAL_METRICS(model_classifier=model,
-	                                     X=X_valid[[x for x in X_train.columns if x != col]],
+	                                     X=X_valid[list_columns],
 	                                     y=y_valid).get(str_eval_metric.lower()) # this could cause bugs in the future
 		# create dictionary
 		dict_ = {'feature_removed':col, str_eval_metric:metric_}
