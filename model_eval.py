@@ -269,41 +269,58 @@ def SENSITIVITY_PLOT(df, str_eval_metric='PR-AUC', str_filename='./output/plt_se
 
 # define function for pd plots
 def PARTIAL_DEPENDENCE_PLOTS(model, X_train, y_train, list_cols, tpl_figsize=(15,10), 
-	                         str_dirname='./output/pd_plots', logger=None):
+	                         str_dirname='./output/pd_plots', str_filename='./output/df_trends.csv', logger=None):
 	# generate predicted probabilities
 	y_hat_train = model.predict_proba(X_train)[:,1]
 	# create dataframe
 	X_train['predicted'] = y_hat_train
 	X_train['actual'] = y_train
+	# create empty df
+	df_empty = pd.DataFrame()
 	# generate plots
 	for a, col in enumerate(list_cols):
 		# print meessage
 		print(f'Creating plot {a+1}/{len(list_cols)}')
 		# group df
 		X_train_grouped = X_train.groupby(by=col, as_index=False).agg({'predicted': 'mean',
-	                                                                   'actual': 'mean'})
+		                                                               'actual': 'mean'})
 		# sort
 		X_train_grouped = X_train_grouped.sort_values(by=col, ascending=True)
 		# make z score col name
-		str_z_col = '{0}_z'.format(col)
+		str_z_col = f'{col}_z'
+
 		# get z score
 		X_train_grouped[str_z_col] = zscore(X_train_grouped[col])
 		# subset to only those with z >= 3 and <= -3 (i.e., remove outliers)
 		X_train_grouped = X_train_grouped[(X_train_grouped[str_z_col] < 3) & (X_train_grouped[str_z_col] > -3)]
+
 		# calculate trendlines
 		# predicted
 		z_pred = np.polyfit(X_train_grouped[col], X_train_grouped['predicted'], 1)
 		p_pred = np.poly1d(z_pred)
+		# get predicted trend
+		flt_trend_pred = z_pred[1]
+
 		# actual
 		z_act = np.polyfit(X_train_grouped[col], X_train_grouped['actual'], 1)
 		p_act = np.poly1d(z_act)
+		# get actual trend
+		flt_trend_actual = z_act[1]
+
+		# make dictionary
+		dict_ = {'feature':col, 'trend_pred':flt_trend_pred, 'trend_act':flt_trend_actual}
+		# append to df_empty
+		df_empty = df_empty.append(dict_, ignore_index=True)
+		# write to csv
+		df_empty.to_csv(str_filename, index=False)
+
 		# create ax
 		fig, ax = plt.subplots(figsize=tpl_figsize)
 		# plot trendline
 		# predicted
-		ax.plot(X_train_grouped[col], p_pred(X_train_grouped[col]), color='green', label='Trend - Predicted')
+		ax.plot(X_train_grouped[col], p_pred(X_train_grouped[col]), color='green', label=f'Trend - Predicted ({flt_trend_pred:0.4})')
 		# actual
-		ax.plot(X_train_grouped[col], p_act(X_train_grouped[col]), color='orange', label='Trend - Actual')
+		ax.plot(X_train_grouped[col], p_act(X_train_grouped[col]), color='orange', label=f'Trend - Actual ({flt_trend_actual:0.4})')
 		# plot it
 		ax.set_title(col)
 		# predicted
@@ -320,7 +337,8 @@ def PARTIAL_DEPENDENCE_PLOTS(model, X_train, y_train, list_cols, tpl_figsize=(15
 	del X_train['predicted'], X_train['actual']
 	# if logging
 	if logger:
-		logger.warning(f'{len(list_cols)} partial dependence plots generate and saved to {str_dirname}')
+		logger.warning(f'Predicted and actual trends generated and saved to {str_filename}')
+		logger.warning(f'{len(list_cols)} partial dependence plots generated and saved to {str_dirname}')
 
 # define function for sensitivity analysis
 def SENSITIVITY_ANALYSIS(X_train, X_valid, y_train, y_valid, list_cols, list_class_weights=None, 
