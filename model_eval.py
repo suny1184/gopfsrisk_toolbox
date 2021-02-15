@@ -308,17 +308,20 @@ def PARTIAL_DEPENDENCE_PLOTS(model, X_train, y_train, list_cols, tpl_figsize=(15
 		# create array for actual
 		arr_trend_actual = p_act(X_train_grouped[col])
 
+		"""
 		# calculate max of X_train_grouped[col]
 		max_X_train_grouped = np.max(X_train_grouped[col])
 		# calculate min of X_train_grouped[col]
 		min_X_train_grouped = np.min(X_train_grouped[col])
+		"""
+
 		# calculate run
 		run_ = max_X_train_grouped - min_X_train_grouped
 
 		# calculate slope predicted
-		flt_trend_pred = (np.max(arr_trend_pred) - np.min(arr_trend_pred)) / run_
+		flt_trend_pred = (arr_trend_pred[-1] - arr_trend_pred[0] / run_
 		# calculate slope actual
-		flt_trend_actual = (np.max(arr_trend_actual) - np.min(arr_trend_actual)) / run_
+		flt_trend_actual = (arr_trend_actual[-1] - arr_trend_actual[0] / run_
 
 		# make dictionary
 		dict_ = {'feature':col, 'trend_pred':flt_trend_pred, 'trend_act':flt_trend_actual}
