@@ -308,13 +308,6 @@ def PARTIAL_DEPENDENCE_PLOTS(model, X_train, y_train, list_cols, tpl_figsize=(15
 		# create array for actual
 		arr_trend_actual = p_act(X_train_grouped[col])
 
-		"""
-		# calculate max of X_train_grouped[col]
-		max_X_train_grouped = np.max(X_train_grouped[col])
-		# calculate min of X_train_grouped[col]
-		min_X_train_grouped = np.min(X_train_grouped[col])
-		"""
-
 		# calculate run
 		run_ = max_X_train_grouped - min_X_train_grouped
 
