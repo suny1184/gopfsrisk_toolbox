@@ -286,9 +286,9 @@ def PARTIAL_DEPENDENCE_PLOTS(model, X_train, y_train, list_cols, tpl_figsize=(15
 		                                                               'actual': 'mean'})
 		# sort
 		X_train_grouped = X_train_grouped.sort_values(by=col, ascending=True)
+		
 		# make z score col name
 		str_z_col = f'{col}_z'
-
 		# get z score
 		X_train_grouped[str_z_col] = zscore(X_train_grouped[col])
 		# subset to only those with z >= 3 and <= -3 (i.e., remove outliers)
@@ -298,7 +298,6 @@ def PARTIAL_DEPENDENCE_PLOTS(model, X_train, y_train, list_cols, tpl_figsize=(15
 		# predicted
 		z_pred = np.polyfit(X_train_grouped[col], X_train_grouped['predicted'], 1)
 		p_pred = np.poly1d(z_pred)
-
 		# actual
 		z_act = np.polyfit(X_train_grouped[col], X_train_grouped['actual'], 1)
 		p_act = np.poly1d(z_act)
@@ -309,7 +308,7 @@ def PARTIAL_DEPENDENCE_PLOTS(model, X_train, y_train, list_cols, tpl_figsize=(15
 		arr_trend_actual = p_act(X_train_grouped[col])
 
 		# calculate run
-		run_ = max_X_train_grouped - min_X_train_grouped
+		run_ = np.max(X_train_grouped[col]) - np.min(X_train_grouped[col])
 
 		# calculate slope predicted
 		flt_trend_pred = (arr_trend_pred[-1] - arr_trend_pred[0] / run_
