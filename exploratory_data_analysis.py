@@ -278,7 +278,7 @@ class DistributionAnalysis:
 			# logic for significance
 			if (flt_avg >= flt_thresh_upper):
 				# print
-				print(f'Significant difference in {col} between train and valid')
+				print(f'Significant difference in {col} between train and valid ({flt_avg:0.4})')
 				# append to list
 				list_sig_diff.append(col)
 				# make distribution plot
@@ -305,7 +305,7 @@ class DistributionAnalysis:
 				# logic for significance
 				if (flt_avg >= flt_thresh_upper):
 					# print
-					print(f'Significant difference in {col} between train and valid')
+					print(f'Significant difference in {col} between train and valid ({flt_avg:0.4})')
 					# append to list
 					list_sig_diff.append(col)
 					# make distribution plot
@@ -332,7 +332,7 @@ class DistributionAnalysis:
 			# logic for significance
 			if (flt_avg >= flt_thresh_upper):
 				# print
-				print(f'Significant difference in {col} between train and test')
+				print(f'Significant difference in {col} between train and test ({flt_avg:0.4})')
 				# append to list
 				list_sig_diff.append(col)
 				# make distribution plot
@@ -359,7 +359,7 @@ class DistributionAnalysis:
 				# logic for significance
 				if (flt_avg >= flt_thresh_upper):
 					# print
-					print(f'Significant difference in {col} between train and test')
+					print(f'Significant difference in {col} between train and test ({flt_avg:0.4})')
 					# append to list
 					list_sig_diff.append(col)
 					# make distribution plot
@@ -386,7 +386,7 @@ class DistributionAnalysis:
 			# logic for significance
 			if (flt_avg >= flt_thresh_upper):
 				# print
-				print(f'Significant difference in {col} between valid and test')
+				print(f'Significant difference in {col} between valid and test ({flt_avg:0.4})')
 				# append to list
 				list_sig_diff.append(col)
 				# make distribution plot
@@ -411,7 +411,7 @@ class DistributionAnalysis:
 				# logic for significance
 				if (flt_avg >= flt_thresh_upper):
 					# print
-					print(f'Significant difference in {col} between test and valid')
+					print(f'Significant difference in {col} between test and valid ({flt_avg:0.4})')
 					# append to list
 					list_sig_diff.append(col)
 					# make distribution plot
