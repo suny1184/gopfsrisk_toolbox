@@ -28,7 +28,7 @@ def ITERATIVE_MODEL_FITTING(train_pool, valid_pool, X_valid, y_valid, list_class
 	if logger:
 		# log it
 		logger.warning(str_message)
-
+	# see if str_filename exists
 	try:
 		# read in str_filename
 		df_empty = pd.read_csv(str_filename)
@@ -64,7 +64,7 @@ def ITERATIVE_MODEL_FITTING(train_pool, valid_pool, X_valid, y_valid, list_class
 			flt_evalmetric = recall_score(y_true=y_valid, y_pred=model.predict(X_valid))
 		elif str_eval_metric == 'AUC':
 			# get eval metric
-			flt_evalmetric = roc_auc_score(y_true=y, y_score=model.predict_proba(X_valid)[:,1])
+			flt_evalmetric = roc_auc_score(y_true=y_valid, y_score=model.predict_proba(X_valid)[:,1])
 
 		# if we are on first iteration
 		if counter == 0:
