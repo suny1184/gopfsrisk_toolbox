@@ -5,10 +5,8 @@ from .algorithms import FIT_CATBOOST_MODEL
 from .general import GET_NUMERIC_AND_NONNUMERIC
 import ast
 import pickle
-from sklearn.metrics import f1_score
+from sklearn.metrics import f1_score, roc_auc_score
 from scipy.special import expit
-
-
 
 # define function for iterative feature selection
 def ITERATIVE_FEAT_SELECTION(X_train, y_train, X_valid, y_valid, list_non_numeric, 
@@ -121,7 +119,10 @@ def STEPWISE_SENSITIVITY_SELECTION(X_train, y_train, X_valid, y_valid, list_feat
 				                           list_class_weights=list_class_weights,
 				                           int_random_state=int_random_state)
 				# get eval metric
-				flt_evalmetric_sensitivity = f1_score(y_true=y_valid, y_pred=model.predict(X_valid[list_feats_all_copy]))
+				if str_eval_metric == 'F1':
+					flt_evalmetric_sensitivity = f1_score(y_true=y_valid, y_pred=model.predict(X_valid[list_feats_all_copy]))
+				elif str_eval_metric == 'AUC':
+					flt_evalmetric_sensitivity = roc_auc_score(y_true=y_valid, y_score=model.predict_proba(X_valid[list_feats_all_copy])[:,1])
 				# create dictionary
 				dict_ = {'list_feats': model.feature_names_,
 				         'eval_metric': flt_evalmetric_sensitivity,
@@ -199,7 +200,10 @@ def STEPWISE_SENSITIVITY_SELECTION(X_train, y_train, X_valid, y_valid, list_feat
 			# append list of model feats to list_list_feats_stepwise
 			list_list_feats_stepwise.append(model.feature_names_)
 			# get eval metric
-			flt_evalmetric_stepwise = f1_score(y_true=y_valid, y_pred=model.predict(X_valid[list_feats_stepwise]))
+			if str_eval_metric == 'F1':
+				flt_evalmetric_sensitivity = f1_score(y_true=y_valid, y_pred=model.predict(X_valid[list_feats_stepwise]))
+			elif str_eval_metric == 'AUC':
+				flt_evalmetric_sensitivity = roc_auc_score(y_true=y_valid, y_score=model.predict_proba(X_valid[list_feats_stepwise])[:,1])
 			# create dictionary
 			dict_ = {'list_feats': model.feature_names_,
 			         'eval_metric': flt_evalmetric_stepwise,

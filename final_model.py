@@ -2,7 +2,7 @@
 import pandas as pd
 from .algorithms import FIT_CATBOOST_MODEL
 import pickle
-from sklearn.metrics import f1_score, average_precision_score, precision_score, recall_score
+from sklearn.metrics import f1_score, average_precision_score, precision_score, recall_score, roc_auc_score
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -64,6 +64,9 @@ def ITERATIVE_MODEL_FITTING(train_pool, valid_pool, X_valid, y_valid, list_class
 		elif str_eval_metric == 'Recall':
 			# get eval metric
 			flt_eval_metric = recall_score(y_true=y_valid, y_pred=model.predict(X_valid))
+		elif str_eval_metric == 'ROC':
+			# get eval metric
+			str_eval_metric = roc_auc_score(y_true=y, y_score=model.predict_proba(X_valid)[:,1])
 
 		# if we are on first iteration
 		if counter == 0:
