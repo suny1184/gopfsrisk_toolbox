@@ -225,8 +225,6 @@ class DropRedundantFeatures(BaseEstimator, TransformerMixin):
 			del X[col]
 			# print message
 			print(f'Dropped {col}')
-		# return X
-		return X
 
 # define class for automating distribution plot analysis
 class DistributionAnalysis:
