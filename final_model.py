@@ -52,21 +52,19 @@ def ITERATIVE_MODEL_FITTING(train_pool, valid_pool, X_valid, y_valid, list_class
 		                           list_class_weights=list_class_weights,
 		                           int_random_state=int_random_state,
 		                           bool_pool=False)
-		
 		# logic
 		if str_eval_metric == 'F1':
 			# get eval metric
-			#flt_evalmetric = average_precision_score(y_true=y_valid, y_score=model.predict_proba(X_valid)[:,1])
 			flt_evalmetric = f1_score(y_true=y_valid, y_pred=model.predict(X_valid))
 		elif str_eval_metric == 'Precision':
 			# get eval metric
 			flt_evalmetric = precision_score(y_true=y_valid, y_pred=model.predict(X_valid))
 		elif str_eval_metric == 'Recall':
 			# get eval metric
-			flt_eval_metric = recall_score(y_true=y_valid, y_pred=model.predict(X_valid))
-		elif str_eval_metric == 'ROC':
+			flt_evalmetric = recall_score(y_true=y_valid, y_pred=model.predict(X_valid))
+		elif str_eval_metric == 'AUC':
 			# get eval metric
-			str_eval_metric = roc_auc_score(y_true=y, y_score=model.predict_proba(X_valid)[:,1])
+			flt_evalmetric = roc_auc_score(y_true=y, y_score=model.predict_proba(X_valid)[:,1])
 
 		# if we are on first iteration
 		if counter == 0:
