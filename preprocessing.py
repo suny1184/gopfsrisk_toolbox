@@ -9,6 +9,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from pandas.api.types import is_numeric_dtype
 import pickle
 import math
+from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
 
 # define function for chronological split
 def CHRON_TRAIN_VALID_TEST_SPLIT(df, flt_prop_train=0.5, flt_prop_valid=0.25, logger=None):
@@ -215,4 +216,54 @@ class ImputerMode(BaseEstimator, TransformerMixin):
 		else:
 			for key, val in self.dict_mode.items():
 				X['{0}__imp_mode'.format(key)] = X[key].fillna(value=val, inplace=False)
+		return X
+
+# class for one-hot encoding
+class MyOneHotEncoder(BaseEstimator, TransformerMixin):
+	# initialize class
+	def __init__(self, list_cols):
+		self.list_cols = list_cols
+		self.cls_onehotencoder = OneHotEncoder(drop=None)
+	# def fit
+	def fit(self, X, y=None):
+		# instantiate class
+		cls_onehotencoder = self.cls_onehotencoder
+		# fit
+		cls_onehotencoder.fit(X[self.list_cols])
+		# save to self
+		self.cls_onehotencoder = cls_onehotencoder
+		# return
+		return self
+	# define transform
+	def transform(self, X):
+		X_hot = pd.DataFrame(self.cls_onehotencoder.transform(X[self.list_cols]).toarray())
+		# make sure the indices match
+		X_hot.index = X.index
+		# concatenate the X and X hot dfs
+		X = pd.concat([X, X_hot], axis=1, ignore_index=False)
+		# drop list_cols
+		X.drop(self.list_cols, axis=1, inplace=True)
+		# return
+		return X
+
+# class for min max scaling
+class MyMinMaxScaler(BaseEstimator, TransformerMixin):
+	# initialize class
+	def __init__(self):
+		self.cls_minmaxscaler = MinMaxScaler()
+	# define fit
+	def fit(self, X, y=None):
+		# instantiate class
+		cls_minmaxscaler = self.cls_minmaxscaler
+		# fit
+		cls_minmaxscaler.fit(X)
+		# save to self
+		self.cls_minmaxscaler = cls_minmaxscaler
+		# return
+		return self
+	# define transform
+	def transform(self, X):
+		# transform
+		X = pd.DataFrame(self.cls_minmaxscaler.transform(X), columns=X.columns)
+		# return X
 		return X
