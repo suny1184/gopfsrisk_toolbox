@@ -7,6 +7,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 import matplotlib.pyplot as plt
 import seaborn as sns
 import itertools
+from sklearn.decomposition import PCA
 
 # define function to log df info
 def LOG_DF_INFO(df, str_dflogname='df_train', str_datecol='dtmStampCreation__app', str_bin_target='TARGET__app', 
@@ -436,3 +437,77 @@ class DistributionAnalysis:
 		list_good_cols = [col for col in self.df_train_sub.columns if col not in self.list_sig_diff]
 		# return
 		return list_good_cols
+
+# define function to find optimal n_components for PCA
+def PLOT_PCA_EXPLAINED_VARIANCE(df, int_n_components_min=1, int_n_components_max=259,
+								tpl_figsize=(12,10), str_filename='./output/plt_pca.png'):
+	# list to append to
+	list_flt_expl_var = []
+	# iterate through n_components
+	for n_components in range(int_n_components_min, int_n_components_max+1):
+		# print status
+		print(f'PCA - {n_components}/{int_n_components_max}')
+		# instantiate class
+		cls_pca = PCA(n_components=n_components, 
+				      copy=True, 
+					  whiten=False, 
+				      svd_solver='auto', 
+				      tol=0.0, 
+				      iterated_power='auto', 
+				      random_state=42)
+		# fit to df
+		cls_pca.fit(df)
+		# get explained variance
+		flt_expl_var = np.sum(cls_pca.explained_variance_ratio_)
+		# append to list
+		list_flt_expl_var.append(flt_expl_var)
+	# create empty canvas
+	fig, ax = plt.subplots(figsize=tpl_figsize)
+	# title
+	ax.set_title('Explained Variance by n_components (PCA)')
+	# x axis
+	ax.set_xlabel('n_components')
+	# y axis
+	ax.set_ylabel('Explained Variance')
+	# plot it
+	ax.plot([item for item in range(int_n_components_min, int_n_components_max+1)] , list_flt_expl_var)
+	# save fig
+	plt.savefig(str_filename, bbox_inches='tight')
+	# return
+	return fig
+
+# class to create pca features
+class CreatePCAFeatures(BaseEstimator, TransformerMixin):
+	# initialize class
+	def __init__(self, int_n_components=50):
+		self.int_n_components = int_n_components
+	# fit
+	def fit(self, X, y=None):
+		# instantiate class
+		cls_pca = PCA(n_components=self.int_n_components, 
+		              copy=True, 
+					  whiten=False, 
+		              svd_solver='auto', 
+		              tol=0.0, 
+		              iterated_power='auto', 
+		              random_state=42)
+		# fit
+		cls_pca.fit(X)
+		# save to object
+		self.cls_pca = cls_pca
+		# return
+		return self
+	# transform
+	def transform(self, X):
+		# transform
+		arr_X_pca = self.cls_pca.transform(X)
+		# convert array to df
+		df_X_pca = pd.DataFrame(arr_X_pca)
+		# rename columns
+		df_X_pca.columns = [f'pca_{col}' for col in df_X_pca.columns]
+		# make sure index matches X
+		df_X_pca.index = X.index
+		# concatenate
+		df_concat = pd.concat([X, df_X_pca], axis=1)
+		# return
+		return df_concat
