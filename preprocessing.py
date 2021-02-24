@@ -12,6 +12,7 @@ import math
 from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
 from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer
+from sklearn.linear_model import BayesianRidge
 
 # define function for chronological split
 def CHRON_TRAIN_VALID_TEST_SPLIT(df, flt_prop_train=0.5, flt_prop_valid=0.25, logger=None):
@@ -156,12 +157,15 @@ def PROP_RTI(df, list_str_rti_rvlr_col, bool_drop_col=True, logger=None):
 # define class for iterative imputing
 class IterativeImputerNumeric(BaseEstimator, TransformerMixin):
 	# initialize class
-	def __init__(self, list_cols):
+	def __init__(self, list_cols, cls_estimator=BayesianRidge()):
 		self.list_cols = list_cols
+		self.cls_estimator = cls_estimator
 	# fit
 	def fit(self, X, y=None):
 		# instantiate class
-		cls_iterative_imputer = IterativeImputer(max_iter=10, random_state=0)
+		cls_iterative_imputer = IterativeImputer(max_iter=10, 
+			                                     random_state=42,
+			                                     estimator=self.cls_estimator)
 		# fit
 		cls_iterative_imputer.fit(X[self.list_cols])
 		# save to object
