@@ -439,6 +439,37 @@ class DistributionAnalysis:
 		# return
 		return list_good_cols
 
+# define function to get inertia by n_clusters
+def PLOT_INERTIA(df, int_n_max_clusters=20, tpl_figsize=(20,15), str_filename='./output/plt_inertia.png', logger=None):
+	# instatiate list_inertia
+	list_inertia = []
+	# iterate through a range of clusters
+	for n_clusters in np.arange(1, int_n_max_clusters+1):
+		# print message
+		print(f'KMeans - cluster {n_clusters}/{int_n_max_clusters}')
+		# instantiate model
+		model = KMeans(n_clusters=n_clusters)
+		# fit model to df_cluster
+		model.fit(df)
+		# get inertia and append to list
+		list_inertia.append(model.inertia_)
+	# create axis
+	fig, ax = plt.subplots(figsize=tpl_figsize)
+	# generate title
+	ax.set_title('Inertia by n Clusters', fontsize=20)
+	# x label
+	ax.set_xlabel('n Clusters', fontsize=15)
+	# y label
+	ax.set_ylabel('Inertia', fontsize=15)
+	# plot inertia by n_clusters
+	ax.plot(list(np.arange(1, int_n_max_clusters+1)), list_inertia)
+	# xticks
+	ax.set_xticks(list(np.arange(1, int_n_max_clusters+1)))
+	# save figures
+	plt.savefig(f'{str_filename}', bbox_inches='tight')
+	# return fig
+	return fig
+
 # class to create kmeans feature
 class CreateKMeansFeature(BaseEstimator, TransformerMixin):
 	# initialize class
