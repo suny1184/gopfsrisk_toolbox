@@ -467,6 +467,9 @@ def PLOT_INERTIA(df, int_n_max_clusters=20, tpl_figsize=(20,15), str_filename='.
 	ax.set_xticks(list(np.arange(1, int_n_max_clusters+1)))
 	# save figures
 	plt.savefig(f'{str_filename}', bbox_inches='tight')
+	# if using logger
+	if logger:
+		logger.WARNING(f'Inertia plot generated and saved to {str_filename}')
 	# return fig
 	return fig
 
@@ -494,7 +497,8 @@ class CreateKMeansFeature(BaseEstimator, TransformerMixin):
 
 # define function to find optimal n_components for PCA
 def PLOT_PCA_EXPLAINED_VARIANCE(df, int_n_components_min=1, int_n_components_max=259,
-								tpl_figsize=(12,10), str_filename='./output/plt_pca.png'):
+								tpl_figsize=(12,10), str_filename='./output/plt_pca.png',
+								logger=None):
 	# list to append to
 	list_flt_expl_var = []
 	# iterate through n_components
@@ -527,6 +531,9 @@ def PLOT_PCA_EXPLAINED_VARIANCE(df, int_n_components_min=1, int_n_components_max
 	ax.plot([item for item in range(int_n_components_min, int_n_components_max+1)] , list_flt_expl_var)
 	# save fig
 	plt.savefig(str_filename, bbox_inches='tight')
+	# if using logging
+	if logger:
+		logger.WARNING(f'PCA explained variance plot generated and saved to {str_filename}')
 	# return
 	return fig
 
