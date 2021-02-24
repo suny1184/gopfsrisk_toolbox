@@ -446,7 +446,7 @@ def PLOT_INERTIA(df, int_n_max_clusters=20, tpl_figsize=(20,15), str_filename='.
 	# iterate through a range of clusters
 	for n_clusters in np.arange(1, int_n_max_clusters+1):
 		# print message
-		print(f'KMeans - cluster {n_clusters}/{int_n_max_clusters}')
+		print(f'KMeans - n_clusters {n_clusters}/{int_n_max_clusters}')
 		# instantiate model
 		model = KMeans(n_clusters=n_clusters)
 		# fit model to df_cluster
@@ -469,7 +469,7 @@ def PLOT_INERTIA(df, int_n_max_clusters=20, tpl_figsize=(20,15), str_filename='.
 	plt.savefig(f'{str_filename}', bbox_inches='tight')
 	# if using logger
 	if logger:
-		logger.WARNING(f'Inertia plot generated and saved to {str_filename}')
+		logger.warning(f'Inertia plot generated and saved to {str_filename}')
 	# return fig
 	return fig
 
@@ -504,7 +504,7 @@ def PLOT_PCA_EXPLAINED_VARIANCE(df, int_n_components_min=1, int_n_components_max
 	# iterate through n_components
 	for n_components in range(int_n_components_min, int_n_components_max+1):
 		# print status
-		print(f'PCA - {n_components}/{int_n_components_max}')
+		print(f'PCA - n_components {n_components}/{int_n_components_max}')
 		# instantiate class
 		cls_pca = PCA(n_components=n_components, 
 				      copy=True, 
@@ -533,7 +533,7 @@ def PLOT_PCA_EXPLAINED_VARIANCE(df, int_n_components_min=1, int_n_components_max
 	plt.savefig(str_filename, bbox_inches='tight')
 	# if using logging
 	if logger:
-		logger.WARNING(f'PCA explained variance plot generated and saved to {str_filename}')
+		logger.warning(f'PCA explained variance plot generated and saved to {str_filename}')
 	# return
 	return fig
 
