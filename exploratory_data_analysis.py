@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import itertools
 from sklearn.decomposition import PCA
+from sklearn.cluster import KMeans
 
 # define function to log df info
 def LOG_DF_INFO(df, str_dflogname='df_train', str_datecol='dtmStampCreation__app', str_bin_target='TARGET__app', 
@@ -437,6 +438,28 @@ class DistributionAnalysis:
 		list_good_cols = [col for col in self.df_train_sub.columns if col not in self.list_sig_diff]
 		# return
 		return list_good_cols
+
+# class to create kmeans feature
+class CreateKMeansFeature(BaseEstimator, TransformerMixin):
+	# initialize class
+	def __init__(self, int_n_clusters=7):
+		self.int_n_clusters = int_n_clusters
+	# fit
+	def fit(self, X, y=None):
+		# instantiate class
+		cls_kmeans = KMeans(n_clusters=self.int_n_clusters)
+		# fit to X
+		cls_kmeans.fit(X)
+		# save to object
+		self.cls_kmeansv = cls_kmeans
+		# return
+		return self
+	# transform
+	def transform(self, X):
+		# create feature
+		X[f'clusters_{self.int_n_clusters}'] = self.cls_kmeansv.predict(X)
+		# return
+		return X
 
 # define function to find optimal n_components for PCA
 def PLOT_PCA_EXPLAINED_VARIANCE(df, int_n_components_min=1, int_n_components_max=259,
