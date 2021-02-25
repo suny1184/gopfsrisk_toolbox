@@ -433,6 +433,8 @@ class DistributionAnalysis(BaseEstimator, TransformerMixin):
 					plt.close()	
 		# save to object
 		self.list_sig_diff = list_sig_diff
+		# delete the objects we don't want
+		del self.df_train_sub, self.df_valid_sub, self.df_test_sub, df_col
 		# return self
 		return self
 	# drop columns
