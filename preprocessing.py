@@ -96,8 +96,10 @@ class Binaritizer(BaseEstimator, TransformerMixin):
 		X_bin.columns = pd.Series(X_bin.columns).apply(lambda x: '{}__bin'.format(x))
 		# make sure X_bin.index == X.index
 		X_bin.index = X.index
-		# concatenate and return
-		return pd.concat([X, X_bin], axis=1, sort=False)
+		# concatenate
+		X = pd.concat([X, X_bin], axis=1, sort=False)
+		# return
+		return X
 
 # define function to get list of non-numeric rvlr cols
 def GET_NONNUMERIC_RVLR_COLS(df, logger=None):
@@ -207,8 +209,6 @@ class ImputerNumeric(BaseEstimator, TransformerMixin):
 		elif self.metric == 'mean':
 			# get metric for columns in list_cols
 			ser_metric = X[self.list_cols].apply(lambda x: np.nanmean(drop_negative(ser_=x, bool_ignore_neg=self.bool_ignore_neg)), axis=0)
-		# zip the col name and metric to dictionary
-		dict_metric_ = dict(zip(ser_metric.index, ser_metric))
 		# zip into dictionary
 		self.dict_metric_ = dict(zip(ser_metric.index, ser_metric))
 		return self
@@ -216,10 +216,28 @@ class ImputerNumeric(BaseEstimator, TransformerMixin):
 	def transform(self, X):
 		if self.inplace:
 			# fill the nas with dict_metric_
-			X = X.fillna(value=self.dict_metric_, inplace=False)
+			X.fillna(value=self.dict_metric_, inplace=True)
 		else:
 			for key, val in self.dict_metric_.items():
-				X[f'{key}__imp_{metric}'] = X[key].fillna(value=val, inplace=False)
+				X[f'{key}__imp_{val}'] = X[key].fillna(value=val, inplace=False)
+		return X
+
+# create string imputer
+class ImputerStringNonNumeric(BaseEstimator, TransformerMixin):
+	# initialize
+	def __init__(self, list_cols, str_impute='MISSING'):
+		self.list_cols = list_cols
+		self.str_impute = str_impute
+	# fit to X
+	def fit(self, X, y=None):
+		# create dictionary
+		self.dict_impute = dict(zip(self.list_cols, [self.str_impute for col in self.list_cols]))
+		# return
+		return self
+	# transform
+	def transform(self, X):
+		X.fillna(self.dict_impute, inplace=True)
+		# return
 		return X
 
 # create mode imputer
@@ -244,7 +262,7 @@ class ImputerMode(BaseEstimator, TransformerMixin):
 	def transform(self, X):
 		if self.inplace:
 			# fill the nas with dict_mode
-			X = X.fillna(value=self.dict_mode, inplace=False)
+			X.fillna(value=self.dict_mode, inplace=True)
 		else:
 			for key, val in self.dict_mode.items():
 				X['{0}__imp_mode'.format(key)] = X[key].fillna(value=val, inplace=False)

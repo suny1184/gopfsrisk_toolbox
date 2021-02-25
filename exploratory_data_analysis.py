@@ -129,10 +129,9 @@ class DropAllNaN(BaseEstimator, TransformerMixin):
 	# transform
 	def transform(self, X):
 		# drop features
-		for col in self.list_cols_allnan:
-			del X[col]
-			# print message
-			print(f'Dropped {col}')
+		X.drop(self.list_cols_allnan, axis=1, inplace=True)
+		# return
+		return X
 
 # define function to log df shape
 def LOG_DF_SHAPE(df, logger=None):
@@ -181,10 +180,9 @@ class DropNoVariance(BaseEstimator, TransformerMixin):
 	# transform X
 	def transform(self, X):
 		# drop list_novar
-		for col in self.list_novar:
-			del X[col]
-			# print message
-			print(f'Dropped {col}')
+		X.drop(self.list_novar, axis=1, inplace=True)
+		# return
+		return X
 
 # define class
 class DropRedundantFeatures(BaseEstimator, TransformerMixin):
@@ -223,18 +221,21 @@ class DropRedundantFeatures(BaseEstimator, TransformerMixin):
 	# transform
 	def transform(self, X):
 		# drop list_redundant_cols
-		for col in self.list_redundant_cols:
-			del X[col]
-			# print message
-			print(f'Dropped {col}')
+		X.drop(self.list_redundant_cols, axis=1, inplace=True)
+		# return
+		return X
 
 # define class for automating distribution plot analysis
-class DistributionAnalysis:
+class DistributionAnalysis(BaseEstimator, TransformerMixin):
 	# initialiaze
-	def __init__(self, list_cols, int_nrows=1000, int_random_state=42):
+	def __init__(self, list_cols, int_nrows=1000, int_random_state=42, flt_thresh_upper=0.95, tpl_figsize=(10,10), 
+		         str_dirname='./output/distplots'):
 		self.list_cols = list_cols
 		self.int_nrows = int_nrows
 		self.int_random_state = int_random_state
+		self.flt_thresh_upper = flt_thresh_upper
+		self.tpl_figsize = tpl_figsize
+		self.str_dirname = str_dirname
 	# random sample
 	def get_random_sample(self, X, str_df_name='train'):
 		# logic
@@ -245,7 +246,7 @@ class DistributionAnalysis:
 		else:
 			self.df_test_sub = X.sample(n=self.int_nrows, random_state=self.int_random_state)
 	# compare each col
-	def compare_columns(self, flt_thresh_upper=0.95, tpl_figsize=(10,10), str_dirname='./output/distplots'):
+	def fit(self, X, y=None):
 		# iterate through cols
 		list_sig_diff = []
 		for a, col in enumerate(self.list_cols):
@@ -276,7 +277,7 @@ class DistributionAnalysis:
 			# first test (train > valid)
 			flt_avg = np.mean(df_col.apply(lambda x: 1 if x['train'] > x['valid'] else 0, axis=1))
 			# logic for significance
-			if (flt_avg >= flt_thresh_upper):
+			if (flt_avg >= self.flt_thresh_upper):
 				# print
 				print(f'Significant difference in {col} between train and valid ({flt_avg:0.4})')
 				# append to list
@@ -303,7 +304,7 @@ class DistributionAnalysis:
 				# second test (valid > train)
 				flt_avg = np.mean(df_col.apply(lambda x: 1 if x['valid'] > x['train'] else 0, axis=1))
 				# logic for significance
-				if (flt_avg >= flt_thresh_upper):
+				if (flt_avg >= self.flt_thresh_upper):
 					# print
 					print(f'Significant difference in {col} between train and valid ({flt_avg:0.4})')
 					# append to list
@@ -330,7 +331,7 @@ class DistributionAnalysis:
 			# first test (train > test)
 			flt_avg = np.mean(df_col.apply(lambda x: 1 if x['train'] > x['test'] else 0, axis=1))
 			# logic for significance
-			if (flt_avg >= flt_thresh_upper):
+			if (flt_avg >= self.flt_thresh_upper):
 				# print
 				print(f'Significant difference in {col} between train and test ({flt_avg:0.4})')
 				# append to list
@@ -357,7 +358,7 @@ class DistributionAnalysis:
 				# second test (test > train)
 				flt_avg = np.mean(df_col.apply(lambda x: 1 if x['test'] > x['train'] else 0, axis=1))
 				# logic for significance
-				if (flt_avg >= flt_thresh_upper):
+				if (flt_avg >= self.flt_thresh_upper):
 					# print
 					print(f'Significant difference in {col} between train and test ({flt_avg:0.4})')
 					# append to list
@@ -384,7 +385,7 @@ class DistributionAnalysis:
 			# first test (valid > test)
 			flt_avg = np.mean(df_col.apply(lambda x: 1 if x['valid'] > x['test'] else 0, axis=1))
 			# logic for significance
-			if (flt_avg >= flt_thresh_upper):
+			if (flt_avg >= self.flt_thresh_upper):
 				# print
 				print(f'Significant difference in {col} between valid and test ({flt_avg:0.4})')
 				# append to list
@@ -409,7 +410,7 @@ class DistributionAnalysis:
 				# second test (test > valid)
 				flt_avg = np.mean(df_col.apply(lambda x: 1 if x['test'] > x['valid'] else 0, axis=1))
 				# logic for significance
-				if (flt_avg >= flt_thresh_upper):
+				if (flt_avg >= self.flt_thresh_upper):
 					# print
 					print(f'Significant difference in {col} between test and valid ({flt_avg:0.4})')
 					# append to list
@@ -432,12 +433,14 @@ class DistributionAnalysis:
 					plt.close()	
 		# save to object
 		self.list_sig_diff = list_sig_diff
+		# return self
+		return self
 	# drop columns
-	def get_list_good_cols(self):
-		# remove the significantly different columns
-		list_good_cols = [col for col in self.df_train_sub.columns if col not in self.list_sig_diff]
+	def transform(self, X):
+		# drop sig diff cols
+		X.drop(self.list_sig_diff, axis=1, inplace=True)
 		# return
-		return list_good_cols
+		return X
 
 # define function to get inertia by n_clusters
 def PLOT_INERTIA(df, int_n_max_clusters=20, tpl_figsize=(20,15), str_filename='./output/plt_inertia.png', logger=None):
