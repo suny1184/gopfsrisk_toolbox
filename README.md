@@ -1,5 +1,3 @@
-# gopfsrisk_toolbox
-
 <h1>gopfsrisk_toolbox (version = 1.0.0)</h1>
 
 Install from Github via pip:
