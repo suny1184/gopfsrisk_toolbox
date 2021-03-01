@@ -240,7 +240,6 @@ class ImputerMode(BaseEstimator, TransformerMixin):
 	# initialize class
 	def __init__(self, list_cols):
 		self.list_cols = list_cols
-		self.inplace = inplace
 	# fit to X
 	def fit(self, X, y=None):
 		# define function to get mode for each col
