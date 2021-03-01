@@ -83,7 +83,7 @@ class Binaritizer(BaseEstimator, TransformerMixin):
 		self.bool_inplace = bool_inplace
 	# fit to X
 	def fit(self, X, y=None):
-		pass
+		return self
 	# transform X
 	def transform(self, X):
 		# convert X to binary with cols from list_cols
