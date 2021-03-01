@@ -188,16 +188,15 @@ class IterativeImputerNumeric(BaseEstimator, TransformerMixin):
 # create median imputer
 class ImputerNumeric(BaseEstimator, TransformerMixin):
 	# initialize class
-	def __init__(self, list_cols, metric='median', inplace=True, bool_ignore_neg=True):
+	def __init__(self, list_cols, metric='median', bool_ignore_neg=True):
 		self.list_cols = list_cols
 		self.metric = metric
-		self.inplace = inplace
 		self.bool_ignore_neg = bool_ignore_neg
 	# fit to X
 	def fit(self, X, y=None):
 		# define function to remove negative values from a series
 		def drop_negative(ser_, bool_ignore_neg=True):
-			if bool_ignore_neg:
+			if self.bool_ignore_neg:
 				# subset series to those >= 0
 				return ser_[ser_ >= 0]
 			else:
@@ -214,12 +213,8 @@ class ImputerNumeric(BaseEstimator, TransformerMixin):
 		return self
 	# transform X
 	def transform(self, X):
-		if self.inplace:
-			# fill the nas with dict_metric_
-			X.fillna(value=self.dict_metric_, inplace=True)
-		else:
-			for key, val in self.dict_metric_.items():
-				X[f'{key}__imp_{val}'] = X[key].fillna(value=val, inplace=False)
+		# fill the nas with dict_metric_
+		X.fillna(value=self.dict_metric_, inplace=True)
 		return X
 
 # create string imputer
@@ -243,7 +238,7 @@ class ImputerStringNonNumeric(BaseEstimator, TransformerMixin):
 # create mode imputer
 class ImputerMode(BaseEstimator, TransformerMixin):
 	# initialize class
-	def __init__(self, list_cols, inplace=True):
+	def __init__(self, list_cols):
 		self.list_cols = list_cols
 		self.inplace = inplace
 	# fit to X
@@ -260,12 +255,8 @@ class ImputerMode(BaseEstimator, TransformerMixin):
 		return self
 	# transform X
 	def transform(self, X):
-		if self.inplace:
-			# fill the nas with dict_mode
-			X.fillna(value=self.dict_mode, inplace=True)
-		else:
-			for key, val in self.dict_mode.items():
-				X['{0}__imp_mode'.format(key)] = X[key].fillna(value=val, inplace=False)
+		# fill the nas with dict_mode
+		X.fillna(value=self.dict_mode, inplace=True)
 		return X
 
 # class for one-hot encoding
