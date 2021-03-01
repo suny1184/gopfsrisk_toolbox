@@ -228,7 +228,7 @@ class DropRedundantFeatures(BaseEstimator, TransformerMixin):
 # define class for automating distribution plot analysis
 class DistributionAnalysis(BaseEstimator, TransformerMixin):
 	# initialiaze
-	def __init__(self, list_cols, int_nrows=1000, int_random_state=42, flt_thresh_upper=0.95, tpl_figsize=(10,10), 
+	def __init__(self, list_cols, int_nrows=10000, int_random_state=42, flt_thresh_upper=0.95, tpl_figsize=(10,10), 
 		         str_dirname='./output/distplots'):
 		self.list_cols = list_cols
 		self.int_nrows = int_nrows
