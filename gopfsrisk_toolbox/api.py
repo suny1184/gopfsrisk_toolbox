@@ -14,7 +14,7 @@ class Subsetter(BaseEstimator, TransformerMixin):
 		# subset
 		X = X[self.list_cols]
 		# return
-		return self
+		return X
 
 # define pipeline class
 class PipelineDataPrep:
