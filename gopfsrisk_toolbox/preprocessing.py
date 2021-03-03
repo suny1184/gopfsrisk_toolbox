@@ -87,20 +87,17 @@ def GET_LIST_THRESHOLD_NAN(df, flt_threshold=0.5, logger=None, bool_low_memory=T
 # define Binaritizer
 class Binaritizer(BaseEstimator, TransformerMixin):
 	# initialize class
-	def __init__(self, list_columns, bool_inplace=False):
-		self.list_columns = list_columns
-		self.bool_inplace = bool_inplace
+	def __init__(self, list_cols):
+		self.list_cols = list_cols
 	# fit to X
 	def fit(self, X, y=None):
 		return self
 	# transform X
 	def transform(self, X):
+		# make sure all cols in self.list_columns are in X
+		list_cols = [col for col in self.list_cols if col in list(X.columns)]
 		# convert X to binary with cols from list_cols
-		X_bin = X[self.list_columns].notnull()*1
-		# if we are replacing
-		if self.bool_inplace:
-			# drop list_columns from X
-			X.drop(self.list_columns, axis=1, inplce=True)
+		X_bin = X[list_cols].notnull()*1
 		# convert each col name to __bin and set as cols in X_bin
 		X_bin.columns = pd.Series(X_bin.columns).apply(lambda x: '{}__bin'.format(x))
 		# make sure X_bin.index == X.index
