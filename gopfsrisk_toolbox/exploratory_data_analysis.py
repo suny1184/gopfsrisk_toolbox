@@ -10,6 +10,71 @@ import itertools
 from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
 
+# pie chart of proportion NaN values
+def PIE_PLOT_NA_OVERALL(df, str_filename='./output/plt_na_overall.png', tpl_figsize=(10,15), logger=None):
+	# get total number missing
+	n_missing = np.sum(df.isnull().sum())
+	# get total observations
+	n_observations = df.shape[0] * df.shape[1]
+	# both into a list
+	list_values = [n_missing, n_observations]
+	# create axis
+	fig, ax = plt.subplots(figsize=tpl_figsize)
+	# title
+	ax.set_title('Pie Chart of Missing Values')
+	ax.pie(x=[n_missing, n_observations], 
+	       colors=['y', 'c'],
+	       explode=(0, 0.1),
+	       labels=['Missing', 'Non-Missing'], 
+	       autopct='%1.1f%%')
+	# save fig
+	plt.savefig(str_filename, bbox_inches='tight')
+	# close plot
+	plt.close()
+	# logging
+	if logger:
+		logger.WARNING(f'Pie chart of NaN overall saved to {str_filename}')
+	# return fig
+	return fig
+
+# plot binary frequency (i.e., target frequency using binary target)
+def PLOT_BINARY_COMPARISON(ser_binary, str_filename='./output/target_freqplot.png', logger=None):
+	# get value counts for each
+	ser_val_counts = pd.value_counts(ser_binary)
+	# get x
+	x = ser_val_counts.index
+	# get y
+	y = ser_val_counts.values
+	# get total
+	int_total = len(ser_binary)
+	# get pct negative class
+	flt_pct_negative = (y[1]/int_total)*100
+	# get pct positive class
+	flt_pct_positive = (y[0]/int_total)*100
+	# create axis
+	fig, ax = plt.subplots(figsize=(15, 10))
+	# title
+	ax.set_title(f'{flt_pct_negative:0.4}% = 0, {flt_pct_positive:0.4}% = 1, (N = {int_total})')
+	# frequency bar plot
+	ax.bar(x, y)
+	# ylabel
+	ax.set_ylabel('Frequency')
+	# xticks
+	ax.set_xticks([0, 1])
+	# xtick labels
+	ax.set_xticklabels(['0','1'])
+	# save
+	plt.savefig(str_filename, bbox_inches='tight')
+	# close plot
+	plt.close()
+	# log it
+	if logger:
+		logger.warning(f'Target frequency plot saved to {str_filename}')
+	# return
+	return fig
+
+
+
 # define function to log df info
 def LOG_DF_INFO(df, str_dflogname='df_train', str_datecol='dtmStampCreation__app', str_bin_target='TARGET__app', 
 	            logger=None, bool_low_memory=True):
