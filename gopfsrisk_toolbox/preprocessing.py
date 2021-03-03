@@ -35,6 +35,34 @@ def CHRON_TRAIN_VALID_TEST_SPLIT(df, flt_prop_train=0.5, flt_prop_valid=0.25, lo
 	# return
 	return df_train, df_valid, df_test
 
+# class for converting boolean to binary
+class BooleanToBinary(BaseEstimator, TransformerMixin):
+	# initialize
+	def __init__(self, str_datecol=None):
+		self.str_datecol = str_datecol
+	# fit
+	def fit(self, X, y=None):
+		return self
+	# transform
+	def transform(self, X):
+		if self.str_datecol:
+			# save str_datecol as a list
+			list_ = list(X[self.str_datecol])
+			# drop str_datecol
+			del X[self.str_datecol]
+			# multiply X by 1
+			X = X * 1
+			# put list_ into X
+			X[self.str_datecol] = list_
+		else:
+			# multiply X by 1
+			X = X * 1
+		# return
+		return X
+
+
+
+
 # define function to convert true/false columns to 1 0
 def CONVERT_BOOL_TO_BINARY(df, str_datecol='dtmStampCreation__app', logger=None):
 	# save str_datecol as a list
