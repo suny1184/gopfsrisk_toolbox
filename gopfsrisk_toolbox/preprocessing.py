@@ -149,20 +149,18 @@ def ProportionRTIConverter(BaseEstimator, TransformerMixin):
 				prop_rti = n_rti / len_str
 				# return proportion
 				return prop_rti
+		# make sure cols in self.list_cols are in X
+		list_cols = [cols for col in self.list_cols if col in list(X.columns)]
 		# iterate through cols
-		for a, col in enumerate(self.list_cols):
-			# use try except block in case features aren't in X
-			try:
-				# get series
-				series_ = X[col]
-				# iterate through R, T, I
-				for rti in ['R','T','I']:
-					# create new col
-					X[f'{col}__prop_{rti}'] = series_.apply(lambda x: HELPER_PROP_RTI(str_=x, rti=rti))
-				# drop col
-				X.drop(col, axis=1, inplace=True)
-			except:
-				pass
+		for a, col in enumerate(list_cols):
+			# get series
+			series_ = X[col]
+			# iterate through R, T, I
+			for rti in ['R','T','I']:
+				# create new col
+				X[f'{col}__prop_{rti}'] = series_.apply(lambda x: HELPER_PROP_RTI(str_=x, rti=rti))
+			# drop col
+			X.drop(col, axis=1, inplace=True)
 		# return df
 		return X
 
