@@ -47,10 +47,10 @@ def PLOT_BINARY_COMPARISON(ser_binary, str_filename='./output/target_freqplot.pn
 	y = ser_val_counts.values
 	# get total
 	int_total = len(ser_binary)
-	# get pct negative class
-	flt_pct_negative = (y[1]/int_total)*100
-	# get pct positive class
-	flt_pct_positive = (y[0]/int_total)*100
+	# get pct negative class (i.e., when y == 0)
+	flt_pct_negative = (y[0]/int_total)*100
+	# get pct positive class (i.e., when y == 1)
+	flt_pct_positive = (y[1]/int_total)*100
 	# create axis
 	fig, ax = plt.subplots(figsize=(15, 10))
 	# title
