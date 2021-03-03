@@ -60,25 +60,6 @@ class BooleanToBinary(BaseEstimator, TransformerMixin):
 		# return
 		return X
 
-
-
-
-# define function to convert true/false columns to 1 0
-def CONVERT_BOOL_TO_BINARY(df, str_datecol='dtmStampCreation__app', logger=None):
-	# save str_datecol as a list
-	list_ = list(df[str_datecol])
-	# drop str_datecol
-	del df[str_datecol]
-	# multiply df by 1
-	df = df * 1
-	# put list_ into df
-	df[str_datecol] = list_
-	# if using logger
-	if logger:
-		logger.warning('True and False converted into 1 and 0, respectively')
-	# return df
-	return df
-
 # define function to get list of cols with threshold nan
 def GET_LIST_THRESHOLD_NAN(df, flt_threshold=0.5, logger=None, bool_low_memory=True):
 	# empty list
