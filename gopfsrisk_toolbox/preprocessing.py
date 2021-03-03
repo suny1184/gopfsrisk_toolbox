@@ -150,7 +150,7 @@ class ProportionRTIConverter(BaseEstimator, TransformerMixin):
 				# return proportion
 				return prop_rti
 		# make sure cols in self.list_cols are in X
-		list_cols = [cols for col in self.list_cols if col in list(X.columns)]
+		list_cols = [col for col in self.list_cols if col in list(X.columns)]
 		# iterate through cols
 		for a, col in enumerate(list_cols):
 			# get series
