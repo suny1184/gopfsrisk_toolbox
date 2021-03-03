@@ -122,7 +122,7 @@ def GET_NONNUMERIC_RVLR_COLS(df, logger=None):
 	return list_columns
 
 # define class to make proportion R, T, and I from rvlr cols
-def ProportionRTIConverter(BaseEstimator, TransformerMixin):
+class ProportionRTIConverter(BaseEstimator, TransformerMixin):
 	# initialize
 	def __init__(self, list_cols):
 		self.list_cols = list_cols
