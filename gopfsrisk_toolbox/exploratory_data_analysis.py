@@ -33,7 +33,7 @@ def PIE_PLOT_NA_OVERALL(df, str_filename='./output/plt_na_overall.png', tpl_figs
 	plt.close()
 	# logging
 	if logger:
-		logger.WARNING(f'Pie chart of NaN overall saved to {str_filename}')
+		logger.warning(f'Pie chart of NaN overall saved to {str_filename}')
 	# return fig
 	return fig
 
