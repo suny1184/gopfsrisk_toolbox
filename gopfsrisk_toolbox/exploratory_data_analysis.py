@@ -73,7 +73,39 @@ def PLOT_BINARY_COMPARISON(ser_binary, str_filename='./output/target_freqplot.pn
 	# return
 	return fig
 
-
+# define function to create dtype frequ plot
+def PLOT_DTYPE(df, str_filename='./output/plt_dtype.png', tpl_figsize=(10,10), logger=None):
+	# get frequency of numeric and non-numeric
+	counter_numeric = 0
+	counter_non_numeric = 0
+	for col in df.columns:
+		if is_numeric_dtype(df[col]):
+			counter_numeric += 1
+		else:
+			counter_non_numeric += 1
+	# number of cols
+	int_n_cols = len(list(df.columns))
+	# % numeric
+	flt_pct_numeric = (counter_numeric / int_n_cols) * 100
+	# % non-numeric
+	flt_pct_non_numeric = (counter_non_numeric / int_n_cols) * 100
+	# create ax
+	fig, ax = plt.subplots(figsize=tpl_figsize)
+	# title
+	ax.set_title(f'{flt_pct_numeric:0.4}% Numeric, {flt_pct_non_numeric:0.4}% Non-Numeric (N = {int_n_cols})')
+	# y label
+	ax.set_ylabel('Frequency')
+	# bar plot
+	ax.bar(['Numeric','Non-Numeric'], [counter_numeric, counter_non_numeric])
+	# save plot
+	plt.savefig(str_filename, bbox_inches='tight')
+	# close plot
+	plt.close()
+	# log
+	if logger:
+		logger.warning(f'Data type frequency plot saved to {str_filename}')
+	# return
+	return fig
 
 # define function to log df info
 def LOG_DF_INFO(df, str_dflogname='df_train', str_datecol='dtmStampCreation__app', str_bin_target='TARGET__app', 
