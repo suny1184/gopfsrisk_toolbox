@@ -225,8 +225,10 @@ class DropAllNaN(BaseEstimator, TransformerMixin):
 		return self
 	# transform
 	def transform(self, X):
+		# make sure all cols in self.list_cols_allnan are in X
+		list_cols = [col for col in self.list_cols_allnan if col in list(X.columns)]
 		# drop features
-		X.drop(self.list_cols_allnan, axis=1, inplace=True)
+		X.drop(list_cols, axis=1, inplace=True)
 		# return
 		return X
 
@@ -276,8 +278,10 @@ class DropNoVariance(BaseEstimator, TransformerMixin):
 		return self
 	# transform X
 	def transform(self, X):
-		# drop list_novar
-		X.drop(self.list_novar, axis=1, inplace=True)
+		# make sure all cols in self.list_novar are in X
+		list_cols = [col for col in self.list_novar if col in list(X.columns)]
+		# drop list_cols
+		X.drop(list_cols, axis=1, inplace=True)
 		# return
 		return X
 
@@ -317,8 +321,10 @@ class DropRedundantFeatures(BaseEstimator, TransformerMixin):
 		return self
 	# transform
 	def transform(self, X):
-		# drop list_redundant_cols
-		X.drop(self.list_redundant_cols, axis=1, inplace=True)
+		# make sure all cols in self.list_redundant_cols are in X
+		list_cols = [col for col in self.list_redundant_cols if col in list(X.columns)]
+		# drop list_cols
+		X.drop(list_cols, axis=1, inplace=True)
 		# return
 		return X
 
@@ -536,8 +542,10 @@ class DistributionAnalysis(BaseEstimator, TransformerMixin):
 		return self
 	# drop columns
 	def transform(self, X):
-		# drop sig diff cols
-		X.drop(self.list_sig_diff, axis=1, inplace=True)
+		# make sure all cols in self.list_sig_diff are in X
+		list_cols = [col for col in self.list_sig_diff if col in list(X.columns)]
+		# drop list_cols
+		X.drop(list_cols, axis=1, inplace=True)
 		# return
 		return X
 
