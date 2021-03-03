@@ -124,46 +124,50 @@ def GET_NONNUMERIC_RVLR_COLS(df, logger=None):
 	# return
 	return list_columns
 
-# create proportion R, T, and I from rvlr cols
-def PROP_RTI(df, list_str_rti_rvlr_col, bool_drop_col=True, logger=None):
-	# define a helper function for lambda
-	def HELPER_PROP_RTI(str_, rti):
-		# if string is NaN
-		if pd.isnull(str_):
-			return np.nan
-		# if string is not a string
-		elif type(str_) != str:
-			return str_
-		# else
-		else:
-			# get length of string
-			len_str = len(str_)
-			# get number of rti is in str_
-			n_rti = str_.count(rti)
-			# calculate proportion
-			prop_rti = n_rti / len_str
-			# return proportion
-			return prop_rti
-	# iterate through cols
-	for a, col in enumerate(list_str_rti_rvlr_col):
-		# if using logger
-		if logger:
-			logger.warning(f'Converting {col} to proportions of R, T, and I; {a+1}/{len(list_str_rti_rvlr_col)}')
-		# get series
-		series_ = df[col]
-		# iterate through R, T, I
-		for rti in ['R','T','I']:
-			# create new col
-			df[f'{col}__prop_{rti}'] = series_.apply(lambda x: HELPER_PROP_RTI(str_=x, rti=rti))
-		# if we want to drop the original col
-		if bool_drop_col:
-			# drop col
-			df.drop(col, axis=1, inplace=True)
-			# if using logger
-			if logger:
-				logger.warning(f'{col} has been dropped from df.')
-	# return df
-	return df
+# define class to make proportion R, T, and I from rvlr cols
+def ProportionRTIConverter(BaseEstimator, TransformerMixin):
+	# initialize
+	def __init__(self, list_cols):
+		self.list_cols = list_cols
+	# fit
+	def fit(self, X, y=None):
+		return self
+	# transform
+	def transform(self, X):
+		# define a helper function for lambda
+		def HELPER_PROP_RTI(str_, rti):
+			# if string is NaN
+			if pd.isnull(str_):
+				return np.nan
+			# if string is not a string
+			elif type(str_) != str:
+				return str_
+			# else
+			else:
+				# get length of string
+				len_str = len(str_)
+				# get number of rti is in str_
+				n_rti = str_.count(rti)
+				# calculate proportion
+				prop_rti = n_rti / len_str
+				# return proportion
+				return prop_rti
+		# iterate through cols
+		for a, col in enumerate(self.list_cols):
+			# use try except block in case features aren't in X
+			try:
+				# get series
+				series_ = X[col]
+				# iterate through R, T, I
+				for rti in ['R','T','I']:
+					# create new col
+					X[f'{col}__prop_{rti}'] = series_.apply(lambda x: HELPER_PROP_RTI(str_=x, rti=rti))
+				# drop col
+				X.drop(col, axis=1, inplace=True)
+			except:
+				pass
+		# return df
+		return X
 
 # define class for iterative imputing
 class IterativeImputerNumeric(BaseEstimator, TransformerMixin):
