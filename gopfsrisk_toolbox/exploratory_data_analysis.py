@@ -73,6 +73,76 @@ def PLOT_BINARY_COMPARISON(ser_binary, str_filename='./output/target_freqplot.pn
 	# return
 	return fig
 
+# define class to make plot comparisons
+class BinaryTargetComparison:
+	# get y
+	def get_y(self, ser_y, str_df_name='train'):
+		if str_df_name == 'train':
+			self.y_train = ser_y
+		elif str_df_name == 'valid':
+			self.y_valid = ser_y
+		else:
+			self.y_test = ser_y
+	# make plot
+	def make_and_save_plot(self, str_filename='./output/plt_targetcompare.png', tpl_figsize=(12,8)):
+		# iterate through y's and get vals into dict_
+		dict_empty = {}
+		for a, ser_y in enumerate([self.y_train, self.y_valid, self.y_test]):
+			# get value counts for each
+			y_val_counts = pd.value_counts(ser_y)
+			# get x
+			x = y_val_counts.index
+			# logic
+			if a == 0:
+				dict_empty['train_x'] = x
+			elif a == 1:
+				dict_empty['valid_x'] = x
+			else:
+				dict_empty['test_x'] = x
+			# get y
+			y = y_val_counts.values
+			# logic
+			if a == 0:
+				dict_empty['train_y'] = y
+			elif a == 1:
+				dict_empty['valid_y'] = y
+			else:
+				dict_empty['test_y'] = y
+		# create axis
+		fig, ax = plt.subplots(nrows=1, ncols=3, figsize=tpl_figsize)
+		# main title
+		fig.suptitle('Target Frequencies', fontsize=14)
+		counter=0
+		for x, y in ([(dict_empty['train_x'], dict_empty['train_y']),
+			          (dict_empty['valid_x'], dict_empty['valid_y']),
+					  (dict_empty['test_x'], dict_empty['test_y'])]):
+			if counter == 0:
+				str_df_name = 'Train'
+			elif counter == 1:
+				str_df_name = 'Valid'
+			else:
+				str_df_name = 'Test'
+			# title
+			ax[counter].set_title(f'{str_df_name}')
+			# frequency bar plot
+			ax[counter].bar(x, y)
+			# logic
+			if counter == 0:
+				# ylabel
+				ax[counter].set_ylabel('Frequency')
+			# xticks
+			ax[counter].set_xticks([0, 1])
+			# xtick labels
+			ax[counter].set_xticklabels(['0','1'])
+			# increase counter
+			counter += 1
+		# fix overlap
+		plt.tight_layout()
+		# save
+		plt.savefig(str_filename, bbox_inches='tight')
+		# close plot
+		plt.close()
+
 # define function to create dtype frequ plot
 def PLOT_DTYPE(df, str_filename='./output/plt_dtype.png', tpl_figsize=(10,10), logger=None):
 	# get frequency of numeric and non-numeric
