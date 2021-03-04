@@ -468,7 +468,7 @@ class DistributionAnalysis(BaseEstimator, TransformerMixin):
 				# legend
 				plt.legend()
 				# save plot
-				plt.savefig(f'{str_dirname}/{col}.png', bbox_inches='tight')
+				plt.savefig(f'{self.str_dirname}/{col}.png', bbox_inches='tight')
 				# close plot
 				plt.close()
 				# move to next col
@@ -495,7 +495,7 @@ class DistributionAnalysis(BaseEstimator, TransformerMixin):
 					# legend
 					plt.legend()
 					# save plot
-					plt.savefig(f'{str_dirname}/{col}.png', bbox_inches='tight')
+					plt.savefig(f'{self.str_dirname}/{col}.png', bbox_inches='tight')
 					# close plot
 					plt.close()
 					# move to next col
@@ -522,7 +522,7 @@ class DistributionAnalysis(BaseEstimator, TransformerMixin):
 				# legend
 				plt.legend()
 				# save plot
-				plt.savefig(f'{str_dirname}/{col}.png', bbox_inches='tight')
+				plt.savefig(f'{self.str_dirname}/{col}.png', bbox_inches='tight')
 				# close plot
 				plt.close()
 				# move to next col
@@ -549,7 +549,7 @@ class DistributionAnalysis(BaseEstimator, TransformerMixin):
 					# legend
 					plt.legend()
 					# save plot
-					plt.savefig(f'{str_dirname}/{col}.png', bbox_inches='tight')
+					plt.savefig(f'{self.str_dirname}/{col}.png', bbox_inches='tight')
 					# close plot
 					plt.close()
 					# move to next col
@@ -576,7 +576,7 @@ class DistributionAnalysis(BaseEstimator, TransformerMixin):
 				# legend
 				plt.legend()
 				# save plot
-				plt.savefig(f'{str_dirname}/{col}.png', bbox_inches='tight')
+				plt.savefig(f'{self.str_dirname}/{col}.png', bbox_inches='tight')
 				# close plot
 				plt.close()
 			else:
@@ -601,7 +601,7 @@ class DistributionAnalysis(BaseEstimator, TransformerMixin):
 					# legend
 					plt.legend()
 					# save plot
-					plt.savefig(f'{str_dirname}/{col}.png', bbox_inches='tight')
+					plt.savefig(f'{self.str_dirname}/{col}.png', bbox_inches='tight')
 					# close plot
 					plt.close()	
 		# save to object
