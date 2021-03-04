@@ -456,7 +456,7 @@ class DistributionAnalysis(BaseEstimator, TransformerMixin):
 				# append to list
 				list_sig_diff.append(col)
 				# make distribution plot
-				fig, ax = plt.subplots(figsize=tpl_figsize)
+				fig, ax = plt.subplots(figsize=self.tpl_figsize)
 				# title
 				ax.set_title(f'{col} - Train > Test')
 				# plot train
@@ -483,7 +483,7 @@ class DistributionAnalysis(BaseEstimator, TransformerMixin):
 					# append to list
 					list_sig_diff.append(col)
 					# make distribution plot
-					fig, ax = plt.subplots(figsize=tpl_figsize)
+					fig, ax = plt.subplots(figsize=self.tpl_figsize)
 					# title
 					ax.set_title(f'{col} Valid > Train')
 					# plot train
@@ -510,7 +510,7 @@ class DistributionAnalysis(BaseEstimator, TransformerMixin):
 				# append to list
 				list_sig_diff.append(col)
 				# make distribution plot
-				fig, ax = plt.subplots(figsize=tpl_figsize)
+				fig, ax = plt.subplots(figsize=self.tpl_figsize)
 				# title
 				ax.set_title(f'{col} - Train > Test')
 				# plot train
@@ -537,7 +537,7 @@ class DistributionAnalysis(BaseEstimator, TransformerMixin):
 					# append to list
 					list_sig_diff.append(col)
 					# make distribution plot
-					fig, ax = plt.subplots(figsize=tpl_figsize)
+					fig, ax = plt.subplots(figsize=self.tpl_figsize)
 					# title
 					ax.set_title(f'{col} - Test > Train')
 					# plot train
@@ -564,7 +564,7 @@ class DistributionAnalysis(BaseEstimator, TransformerMixin):
 				# append to list
 				list_sig_diff.append(col)
 				# make distribution plot
-				fig, ax = plt.subplots(figsize=tpl_figsize)
+				fig, ax = plt.subplots(figsize=self.tpl_figsize)
 				# title
 				ax.set_title(f'{col} - Valid > Test')
 				# plot train
@@ -589,7 +589,7 @@ class DistributionAnalysis(BaseEstimator, TransformerMixin):
 					# append to list
 					list_sig_diff.append(col)
 					# make distribution plot
-					fig, ax = plt.subplots(figsize=tpl_figsize)
+					fig, ax = plt.subplots(figsize=self.tpl_figsize)
 					# title
 					ax.set_title(f'{col} - Test > Valid')
 					# plot train
