@@ -111,7 +111,7 @@ class BinaryTargetComparison:
 		# create axis
 		fig, ax = plt.subplots(nrows=1, ncols=3, figsize=tpl_figsize)
 		# main title
-		fig.suptitle('Target Frequencies', fontsize=14)
+		#fig.suptitle('Target Frequencies', fontsize=14)
 		counter=0
 		for x, y in ([(dict_empty['train_x'], dict_empty['train_y']),
 			          (dict_empty['valid_x'], dict_empty['valid_y']),
