@@ -29,7 +29,7 @@ class StringConverter(BaseEstimator, TransformerMixin):
 		# get the null cells
 		df_null_cells = X[list_cols].isnull()
 		# convert to string
-		X = X[list_cols].astype(str).mask(df_null_cells, np.nan)
+		X[list_cols] = X[list_cols].astype(str).mask(df_null_cells, np.nan)
 		# return
 		return X
 
