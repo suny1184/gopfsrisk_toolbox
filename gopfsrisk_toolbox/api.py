@@ -33,9 +33,9 @@ class PipelineDataPrep:
 		# return
 		return self
 	# predict
-	def get_prediction(self):
+	def get_prediction(self, X):
 		# generate predictions
-		flt_prediction = self.model.predict_proba(self.X)[0,1]
+		flt_prediction = self.model.predict_proba(X)[:,1]
 		# return
 		return flt_prediction
 	# combine both methods
@@ -43,6 +43,6 @@ class PipelineDataPrep:
 		# call prep_x
 		self.prep_x(X)
 		# return get_prediction
-		return self.get_prediction()
+		return self.get_prediction(X)
 
 
