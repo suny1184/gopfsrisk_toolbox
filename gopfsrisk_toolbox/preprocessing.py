@@ -18,7 +18,7 @@ from sklearn.linear_model import BayesianRidge
 class StringConverter(BaseEstimator, TransformerMixin):
 	# initialize
 	def __init__(self, list_cols):
-		self.list_cols
+		self.list_cols = list_cols
 	# fit
 	def fit(self, X, y=None):
 		return self
@@ -27,7 +27,7 @@ class StringConverter(BaseEstimator, TransformerMixin):
 		# make sure all cols are in X
 		list_cols = [col for col in self.list_cols if col in list(X.columns)]
 		# convert to string
-		X[X[list_cols].notnull()] = X.astype(str)
+		X[X[list_cols].notnull()] = X[list_cols].astype(str)
 		# return
 		return X
 
