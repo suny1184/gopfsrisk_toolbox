@@ -14,6 +14,23 @@ from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer
 from sklearn.linear_model import BayesianRidge
 
+# define string converter
+class StringConverter(BaseEstimator, TransformerMixin):
+    # initialize
+    def __init__(self, list_cols):
+        self.list_cols
+    # fit
+    def fit(self, X, y=None):
+        return self
+    # transform
+    def transform(self, X):
+        # make sure all cols are in X
+        list_cols = [col for col in self.list_cols if col in list(X.columns)]
+        # convert to string
+        X[list_cols] = X[list_cols].astype(str)
+        # return
+        return X
+
 # define function for chronological split
 def CHRON_TRAIN_VALID_TEST_SPLIT(df, flt_prop_train=0.5, flt_prop_valid=0.25, logger=None):
 	# get n_rows in df
