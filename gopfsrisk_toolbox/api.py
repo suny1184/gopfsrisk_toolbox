@@ -22,27 +22,13 @@ class PipelineDataPrep:
 	def __init__(self, list_transformers, model):
 		self.list_transformers = list_transformers
 		self.model = model
-	# prep data
-	def prep_x(self, X):
+	# prep predict
+	def prep_predict(self, X):
 		# loop through transformers
 		for transformer in self.list_transformers:
 			# transform
 			X = transformer.transform(X)
-		# save X to object
-		self.X = X
+		# make predictions
+		y_hat = self.model.predict_proba(X[self.model.feature_names_])[:,1]
 		# return
-		return self
-	# predict
-	def get_prediction(self, X):
-		# generate predictions
-		flt_prediction = self.model.predict_proba(X)[:,1]
-		# return
-		return flt_prediction
-	# combine both methods
-	def prep_predict(self, X):
-		# call prep_x
-		self.prep_x(X)
-		# return get_prediction
-		return self.get_prediction(self.X)
-
-
+		return y_hat
