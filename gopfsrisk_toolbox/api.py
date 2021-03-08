@@ -43,6 +43,6 @@ class PipelineDataPrep:
 		# call prep_x
 		self.prep_x(X)
 		# return get_prediction
-		return self.get_prediction(X)
+		return self.get_prediction(self.X)
 
 
