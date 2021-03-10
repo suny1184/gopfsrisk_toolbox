@@ -1,6 +1,21 @@
 # api
 from sklearn.base import BaseEstimator, TransformerMixin
 
+# define dropper class
+class FeatureDropper(BaseEstimator, TransformerMixin):
+	# initialize
+	def __init__(self, list_cols):
+		self.list_cols = list_cols
+	# fit
+	def fit(self, X, y=None):
+		return self
+	# transform
+	def transform(self, X):
+		# drop
+		X = X.drop(self.list_cols, axis=1, inplace=False)
+		# return
+		return X
+
 # define subsetter class
 class Subsetter(BaseEstimator, TransformerMixin):
 	# initialize
