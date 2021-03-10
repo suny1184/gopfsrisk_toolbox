@@ -358,9 +358,10 @@ class DropNoVariance(BaseEstimator, TransformerMixin):
 # define class
 class DropRedundantFeatures(BaseEstimator, TransformerMixin):
 	# initialize class
-	def __init__(self, list_cols, int_n_rows_check=10000):
+	def __init__(self, list_cols, int_n_rows_check=10000, bool_low_memory=True):
 		self.list_cols = list_cols
 		self.int_n_rows_check = int_n_rows_check
+		self.bool_low_memory = bool_low_memory
 	# fit
 	def fit(self, X, y=None):
 		# instantiate empty list
@@ -394,7 +395,11 @@ class DropRedundantFeatures(BaseEstimator, TransformerMixin):
 		# make sure all cols in self.list_redundant_cols are in X
 		list_cols = [col for col in self.list_redundant_cols if col in list(X.columns)]
 		# drop list_cols
-		X.drop(list_cols, axis=1, inplace=True)
+		if self.bool_low_memory:
+			for col in list_cols:
+				del X[col]
+		else:
+			X.drop(list_cols, axis=1, inplace=True)
 		# return
 		return X
 
@@ -402,13 +407,14 @@ class DropRedundantFeatures(BaseEstimator, TransformerMixin):
 class DistributionAnalysis(BaseEstimator, TransformerMixin):
 	# initialiaze
 	def __init__(self, list_cols, int_nrows=10000, int_random_state=42, flt_thresh_upper=0.95, tpl_figsize=(10,10), 
-		         str_dirname='./output/distplots'):
+		         str_dirname='./output/distplots', bool_low_memory=True):
 		self.list_cols = list_cols
 		self.int_nrows = int_nrows
 		self.int_random_state = int_random_state
 		self.flt_thresh_upper = flt_thresh_upper
 		self.tpl_figsize = tpl_figsize
 		self.str_dirname = str_dirname
+		self.bool_low_memory = bool_low_memory
 	# random sample
 	def get_random_sample(self, X, str_df_name='train'):
 		# logic
@@ -615,7 +621,11 @@ class DistributionAnalysis(BaseEstimator, TransformerMixin):
 		# make sure all cols in self.list_sig_diff are in X
 		list_cols = [col for col in self.list_sig_diff if col in list(X.columns)]
 		# drop list_cols
-		X.drop(list_cols, axis=1, inplace=True)
+		if self.bool_low_memory:
+			for col in list_cols:
+				del X[col]
+		else:
+			X.drop(list_cols, axis=1, inplace=True)
 		# return
 		return X
 
