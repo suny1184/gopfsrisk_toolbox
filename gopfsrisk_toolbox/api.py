@@ -2,19 +2,17 @@
 from sklearn.base import BaseEstimator, TransformerMixin
 
 # define dropper class
-class FeatureDropper(BaseEstimator, TransformerMixin):
+class FinalImputer(BaseEstimator, TransformerMixin):
 	# initialize
-	def __init__(self, list_cols):
-		self.list_cols = list_cols
+	def __init__(self, dict_imputations):
+		self.dict_imputations = dict_imputations
 	# fit
 	def fit(self, X, y=None):
 		return self
 	# transform
 	def transform(self, X):
-		# make sure list_cols are in X
-		list_cols = [col for col in self.list_cols if col in list(X.columns)]
-		# drop
-		X = X.drop(self.list_cols, axis=1, inplace=False)
+		# fillna
+		X.fillna(self.dict_imputations, inplace=True)
 		# return
 		return X
 
