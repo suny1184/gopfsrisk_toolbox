@@ -11,6 +11,8 @@ class FeatureDropper(BaseEstimator, TransformerMixin):
 		return self
 	# transform
 	def transform(self, X):
+		# make sure list_cols are in X
+		list_cols = [col for col in self.list_cols if col in list(X.columns)]
 		# drop
 		X = X.drop(self.list_cols, axis=1, inplace=False)
 		# return
