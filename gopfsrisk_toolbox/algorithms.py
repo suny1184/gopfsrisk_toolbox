@@ -19,7 +19,7 @@ def POOL_DATA(X, y, list_non_numeric, logger=None):
 def FIT_CATBOOST_MODEL(int_iterations, str_eval_metric, int_early_stopping_rounds, list_non_numeric=None, 
 					   X_train=None, y_train=None, X_valid=None, y_valid=None, str_task_type='GPU', 
 					   bool_classifier=True, list_class_weights=None, dict_monotone_constraints=None, 
-					   int_random_state=None, bool_pool=True, train_pool=None, valid_pool=None):
+					   int_random_state=None, bool_pool=True, train_pool=None, valid_pool=None, l2_leaf_reg=None):
 	# logic for pooling
 	if bool_pool:
 		# pool train
@@ -38,14 +38,16 @@ def FIT_CATBOOST_MODEL(int_iterations, str_eval_metric, int_early_stopping_round
 		                              task_type=str_task_type,
 		                              class_weights=list_class_weights,
 		                              monotone_constraints=dict_monotone_constraints,
-		                              random_state=int_random_state)
+		                              random_state=int_random_state,
+		                              l2_leaf_reg=l2_leaf_reg)
 	else:
 		# instantiate CatBoostRegressor model
 		model = cb.CatBoostRegressor(iterations=int_iterations,
 		                             eval_metric=str_eval_metric,
 		                             task_type=str_task_type,
 		                             monotone_constraints=dict_monotone_constraints,
-		                             random_state=int_random_state)
+		                             random_state=int_random_state,
+		                             l2_leaf_reg=l2_leaf_reg)
 	# fit to training
 	model.fit(train_pool,
 	          eval_set=[valid_pool], # can only handle one eval set when using gpu
