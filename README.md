@@ -10,5 +10,5 @@ Upgrade from Github via pip:
 
 Install directly from Github:
 - ```git clone https://github.com/gopfsrisk/gopfsrisk_toolbox```
-- ```cd prestige```
+- ```cd gopfsrisk_toolbox```
 - ```python setup.py install```
