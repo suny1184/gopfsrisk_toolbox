@@ -7,6 +7,7 @@ import ast
 import pickle
 from sklearn.metrics import f1_score, roc_auc_score
 from scipy.special import expit
+import matplotlib.pyplot as plt
 
 # define function for iterative feature selection
 def ITERATIVE_FEAT_SELECTION(X_train, y_train, X_valid, y_valid, list_non_numeric, 
@@ -14,11 +15,16 @@ def ITERATIVE_FEAT_SELECTION(X_train, y_train, X_valid, y_valid, list_non_numeri
 							 int_iterations=1000, int_early_stopping_rounds=100,
 							 str_eval_metric='F1', int_random_state=42,
 							 str_filename='./output/list_bestfeats.pkl',
-							 logger=None):
+							 logger=None, tpl_figsize=(12,10), str_filename_plot='./output/plt_n_feats.png'):
 	# instantiate empty list
 	list_empty = []
+	# instantiate lists for plotting
+	list_idx = []
+	list_n_feats = []
 	# build n models
 	for a in range(int_n_models):
+		# append a+1 to list_idx
+		list_idx.append(a+1)
 		# print message
 		print(f'Fitting model {a+1}/{int_n_models}')
 		# fit model
@@ -49,6 +55,22 @@ def ITERATIVE_FEAT_SELECTION(X_train, y_train, X_valid, y_valid, list_non_numeri
 				list_empty.append(feat)
 		# pickle list
 		pickle.dump(list_empty, open(str_filename, 'wb'))
+		# append length of list_empty to list_n_feats
+		list_n_feats.append(len(list_empty))
+		# ax
+		fig, ax = plt.subplots(figsize=tpl_figsize)
+		# plot
+		ax.plot(list_idx, list_n_feats)
+		# title
+		ax.set_title('N Features by N Models')
+		# x
+		ax.set_xlabel('N Models')
+		# y
+		ax.set_ylabel('N Features')
+		# save
+		plt.savefig(str_filename_plot, bbox_inches='tight')
+		# close
+		plt.close()
 	# if using logger
 	if logger:
 		logger.warning(f'Completed iterative feature selection after fitting {int_n_models} models.')
