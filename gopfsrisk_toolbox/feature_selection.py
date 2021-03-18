@@ -65,6 +65,8 @@ def ITERATIVE_FEAT_SELECTION(X_train, y_train, X_valid, y_valid, list_non_numeri
 		ax.set_title('N Features by N Models')
 		# x
 		ax.set_xlabel('N Models')
+		# x ticks
+		ax.set_xticks(str(idx) for idx in list_idx)
 		# y
 		ax.set_ylabel('N Features')
 		# save
