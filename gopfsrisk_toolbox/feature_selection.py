@@ -55,18 +55,20 @@ def ITERATIVE_FEAT_SELECTION(X_train, y_train, X_valid, y_valid, list_non_numeri
 				list_empty.append(feat)
 		# pickle list
 		pickle.dump(list_empty, open(str_filename, 'wb'))
+
 		# append length of list_empty to list_n_feats
 		list_n_feats.append(len(list_empty))
+
 		# ax
 		fig, ax = plt.subplots(figsize=tpl_figsize)
 		# plot
-		ax.plot(list_idx, list_n_feats)
+		ax.plot([str(idx) for idx in list_idx], list_n_feats)
 		# title
 		ax.set_title('N Features by N Models')
 		# x
 		ax.set_xlabel('N Models')
 		# x ticks
-		ax.set_xticks(str(idx) for idx in list_idx)
+		ax.set_xticks([str(idx) for idx in list_idx])
 		# y
 		ax.set_ylabel('N Features')
 		# save
