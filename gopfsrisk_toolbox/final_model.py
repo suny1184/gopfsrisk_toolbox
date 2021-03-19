@@ -20,7 +20,7 @@ def ITERATIVE_MODEL_FITTING(train_pool, valid_pool, X_valid, y_valid, list_class
 	                        int_iterations=10000, int_early_stopping_rounds=1000,
 		                    str_filename='./output/df_randstates.csv', int_randstate_start=0, logger=None,
 		                    str_eval_metric='F1', str_task_type='GPU', tpl_figsize=(12,10),
-		                    str_filename_plot='./output/plt_randstates.png'):
+		                    str_filename_plot='./output/plt_randstates.png', str_filename_model='./output/cb_model.sav'):
 	# create message
 	str_message = f'Iterative model fitting for {int_n_randstate} rounds starting at random_state {int_randstate_start}'
 	# print it
@@ -96,13 +96,13 @@ def ITERATIVE_MODEL_FITTING(train_pool, valid_pool, X_valid, y_valid, list_class
 			# save flt_evalmetric as the current high
 			flt_evalmetric_curr_max = flt_evalmetric
 			# pickle model
-			pickle.dump(model, open('./model/cb_model.sav', 'wb'))
+			pickle.dump(model, open('./output/cb_model.sav', 'wb'))
 		# if we are not on the first iteration and we have a new high eval metric score
 		if (counter > 0) and (flt_evalmetric > flt_evalmetric_curr_max):
 			# save flt_evalmetric as the current high
 			flt_evalmetric_curr_max = flt_evalmetric
 			# pickle model
-			pickle.dump(model, open('./model/cb_model.sav', 'wb'))
+			pickle.dump(model, open('./output/cb_model.sav', 'wb'))
 
 		# create dict
 		dict_ = {'random_state': int_random_state,
