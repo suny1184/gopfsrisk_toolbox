@@ -19,7 +19,8 @@ def COMBINE_TRAIN_AND_VALID(df_train, df_valid, logger=None):
 def ITERATIVE_MODEL_FITTING(train_pool, valid_pool, X_valid, y_valid, list_class_weights, int_n_randstate=50, 
 	                        int_iterations=10000, int_early_stopping_rounds=1000,
 		                    str_filename='./output/df_randstates.csv', int_randstate_start=0, logger=None,
-		                    str_eval_metric='F1', str_task_type='GPU'):
+		                    str_eval_metric='F1', str_task_type='GPU', tpl_figsize=(12,10),
+		                    str_filename_plot='./output/plt_randstates.png'):
 	# create message
 	str_message = f'Iterative model fitting for {int_n_randstate} rounds starting at random_state {int_randstate_start}'
 	# print it
@@ -36,9 +37,14 @@ def ITERATIVE_MODEL_FITTING(train_pool, valid_pool, X_valid, y_valid, list_class
 		# create empty df
 		df_empty = pd.DataFrame()
 
+	# empty lists
+	list_random_state = []
+	list_flt_evalmetric = []
 	# iterate through random states
 	counter = 0
 	for int_random_state in range(int_randstate_start, (int_randstate_start+int_n_randstate)):
+		# append
+		list_random_state.append(int_random_state)
 		# print message
 		print(f'Fitting model {int_random_state+1}/{int_n_randstate}')
 		# fit cb model
@@ -65,6 +71,25 @@ def ITERATIVE_MODEL_FITTING(train_pool, valid_pool, X_valid, y_valid, list_class
 		elif str_eval_metric == 'AUC':
 			# get eval metric
 			flt_evalmetric = roc_auc_score(y_true=y_valid, y_score=model.predict_proba(X_valid)[:,1])
+		# append to list
+		list_flt_evalmetric.append(flt_evalmetric)
+
+		# ax
+		fig, ax = plt.subplots(figsize=tpl_figsize)
+		# plot
+		ax.plot([str(rand_state) for rand_state in list_random_state], list_flt_evalmetric)
+		# title
+		ax.set_title(f'{str_eval_metric} by Random State')
+		# x
+		ax.set_xlabel('Random State')
+		# xticks
+		ax.set_xticks([str(rand_state) for rand_state in list_random_state])
+		# y
+		ax.set_ylabel(str_eval_metric)
+		# save
+		plt.savefig(str_filename_plot, bbox_inches='tight')
+		# close
+		plt.close()
 
 		# if we are on first iteration
 		if counter == 0:
