@@ -96,13 +96,13 @@ def ITERATIVE_MODEL_FITTING(train_pool, valid_pool, X_valid, y_valid, list_class
 			# save flt_evalmetric as the current high
 			flt_evalmetric_curr_max = flt_evalmetric
 			# pickle model
-			pickle.dump(model, open('./output/cb_model.sav', 'wb'))
+			pickle.dump(model, open(str_filename_model, 'wb'))
 		# if we are not on the first iteration and we have a new high eval metric score
 		if (counter > 0) and (flt_evalmetric > flt_evalmetric_curr_max):
 			# save flt_evalmetric as the current high
 			flt_evalmetric_curr_max = flt_evalmetric
 			# pickle model
-			pickle.dump(model, open('./output/cb_model.sav', 'wb'))
+			pickle.dump(model, open(str_filename_model, 'wb'))
 
 		# create dict
 		dict_ = {'random_state': int_random_state,
