@@ -25,17 +25,15 @@ class CyclicFeatures(BaseEstimator, TransformerMixin):
 	# transform
 	def transform(self, X):
 		# convert to datetime
-		X[str_datecol] = pd.to_datetime(X[str_datecol])
-		
-		# month relative to year
+		X[self.str_datecol] = pd.to_datetime(X[self.str_datecol])
+		# MONTH RELATIVE TO YEAR
 		# get month of year
 		X['month_of_year'] = pd.DatetimeIndex(X[str_datecol]).month
 		# get sin of month
 		X[f'{str_datecol}_month_year_sin'] = np.sin((X['month_of_year']-1) * (2*np.pi/12))
 		# get cos of month
 		X[f'{str_datecol}_month_year_cos'] = np.cos((X['month_of_year']-1) * (2*np.pi/12))	
-		
-		# day relative to month
+		# DAY RELATIVE TO MONTH
 		# get day of month
 		X['day_of_month'] = pd.DatetimeIndex(X[str_datecol]).day
 		# make string of year-month
@@ -46,16 +44,14 @@ class CyclicFeatures(BaseEstimator, TransformerMixin):
 		X[f'{str_datecol}_day_month_sin'] = np.sin((X['day_of_month']-1) * (2*np.pi/X['days_in_month']))
 		# get cosin of day relative to month
 		X[f'{str_datecol}_day_month_cos'] = np.cos((X['day_of_month']-1) * (2*np.pi/X['days_in_month']))
-		
-		# day relative to week
+		# DAY RELATIVE TO WEEK
 		# get day of week (starts at zero so we won't subtract 1 below)
 		X['day_of_week'] = pd.DatetimeIndex(X[str_datecol]).dayofweek
 		# get sin of day relative to week
 		X[f'{str_datecol}_day_week_sin'] = np.sin((X['day_of_week']) * (2*np.pi/7))
 		# get cosin of day relative to month
 		X[f'{str_datecol}_day_week_cos'] = np.cos((X['day_of_week']) * (2*np.pi/7))
-		
-		# day relative to year
+		# DAY RELATIVE TO YEAR
 		# get day of year
 		X['day_of_year'] = pd.DatetimeIndex(X[str_datecol]).dayofyear
 		# get year
@@ -68,20 +64,17 @@ class CyclicFeatures(BaseEstimator, TransformerMixin):
 		X[f'{str_datecol}_day_year_sin'] = np.sin((X['day_of_year']-1) * (2*np.pi/X['days_in_year']))
 		# get cosin of day relative to year
 		X[f'{str_datecol}_day_year_cos'] = np.cos((X['day_of_year']-1) * (2*np.pi/X['days_in_year']))
-		
-		# hour relative to day
+		# HOUR RELATIVE TO DAY
 		# get hour of day
 		X['hour_of_day'] = pd.DatetimeIndex(X[str_datecol]).hour
 		# get sin of hour relative to day
 		X[f'{str_datecol}_hour_day_sin'] = np.sin((X['hour_of_day']) * (2*np.pi/24))
 		# get cos of hour relative to day
 		X[f'{str_datecol}_hour_day_cos'] = np.cos((X['hour_of_day']) * (2*np.pi/24))
-		
-		# drop features
+		# DROP FEATURES
 		X.drop(['month_of_year','day_of_month','year_month','days_in_month',
 		        'day_of_week','day_of_year','year','last_day_of_year',
 				'days_in_year','hour_of_day'], axis=1, inplace=True)
-		
 		# return
 		return X
 
