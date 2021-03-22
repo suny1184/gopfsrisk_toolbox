@@ -1,4 +1,4 @@
-# functions
+# preprocessing
 import logging
 import os
 import pandas as pd
@@ -13,6 +13,77 @@ from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
 from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer
 from sklearn.linear_model import BayesianRidge
+
+# define cyclic FE class
+class CyclicFeatures(BaseEstimator, TransformerMixin):
+	# initialize
+	def __init__(self, str_datecol):
+		self.str_datecol = str_datecol
+	# fit
+	def fit(self, X, y=None):
+		return self
+	# transform
+	def transform(self, X):
+		# convert to datetime
+		X[str_datecol] = pd.to_datetime(X[str_datecol])
+		
+		# month relative to year
+		# get month of year
+		X['month_of_year'] = pd.DatetimeIndex(X[str_datecol]).month
+		# get sin of month
+		X[f'{str_datecol}_month_year_sin'] = np.sin((X['month_of_year']-1) * (2*np.pi/12))
+		# get cos of month
+		X[f'{str_datecol}_month_year_cos'] = np.cos((X['month_of_year']-1) * (2*np.pi/12))	
+		
+		# day relative to month
+		# get day of month
+		X['day_of_month'] = pd.DatetimeIndex(X[str_datecol]).day
+		# make string of year-month
+		X['year_month'] = X[str_datecol].apply(lambda x: f'{x.year}-{x.month}')
+		# get the days in each month
+		X['days_in_month'] = X['year_month'].apply(lambda x: pd.Period(x).days_in_month)
+		# get sin of day relative to month
+		X[f'{str_datecol}_day_month_sin'] = np.sin((X['day_of_month']-1) * (2*np.pi/X['days_in_month']))
+		# get cosin of day relative to month
+		X[f'{str_datecol}_day_month_cos'] = np.cos((X['day_of_month']-1) * (2*np.pi/X['days_in_month']))
+		
+		# day relative to week
+		# get day of week (starts at zero so we won't subtract 1 below)
+		X['day_of_week'] = pd.DatetimeIndex(X[str_datecol]).dayofweek
+		# get sin of day relative to week
+		X[f'{str_datecol}_day_week_sin'] = np.sin((X['day_of_week']) * (2*np.pi/7))
+		# get cosin of day relative to month
+		X[f'{str_datecol}_day_week_cos'] = np.cos((X['day_of_week']) * (2*np.pi/7))
+		
+		# day relative to year
+		# get day of year
+		X['day_of_year'] = pd.DatetimeIndex(X[str_datecol]).dayofyear
+		# get year
+		X['year'] = pd.DatetimeIndex(X[str_datecol]).year
+		# get last day of year
+		X['last_day_of_year'] = X['year'].apply(lambda x: f'12-31-{x}')
+		# get days in year so it works with leap years
+		X['days_in_year'] = pd.DatetimeIndex(X['last_day_of_year']).dayofyear
+		# get sin of day relative to year
+		X[f'{str_datecol}_day_year_sin'] = np.sin((X['day_of_year']-1) * (2*np.pi/X['days_in_year']))
+		# get cosin of day relative to year
+		X[f'{str_datecol}_day_year_cos'] = np.cos((X['day_of_year']-1) * (2*np.pi/X['days_in_year']))
+		
+		# hour relative to day
+		# get hour of day
+		X['hour_of_day'] = pd.DatetimeIndex(X[str_datecol]).hour
+		# get sin of hour relative to day
+		X[f'{str_datecol}_hour_day_sin'] = np.sin((X['hour_of_day']) * (2*np.pi/24))
+		# get cos of hour relative to day
+		X[f'{str_datecol}_hour_day_cos'] = np.cos((X['hour_of_day']) * (2*np.pi/24))
+		
+		# drop features
+		X.drop(['month_of_year','day_of_month','year_month','days_in_month',
+		        'day_of_week','day_of_year','year','last_day_of_year',
+				'days_in_year','hour_of_day'], axis=1, inplace=True)
+		
+		# return
+		return X
 
 # define string converter
 class StringConverter(BaseEstimator, TransformerMixin):
