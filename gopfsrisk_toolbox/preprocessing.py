@@ -17,7 +17,7 @@ from sklearn.linear_model import BayesianRidge
 # define cyclic FE class
 class CyclicFeatures(BaseEstimator, TransformerMixin):
 	# initialize
-	def __init__(self, str_datecol):
+	def __init__(self, str_datecol, bool_drop_datecol=True):
 		self.str_datecol = str_datecol
 	# fit
 	def fit(self, X, y=None):
@@ -72,9 +72,14 @@ class CyclicFeatures(BaseEstimator, TransformerMixin):
 		# get cos of hour relative to day
 		X[f'{self.str_datecol}_hour_day_cos'] = np.cos((X['hour_of_day']) * (2*np.pi/24))
 		# DROP FEATURES
-		X.drop(['month_of_year','day_of_month','year_month','days_in_month',
-		        'day_of_week','day_of_year','year','last_day_of_year',
-				'days_in_year','hour_of_day'], axis=1, inplace=True)
+		if self.bool_drop_datecol:
+			X.drop(['month_of_year','day_of_month','year_month','days_in_month',
+			        'day_of_week','day_of_year','year','last_day_of_year',
+					'days_in_year','hour_of_day', self.str_datecol], axis=1, inplace=True)
+		else:
+			X.drop(['month_of_year','day_of_month','year_month','days_in_month',
+			        'day_of_week','day_of_year','year','last_day_of_year',
+					'days_in_year','hour_of_day'], axis=1, inplace=True)
 		# return
 		return X
 
