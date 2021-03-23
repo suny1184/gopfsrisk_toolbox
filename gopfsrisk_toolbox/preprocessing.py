@@ -19,6 +19,7 @@ class CyclicFeatures(BaseEstimator, TransformerMixin):
 	# initialize
 	def __init__(self, str_datecol, bool_drop_datecol=True):
 		self.str_datecol = str_datecol
+		self.bool_drop_datecol = bool_drop_datecol
 	# fit
 	def fit(self, X, y=None):
 		return self
