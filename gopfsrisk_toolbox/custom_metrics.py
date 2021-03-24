@@ -24,10 +24,10 @@ class DollarsGained:
 		# get true negative, false positives, etc
 		tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
 		# multiply by weights
-		sum_tp = tp * weight[0] # 1st item in class_weights needs to correspond with true positive
-		sum_fp = fp * weight[1] # 2nd item in class_weights needs to correspond with false positives
-		sum_tn = tn * weight[2] # 3rd item in class_weights needs to correspond with true negatives
-		sum_fn = fn * weight[3] # 4th item in class_weights needs to correspond with false negatives
+		sum_tp = tp * 10000
+		sum_fp = fp * -500
+		sum_tn = tn * 0
+		sum_fn = fn * -500
 		# calculate sum
 		error = np.sum([sum_tp, sum_fp, sum_tn, sum_fn])
 		# return
