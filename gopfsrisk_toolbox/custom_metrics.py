@@ -36,6 +36,8 @@ class DollarsGained:
 		return error, weight
 	# get final error   
 	def get_final_error(self, error, weight):
+		# set weight to 1
+		weight = 1
 		# Returns final value of metric
 		return error
 
