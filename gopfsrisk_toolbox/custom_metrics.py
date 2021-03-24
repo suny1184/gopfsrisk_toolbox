@@ -35,7 +35,7 @@ class DollarsGained:
 	# get final error   
 	def get_final_error(self, error, weight):
 		# Returns final value of metric based on error and weight
-		return error * weight
+		return error
 
 # define class for precision-recall AUC (catboost)
 class PrecisionRecallAUC:
