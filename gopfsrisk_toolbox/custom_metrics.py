@@ -38,16 +38,7 @@ class DollarsGained:
 		return error
 
 # define class for precision-recall AUC (catboost)
-class PrecisionRecallAUC:
-	# define a static method to use in evaluate method
-	@staticmethod
-	def get_pr_auc(y_true, y_pred):
-		# fit predictions to logistic sigmoid function
-		y_pred = expit(y_pred).astype(float)
-		# actual values should be 1 or 0 integers
-		y_true = y_true.astype(int)
-		# calculate average precision
-		return average_precision_score(y_true=y_true, y_score=y_pred)	
+class PrecisionRecallAUC:	
 	# Returns whether great values of metric error are better
 	def is_max_optimal(self):
 		return True
