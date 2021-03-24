@@ -30,11 +30,13 @@ class DollarsGained:
 		sum_fn = fn * -500
 		# calculate sum
 		error = np.sum([sum_tp, sum_fp, sum_tn, sum_fn])
+		# set weight to 1
+		weight = 1
 		# return
-		return error, 1
+		return error, weight
 	# get final error   
 	def get_final_error(self, error, weight):
-		# Returns final value of metric based on error and weight
+		# Returns final value of metric
 		return error
 
 # define class for precision-recall AUC (catboost)
