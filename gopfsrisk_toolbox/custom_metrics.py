@@ -11,8 +11,6 @@ class DollarsGained:
 		return True
 	# Compute metric
 	def evaluate(self, approxes, target, weight):
-		# set weight to 1
-		weight = 1
 		# make sure theres only 1 item in approxes
 		assert len(approxes) == 1
 		# make sure there are as many actual (target) as there are predictions (approxes[0])
@@ -33,11 +31,9 @@ class DollarsGained:
 		# calculate sum
 		error = np.sum([sum_tp, sum_fp, sum_tn, sum_fn])
 		# return
-		return error, weight
+		return error, 1
 	# get final error   
 	def get_final_error(self, error, weight):
-		# set weight to 1
-		weight = 1
 		# Returns final value of metric
 		return error
 
