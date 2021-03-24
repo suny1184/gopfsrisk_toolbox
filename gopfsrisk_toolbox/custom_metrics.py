@@ -59,18 +59,13 @@ class PrecisionRecallAUC:
 		assert len(target) == len(approxes[0])
 		# set target to integer and save as y_true
 		y_true = np.array(target).astype(int)
-		# get predictions
-		y_pred = approxes[0]
-		# generate score (we will call it error just to make things work)
-		error = self.get_pr_auc(y_true=y_true, y_pred=y_pred)
-		# generate weight
-		if not weight: # i.e. if list_class_weights is None
-			weight = 1
-		else:
-			weight = weight[1]
+		# get predictions, fit to logistic sigmoid function, and set as float
+		y_pred = expit(approxes[0]).astype(float)
+		# generate pr-auc
+		error = average_precision_score(y_true=y_true, y_score=y_pred)
 		# return
-		return error, weight
+		return error, 1
 	# get final error   
 	def get_final_error(self, error, weight):
-		# Returns final value of metric based on error and weight
-		return error * weight
+		# Returns final value of metric
+		return error
