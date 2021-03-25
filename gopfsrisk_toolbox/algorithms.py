@@ -20,7 +20,7 @@ def FIT_CATBOOST_MODEL(int_iterations, str_eval_metric, int_early_stopping_round
 					   X_train=None, y_train=None, X_valid=None, y_valid=None, str_task_type='GPU', 
 					   bool_classifier=True, list_class_weights=None, dict_monotone_constraints=None, 
 					   int_random_state=None, bool_pool=True, train_pool=None, valid_pool=None, l2_leaf_reg=None,
-					   str_auto_class_weights='Balanced'):
+					   str_auto_class_weights=None):
 	# logic for pooling
 	if bool_pool:
 		# pool train
