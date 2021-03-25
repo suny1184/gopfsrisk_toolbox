@@ -3,6 +3,7 @@ from sklearn.metrics import precision_score
 import numpy as np
 import matplotlib.pyplot as plt
 from .algorithms import FIT_CATBOOST_MODEL
+import pickle
 
 # define function to tune lr
 def TUNE_LEARNING_RATE(X_train, y_train, X_valid, y_valid, list_non_numeric,
