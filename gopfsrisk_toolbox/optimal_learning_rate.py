@@ -37,18 +37,18 @@ def TUNE_LEARNING_RATE(X_train, y_train, X_valid, y_valid, list_non_numeric,
 		print(f'Learning Rate: {flt_learning_rate}')
 		print(f'Rounds no Improvement: {int_n_rounds_no_improve}')
 		# fit a catboost model
-		model = alg.FIT_CATBOOST_MODEL(X_train=X_train, 
-									   y_train=y_train, 
-									   X_valid=X_valid, 
-									   y_valid=y_valid, 
-					                   list_non_numeric=list_non_numeric, 
-					                   int_iterations=int_iterations, 
-					                   str_eval_metric=str_eval_metric, 
-					                   int_early_stopping_rounds=int_early_stopping_rounds, 
-					                   str_task_type='GPU', 
-					                   bool_classifier=True,
-		                               list_class_weights=list_class_weights,
-		                               flt_learning_rate=flt_learning_rate)
+		model = FIT_CATBOOST_MODEL(X_train=X_train, 
+								   y_train=y_train, 
+								   X_valid=X_valid, 
+								   y_valid=y_valid, 
+					               list_non_numeric=list_non_numeric, 
+					               int_iterations=int_iterations, 
+					               str_eval_metric=str_eval_metric, 
+					               int_early_stopping_rounds=int_early_stopping_rounds, 
+					               str_task_type='GPU', 
+					               bool_classifier=True,
+		                           list_class_weights=list_class_weights,
+		                           flt_learning_rate=flt_learning_rate)
 		# append to list
 		list_model.append(model)
 		# get predictions
