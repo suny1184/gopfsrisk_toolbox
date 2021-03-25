@@ -89,10 +89,10 @@ def TUNE_LEARNING_RATE(X_train, y_train, X_valid, y_valid, list_non_numeric,
 			else:
 				# if a == 2 and there was no increaese in flt_metric we want to subtract from 
 				if a == 2:
-					# change flt_learning_rate_increment to negative 2 to subtract from where we started
-					flt_learning_rate_increment = -flt_learning_rate_increment*2
-					# subtract flt_learning_rate_increment from flt_learning_rate_max
-					flt_learning_rate += flt_learning_rate_increment
+					# change flt_learning_rate_increment to negative
+					flt_learning_rate_increment = -flt_learning_rate_increment
+					# subtract 2 * flt_learning_rate_increment from flt_learning_rate_max because if we just subtract flt_learning_rate_increment we are back at the start
+					flt_learning_rate += (flt_learning_rate_increment * 2)
 					# if flt_learning_rate_max <= 0:
 					if flt_learning_rate <= 0:
 						break
