@@ -4,10 +4,36 @@
 class FeatureEngineeringAaron:
 	# transform
 	def transform(self, X):
+        # debt to income
 		try:
-			X['debt_to_income'] = X['fltBalanceCurrent__debt_sum'] / X['fltGrossMonthly__income_sum']
+			X['ENG_debt_to_income'] = X['fltBalanceCurrent__debt_sum'] / X['fltGrossMonthly__income_sum']
 		except:
 			pass
+        # day relative to year
+        try:
+            X['ENG_dtmStampCreation__app_day_year_sin_X_cos'] = X['dtmStampCreation__app_day_year_sin'] * X['dtmStampCreation__app_day_year_cos']
+        except:
+            pass
+        # day relative to month
+        try:
+            X['ENG_dtmStampCreation__app_day_month_sin_X_cos'] = X['dtmStampCreation__app_day_month_sin'] / X['dtmStampCreation__app_day_month_cos']
+        except:
+            pass
+        # day relative to week
+        try:
+            X['ENG_dtmStampCreation__app_day_week_sin_X_cos'] = X['dtmStampCreation__app_day_week_sin'] / X['dtmStampCreation__app_day_week_cos']
+        except:
+            pass
+        # month relative to year
+        try:
+            X['ENG_dtmStampCreation__app_month_year_sin_X_cos'] = X['dtmStampCreation__app_month_year_sin'] / X['dtmStampCreation__app_month_year_cos']
+        except:
+            pass
+        # hour relative to day
+        try:
+            X['ENG_dtmStampCreation__app_hour_day_sin_X_cos'] = X['dtmStampCreation__app_hour_day_sin'] / X['dtmStampCreation__app_hour_day_cos']
+        except:
+            pass
 		# return
 		return X
 
