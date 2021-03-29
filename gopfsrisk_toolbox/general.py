@@ -49,11 +49,12 @@ def LOAD_FROM_PICKLE(logger=None, str_filename='../06_preprocessing/output/dict_
 
 # define function to read csv
 def CSV_TO_DF(logger=None, str_filename='../output_data/df_raw.csv', list_usecols=None, list_parse_dates=None, int_nrows=None,
-	          list_skiprows=None):
+	          list_skiprows=None, str_sep=','):
 	# start timer
 	time_start = time.perf_counter()
 	# read json file
-	df = pd.read_csv(str_filename, parse_dates=list_parse_dates, usecols=list_usecols, nrows=int_nrows, skiprows=list_skiprows)
+	df = pd.read_csv(str_filename, parse_dates=list_parse_dates, usecols=list_usecols, nrows=int_nrows, 
+		             skiprows=list_skiprows, sep=str_sep)
 	# if we are using a logger
 	if logger:
 		# log it
