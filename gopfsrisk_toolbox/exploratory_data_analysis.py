@@ -9,6 +9,7 @@ import seaborn as sns
 import itertools
 from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
+import os
 
 # create class
 class PiePlotPropTrainValidTest:
