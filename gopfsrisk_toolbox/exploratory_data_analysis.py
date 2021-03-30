@@ -10,6 +10,62 @@ import itertools
 from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
 
+# create class
+class PiePlotPropTrainValidTest:
+	# get na info
+	def get_na_info(self, df, str_df_name):
+		# get total number missing
+		n_missing = np.sum(df.isnull().sum())
+		# get total observations
+		n_observations = df.shape[0] * df.shape[1]
+		# both into a list
+		list_values = [n_missing, n_observations]
+		# logic for organization
+		if str_df_name == 'train':
+			self.list_values_train = list_values
+		elif str_df_name == 'valid':
+			self.list_values_valid = list_values
+		elif str_df_name == 'test':
+			self.list_values_test = list_values
+		else:
+			raise Exception('Valid values for str_df_name include "train", "valid", "test"')
+		# return object
+		return self
+	# make plot
+	def make_plot(self, tpl_figsize=(20,10)):
+		# create ax for suplots
+		fig, ax = plt.subplots(ncols=3, figsize=tpl_figsize) # 3 = train, valid, test
+		# create plot with loop
+		for a, str_df in enumerate(['Train', 'Valid', 'Test']):
+			# title
+			ax[a].set_title(str_df)
+			# plot
+			if a == 0:
+				# use train
+				list_vals = self.list_values_train[:]
+			elif a == 1:
+				# use valid
+				list_vals = self.list_values_valid[:]
+			elif a == 2:
+				# use test
+				list_vals = self.list_values_test[:]
+			# create plot
+			ax[a].pie(x=list_vals, 
+					  colors=['y', 'c'],
+					  explode=(0, 0.1),
+					  labels=['Missing', 'Non-Missing'], 
+					  autopct='%1.1f%%')
+		# fix overlap
+		plt.tight_layout()
+		# save fig to object
+		self.fig = fig
+		# return object
+		return self
+	# save plot
+	def save_plot(self, str_filename='./output/plt_pie_na_compare.png'):
+		# save fig
+		plt.savefig(str_filename, bbox_inches='tight')
+
 # pie chart of proportion NaN values
 def PIE_PLOT_NA_OVERALL(df, str_filename='./output/plt_na_overall.png', tpl_figsize=(10,15), logger=None):
 	# get total number missing
