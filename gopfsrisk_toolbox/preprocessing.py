@@ -26,7 +26,10 @@ class CyclicFeatures(BaseEstimator, TransformerMixin):
 	# transform
 	def transform(self, X):
 		# convert to datetime
-		X[self.str_datecol] = pd.to_datetime(X[self.str_datecol])
+		if X[self.str_datecol].dtype == 'int64':
+			X[self.str_datecol] = pd.to_datetime(X[self.str_datecol], format='%Y%m%d')
+		else:
+			X[self.str_datecol] = pd.to_datetime(X[self.str_datecol])
 		# MONTH RELATIVE TO YEAR
 		# get month of year
 		X['month_of_year'] = pd.DatetimeIndex(X[self.str_datecol]).month
