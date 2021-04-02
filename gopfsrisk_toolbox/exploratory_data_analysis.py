@@ -29,25 +29,25 @@ class CommonColumChecker:
 	# create table
 	def create_table(self):
 		# train and train
-		int_train_train = len(list_train)
+		int_train_train = len(self.list_train)
 		# train and valid
-		int_train_valid = len([col for col in list_train if col in list_valid])
+		int_train_valid = len([col for col in self.list_train if col in self.list_valid])
 		# train and test
-		int_train_test = len([col for col in list_train if col in list_test])
+		int_train_test = len([col for col in self.list_train if col in self.list_test])
 		
 		# valid and train
-		int_valid_train = len([col for col in list_valid if col in list_train])
+		int_valid_train = len([col for col in self.list_valid if col in self.list_train])
 		# valid and valid
-		int_valid_valid = len(list_valid)
+		int_valid_valid = len(self.list_valid)
 		# valid and test
-		int_valid_test = len([col for col in list_valid if col in list_test])
+		int_valid_test = len([col for col in self.list_valid if col in self.list_test])
 		
 		# test and train
-		int_test_train = len([col for col in list_test if col in list_train])
+		int_test_train = len([col for col in self.list_test if col in self.list_train])
 		# test and valid
-		int_test_valid = len([col for col in list_test if col in list_valid])
+		int_test_valid = len([col for col in self.list_test if col in self.list_valid])
 		# test and test
-		int_test_test = len(list_valid)
+		int_test_test = len(self.list_valid)
 		
 		# make data frame
 		self.df_table = pd.DataFrame({'df':['train','valid','test'],
