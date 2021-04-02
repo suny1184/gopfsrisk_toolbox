@@ -11,6 +11,57 @@ from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
 import os
 
+# create common cols class
+class CommonColumChecker:
+	# get cols
+	def get_cols(self, list_cols, str_df_name):
+		# logic for saving lists
+		if str_df_name == 'train':
+			self.list_train = list_cols[:]
+		elif str_df_name == 'valid':
+			self.list_valid = list_cols[:]
+		elif str_df_name == 'test':
+			self.list_test = list_cols[:]
+		else:
+			raise Exception('str_df_name must be "train", "valid", or "test"')
+		# return
+		return self
+	# create table
+	def create_table(self):
+		# train and train
+		int_train_train = len(list_train)
+		# train and valid
+		int_train_valid = len([col for col in list_train if col in list_valid])
+		# train and test
+		int_train_test = len([col for col in list_train if col in list_test])
+		
+		# valid and train
+		int_valid_train = len([col for col in list_valid if col in list_train])
+		# valid and valid
+		int_valid_valid = len(list_valid)
+		# valid and test
+		int_valid_test = len([col for col in list_valid if col in list_test])
+		
+		# test and train
+		int_test_train = len([col for col in list_test if col in list_train])
+		# test and valid
+		int_test_valid = len([col for col in list_test if col in list_valid])
+		# test and test
+		int_test_test = len(list_valid)
+		
+		# make data frame
+		df = pd.DataFrame({'df':['train','valid','test'],
+						   'train':[int_train_train, int_train_valid, int_train_test],
+						   'valid':[int_valid_train, int_valid_valid, int_valid_test],
+						   'test':[int_test_train, int_test_valid, int_test_test]})
+		# save to object
+		self.df_table = df
+		# return
+		return self
+	# save table
+	def save_table(self, str_filename='./output/df_common_cols.csv'):
+		self.df_table.to_csv(str_filename, index=False)
+
 # create class
 class PiePlotPropTrainValidTest:
 	# get na info
