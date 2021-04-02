@@ -58,7 +58,10 @@ class CommonColumChecker:
 		return self
 	# save table
 	def save_table(self, str_filename='./output/df_common_cols.csv'):
-		self.df_table.to_csv(str_filename, index=False)
+		# extract df_table
+		df_table = self.df_table
+		# write to csv
+		df_table.to_csv(str_filename, index=False)
 
 # create class
 class PiePlotPropTrainValidTest:
