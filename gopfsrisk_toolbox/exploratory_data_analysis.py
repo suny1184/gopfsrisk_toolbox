@@ -50,12 +50,10 @@ class CommonColumChecker:
 		int_test_test = len(list_valid)
 		
 		# make data frame
-		df = pd.DataFrame({'df':['train','valid','test'],
-						   'train':[int_train_train, int_train_valid, int_train_test],
-						   'valid':[int_valid_train, int_valid_valid, int_valid_test],
-						   'test':[int_test_train, int_test_valid, int_test_test]})
-		# save to object
-		self.df_table = df
+		self.df_table = pd.DataFrame({'df':['train','valid','test'],
+						   		      'train':[int_train_train, int_train_valid, int_train_test],
+						   			  'valid':[int_valid_train, int_valid_valid, int_valid_test],
+						   			  'test':[int_test_train, int_test_valid, int_test_test]})
 		# return
 		return self
 	# save table
