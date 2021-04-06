@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from .algorithms import FIT_CATBOOST_MODEL
 import pickle
+from sklearn.metrics import roc_auc_score
 
 # define function to tune lr
 def TUNE_LEARNING_RATE(X_train, y_train, X_valid, y_valid, list_non_numeric,
@@ -57,6 +58,9 @@ def TUNE_LEARNING_RATE(X_train, y_train, X_valid, y_valid, list_non_numeric,
 		if str_eval_metric == 'Precision':
 			# get precision
 			flt_metric = precision_score(y_true=y_valid, y_pred=y_hat)
+		elif str_eval_metric == 'AUC':
+			# get roc auc
+			flt_metric = roc_auc_score(y_true=y_valid, y_score=y_hat)
 		# append to list
 		list_flt_metric.append(flt_metric)
 
