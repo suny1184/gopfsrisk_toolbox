@@ -52,13 +52,15 @@ def TUNE_LEARNING_RATE(X_train, y_train, X_valid, y_valid, list_non_numeric,
 		                           flt_learning_rate=flt_learning_rate)
 		# append to list
 		list_model.append(model)
-		# get predictions
-		y_hat = model.predict(X_valid)
 		# if Precision
 		if str_eval_metric == 'Precision':
+			# get predictions
+			y_hat = model.predict(X_valid)
 			# get precision
 			flt_metric = precision_score(y_true=y_valid, y_pred=y_hat)
 		elif str_eval_metric == 'AUC':
+			# get predictions
+			y_hat = model.predict_proba(X_valid)[:,1]
 			# get roc auc
 			flt_metric = roc_auc_score(y_true=y_valid, y_score=y_hat)
 		# append to list
