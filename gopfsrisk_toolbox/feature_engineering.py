@@ -6,32 +6,32 @@ class FeatureEngineeringAaron:
 	def transform(self, X):
 		# debt to income
 		try:
-			X['debt_to_income'] = X['fltBalanceCurrent__debt_sum'] / X['fltGrossMonthly__income_sum']
+			X['ENG_debt_to_income'] = X['fltBalanceCurrent__debt_sum'] / X['fltGrossMonthly__income_sum']
 		except:
 			pass
 		# day relative to year
 		try:
-			X['ApplicationDate_day_year_tan'] = X['ApplicationDate_day_year_sin'] / X['ApplicationDate_day_year_cos']
+			X['ENG_ApplicationDate_day_year_tan'] = X['ApplicationDate_day_year_sin'] / X['ApplicationDate_day_year_cos']
 		except:
 			pass
 		# day relative to month
 		try:
-			X['ApplicationDate_day_month_tan'] = X['ApplicationDate_day_month_sin'] / X['ApplicationDate_day_month_cos']
+			X['ENG_ApplicationDate_day_month_tan'] = X['ApplicationDate_day_month_sin'] / X['ApplicationDate_day_month_cos']
 		except:
 			pass
 		# day relative to week
 		try:
-			X['ApplicationDate_day_week_tan'] = X['ApplicationDate_day_week_sin'] / X['ApplicationDate_day_week_cos']
+			X['ENG_ApplicationDate_day_week_tan'] = X['ApplicationDate_day_week_sin'] / X['ApplicationDate_day_week_cos']
 		except:
 			pass
 		# month relative to year
 		try:
-			X['ApplicationDate_month_year_tan'] = X['ApplicationDate_month_year_sin'] / X['ApplicationDate_month_year_cos']
+			X['ENG_ApplicationDate_month_year_tan'] = X['ApplicationDate_month_year_sin'] / X['ApplicationDate_month_year_cos']
 		except:
 			pass
 		# hour relative to day
 		try:
-			X['ApplicationDate_hour_day_tan'] = X['ApplicationDate_hour_day_sin'] / X['ApplicationDate_hour_day_cos']
+			X['ENG_ApplicationDate_hour_day_tan'] = X['ApplicationDate_hour_day_sin'] / X['ApplicationDate_hour_day_cos']
 		except:
 			pass
 		# return
