@@ -16,7 +16,7 @@ def ITERATIVE_FEAT_SELECTION(X_train, y_train, X_valid, y_valid, list_non_numeri
 							 str_eval_metric='F1', int_random_state=42,
 							 str_filename='./output/list_bestfeats.pkl',
 							 logger=None, tpl_figsize=(12,10), str_filename_plot='./output/plt_n_feats.png',
-							 flt_learning_rate=None):
+							 flt_learning_rate=None, dict_monotone_constraints=None, str_task_type='GPU'):
 	# instantiate empty list
 	list_empty = []
 	# instantiate lists for plotting
@@ -37,11 +37,12 @@ def ITERATIVE_FEAT_SELECTION(X_train, y_train, X_valid, y_valid, list_non_numeri
 					               int_iterations=int_iterations, 
 					               str_eval_metric=str_eval_metric, 
 					               int_early_stopping_rounds=int_early_stopping_rounds, 
-					               str_task_type='GPU', 
+					               str_task_type=str_task_type, 
 					               bool_classifier=True,
 					               list_class_weights=list_class_weights,
 					               int_random_state=int_random_state,
-					               flt_learning_rate=flt_learning_rate)
+					               flt_learning_rate=flt_learning_rate,
+					               dict_monotone_constraints=dict_monotone_constraints)
 		# get model features
 		list_model_features = model.feature_names_
 		# get importance
