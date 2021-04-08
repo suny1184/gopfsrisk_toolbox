@@ -4,6 +4,11 @@
 class FeatureEngineeringAaron:
 	# transform
 	def transform(self, X):
+        # loan to value
+        try:
+            X['ENG_loan_to_value'] = X['fltAmountFinanced__app'] / X['fltApprovedPriceWholesale__app']
+        except:
+            pass
 		# debt to income
 		try:
 			X['ENG_debt_to_income'] = X['fltBalanceCurrent__debt_sum'] / X['fltGrossMonthly__income_sum']
