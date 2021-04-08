@@ -14,6 +14,20 @@ from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer
 from sklearn.linear_model import BayesianRidge
 
+# define feature mapper class
+class FeatureValueReplacer(BaseEstimator, TransformerMixin):
+	# initialize
+	def __init__(self, dict_value_replace):
+		self.dict_value_replace = dict_value_replace
+	# fit
+	def fit(self, X, y=None):
+		return self
+	# transform
+	def transform(self, X):
+		X.replace(self.dict_value_replace, inplace=True)
+		# return
+		return X
+
 # define cyclic FE class
 class CyclicFeatures(BaseEstimator, TransformerMixin):
 	# initialize
