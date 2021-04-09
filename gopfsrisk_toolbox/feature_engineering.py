@@ -11,7 +11,7 @@ class FeatureEngineeringAaron:
 			pass
 		# debt to income
 		try:
-			X['ENG_debt_to_income'] = X['fltBalanceCurrent__debt_sum'] / X['fltGrossMonthly__income_sum']
+			X['ENG_debt_to_income'] = X['fltMonthlyPayment__debt_mean'] / X['fltGrossMonthly__income_sum']
 		except:
 			pass
 		# day relative to year
