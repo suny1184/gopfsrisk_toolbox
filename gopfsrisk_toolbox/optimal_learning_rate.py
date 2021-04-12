@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from .algorithms import FIT_CATBOOST_MODEL
 import pickle
-from sklearn.metrics import precision_score, roc_auc_score, mean_squared_error
+from sklearn.metrics import precision_score, roc_auc_score, mean_squared_error, confusion_matrix
 import numpy as np
 
 # define function to tune lr
