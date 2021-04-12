@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from .algorithms import FIT_CATBOOST_MODEL
 import pickle
 from sklearn.metrics import precision_score, roc_auc_score, mean_squared_error
+import numpy as np
 
 # define function to tune lr
 def TUNE_LEARNING_RATE(X_train, y_train, X_valid, y_valid, list_non_numeric,
@@ -71,8 +72,10 @@ def TUNE_LEARNING_RATE(X_train, y_train, X_valid, y_valid, list_non_numeric,
 		elif str_eval_metric == 'RMSE':
 			# get predictions
 			y_hat = model.predict(X_valid)
-			# get RMSE
+			# get MSE
 			flt_metric = mean_squared_error(y_true=y_valid, y_pred=y_hat)
+			# get RMSE
+			flt_metric = np.sqrt(flt_metric)
 			# make negative so less negative is better (i.e., so our logic works)
 			flt_metric = -flt_metric
 
