@@ -78,6 +78,19 @@ def TUNE_LEARNING_RATE(X_train, y_train, X_valid, y_valid, list_non_numeric,
 			flt_metric = np.sqrt(flt_metric)
 			# make negative so less negative is better (i.e., so our logic works)
 			flt_metric = -flt_metric
+		# if money
+		elif str_eval_metric.__class__.__name__ == 'DollarsGainedPD':
+			# get predictions
+			y_hat = model.predict(X_valid)
+			# get true negative, false positives, etc
+			tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
+			# multiply by weights
+			sum_tp = tp * 0
+			sum_fp = fp * -5000
+			sum_tn = tn * 5000
+			sum_fn = fn * -5000
+			# calculate sum
+			flt_metric = np.sum([sum_tp, sum_fp, sum_tn, sum_fn])
 
 		# append to list
 		list_flt_metric.append(flt_metric)
