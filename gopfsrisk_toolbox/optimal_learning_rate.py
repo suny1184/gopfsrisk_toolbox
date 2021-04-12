@@ -83,7 +83,7 @@ def TUNE_LEARNING_RATE(X_train, y_train, X_valid, y_valid, list_non_numeric,
 			# get predictions
 			y_hat = model.predict(X_valid)
 			# get true negative, false positives, etc
-			tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
+			tn, fp, fn, tp = confusion_matrix(y_true=y_valid, y_pred=y_hat).ravel()
 			# multiply by weights
 			sum_tp = tp * 0
 			sum_fp = fp * -5000
