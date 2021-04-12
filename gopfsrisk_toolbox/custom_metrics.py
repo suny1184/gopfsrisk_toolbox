@@ -5,7 +5,7 @@ from scipy.special import expit
 from sklearn.metrics import confusion_matrix
 
 # define class for dollars gained (catboost -- just a prototype)
-class DollarsGained:	
+class DollarsGainedPD:	
 	# Returns whether great values of metric error are better
 	def is_max_optimal(self):
 		return True
@@ -24,10 +24,10 @@ class DollarsGained:
 		# get true negative, false positives, etc
 		tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
 		# multiply by weights
-		sum_tp = tp * 10000
-		sum_fp = fp * -500
-		sum_tn = tn * 0
-		sum_fn = fn * -500
+		sum_tp = tp * 0
+		sum_fp = fp * -5000
+		sum_tn = tn * 5000
+		sum_fn = fn * -5000
 		# calculate sum
 		error = np.sum([sum_tp, sum_fp, sum_tn, sum_fn])
 		# return
