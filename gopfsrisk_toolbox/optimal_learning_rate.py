@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from .algorithms import FIT_CATBOOST_MODEL
 import pickle
-from sklearn.metrics import roc_auc_score
+from sklearn.metrics import precision_score, roc_auc_score, mean_squared_error
 
 # define function to tune lr
 def TUNE_LEARNING_RATE(X_train, y_train, X_valid, y_valid, list_non_numeric,
@@ -15,7 +15,8 @@ def TUNE_LEARNING_RATE(X_train, y_train, X_valid, y_valid, list_non_numeric,
 						tpl_figsize=(12,10), str_eval_metric='Precision',
 						int_n_rounds_no_improve_thresh=3, logger=None,
 						str_filename_model='./output/model.sav',
-						dict_monotone_constraints=None, str_task_type='GPU'):
+						dict_monotone_constraints=None, str_task_type='GPU',
+						bool_classifier=True):
 	# make sure flt_learning_rate < 1
 	if flt_learning_rate > 1:
 		raise Exception('flt_learning_rate must be less than 1.0')
@@ -48,7 +49,7 @@ def TUNE_LEARNING_RATE(X_train, y_train, X_valid, y_valid, list_non_numeric,
 					               str_eval_metric=str_eval_metric, 
 					               int_early_stopping_rounds=int_early_stopping_rounds, 
 					               str_task_type=str_task_type, 
-					               bool_classifier=True,
+					               bool_classifier=bool_classifier,
 		                           list_class_weights=list_class_weights,
 		                           flt_learning_rate=flt_learning_rate,
 		                           dict_monotone_constraints=dict_monotone_constraints)
@@ -60,11 +61,21 @@ def TUNE_LEARNING_RATE(X_train, y_train, X_valid, y_valid, list_non_numeric,
 			y_hat = model.predict(X_valid)
 			# get precision
 			flt_metric = precision_score(y_true=y_valid, y_pred=y_hat)
+		# if AUC
 		elif str_eval_metric == 'AUC':
 			# get predictions
 			y_hat = model.predict_proba(X_valid)[:,1]
 			# get roc auc
 			flt_metric = roc_auc_score(y_true=y_valid, y_score=y_hat)
+		# if RMSE
+		elif str_eval_metric == 'RMSE':
+			# get predictions
+			y_hat = model.predict(X_valid)
+			# get RMSE
+			flt_metric = mean_squared_error(y_true=y_valid, y_pred=y_hat)
+			# make negative so less negative is better (i.e., so our logic works)
+			flt_metric = -flt_metric
+
 		# append to list
 		list_flt_metric.append(flt_metric)
 
