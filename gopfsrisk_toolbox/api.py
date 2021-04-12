@@ -1,5 +1,6 @@
 # api
 from sklearn.base import BaseEstimator, TransformerMixin
+import numpy as np
 
 # define dropper class
 class FinalImputer(BaseEstimator, TransformerMixin):
@@ -45,5 +46,7 @@ class PipelineDataPrep:
 			X = transformer.transform(X)
 		# make predictions
 		y_hat = self.model.predict_proba(X[self.model.feature_names_])[:,1]
+		# get mean
+		y_hat = np.mean(y_hat)
 		# return
 		return y_hat
