@@ -51,7 +51,6 @@ def FIT_CATBOOST_MODEL(int_iterations, str_eval_metric, int_early_stopping_round
 		                             monotone_constraints=dict_monotone_constraints,
 		                             random_state=int_random_state,
 		                             l2_leaf_reg=l2_leaf_reg,
-		                             auto_class_weights=str_auto_class_weights,
 		                             learning_rate=flt_learning_rate)
 	# fit to training
 	model.fit(train_pool,
