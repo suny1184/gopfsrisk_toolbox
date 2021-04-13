@@ -22,10 +22,10 @@ def QQ_PLOT(arr_yhat, ser_actual, str_filename='./output/plt_qq.png', logger=Non
 	res = arr_yhat - ser_actual
 	# make ax
 	fig, ax = plt.subplots(figsize=tpl_figsize)
+	# title
+	ax.set_title('Q-Q Plot')
 	# create plot
 	sm.qqplot(res, line='45', fit=True, ax=ax)
-	# show it
-	#plt.show()
 	# save it
 	plt.savefig(str_filename, bbox_inches='tight')
 	# close it
