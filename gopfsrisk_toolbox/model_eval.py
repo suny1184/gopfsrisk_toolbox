@@ -208,6 +208,10 @@ def ROC_AUC_CURVE(y_true, y_hat, tpl_figsize=(10,10), logger=None, str_filename=
 def RESIDUAL_PLOT(arr_yhat, ser_actual, str_filename, tpl_figsize=(10,10), logger=None):
 	# get residuals
 	ser_residuals = arr_yhat - ser_actual
+	# get the norm
+	norm = np.linalg.norm(ser_residuals)
+	# normalize residuals
+	ser_residuals = ser_residuals / norm
 	# create ax
 	fig, ax = plt.subplots(figsize=tpl_figsize)
 	# title
