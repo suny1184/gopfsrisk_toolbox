@@ -14,6 +14,25 @@ from sklearn.metrics import (explained_variance_score, mean_absolute_error, mean
 from scipy.stats import zscore
 from .general import GET_NUMERIC_AND_NONNUMERIC
 from .algorithms import FIT_CATBOOST_MODEL
+import statsmodels.api as sm
+
+# define function to make QQ plot
+def QQ_PLOT(model_regressor, X, y, str_filename='./output/plt_qq.png', logger=None):
+	# generate predictions
+	y_hat = model_regressor.predict(X)
+	# get residuals
+	res = y_hat - y
+	# create plot
+	fig = sm.qqplot(res, line='45', fit=True)
+	# show it
+	plt.show()
+	# save it
+	plt.savefig(str_filename, bbox_inches='tight')
+	# close it
+	plt.close()
+	# log it
+	if logger:
+		logger.warning(f'QQ plot saved to {str_filename}')
 
 # define function to get continuous eval metrics
 def CONTINUOUS_EVAL_METRICS(model_regressor, X, y, logger=None):
