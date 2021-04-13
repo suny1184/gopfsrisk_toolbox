@@ -17,11 +17,13 @@ from .algorithms import FIT_CATBOOST_MODEL
 import statsmodels.api as sm
 
 # define function to make QQ plot
-def QQ_PLOT(arr_yhat, ser_actual, str_filename='./output/plt_qq.png', logger=None):
+def QQ_PLOT(arr_yhat, ser_actual, str_filename='./output/plt_qq.png', logger=None, tpl_figsize=(10,10)):
 	# get residuals
 	res = arr_yhat - ser_actual
+	# make ax
+	fig, ax = plt.subplots(figsize=tpl_figsize)
 	# create plot
-	fig = sm.qqplot(res, line='45', fit=True)
+	sm.qqplot(res, line='45', fit=True, ax=ax)
 	# show it
 	plt.show()
 	# save it
