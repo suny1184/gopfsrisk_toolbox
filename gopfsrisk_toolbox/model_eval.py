@@ -17,11 +17,9 @@ from .algorithms import FIT_CATBOOST_MODEL
 import statsmodels.api as sm
 
 # define function to make QQ plot
-def QQ_PLOT(model_regressor, X, y, str_filename='./output/plt_qq.png', logger=None):
-	# generate predictions
-	y_hat = model_regressor.predict(X)
+def QQ_PLOT(arr_yhat, ser_actual, str_filename='./output/plt_qq.png', logger=None):
 	# get residuals
-	res = y_hat - y
+	res = arr_yhat - ser_actual
 	# create plot
 	fig = sm.qqplot(res, line='45', fit=True)
 	# show it
@@ -33,6 +31,8 @@ def QQ_PLOT(model_regressor, X, y, str_filename='./output/plt_qq.png', logger=No
 	# log it
 	if logger:
 		logger.warning(f'QQ plot saved to {str_filename}')
+	# return fig
+	return fig
 
 # define function to get continuous eval metrics
 def CONTINUOUS_EVAL_METRICS(model_regressor, X, y, logger=None):
