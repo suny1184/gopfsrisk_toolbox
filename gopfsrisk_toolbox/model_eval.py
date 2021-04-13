@@ -10,9 +10,33 @@ from sklearn.metrics import (accuracy_score, fowlkes_mallows_score, precision_sc
                              recall_score, f1_score, roc_auc_score, average_precision_score,
                              log_loss, brier_score_loss, precision_recall_curve, auc,
 	                         roc_curve)
+from sklearn.metric import (explained_variance_score, mean_absolute_error, mean_squared_error)
 from scipy.stats import zscore
 from .general import GET_NUMERIC_AND_NONNUMERIC
 from .algorithms import FIT_CATBOOST_MODEL
+
+# define function to get continuous eval metrics
+def CONTINUOUS_EVAL_METRICS(model_regressor, X, y, logger=None):
+	# generate predictions
+	y_hat = model_regressor.predict(X)
+	# explained variance
+	exp_var = explained_variance_score(y_true=y, y_pred=y_hat)
+	# MAE
+	mae = mean_absolute_error(y_true=y, y_pred=y_hat)
+	# MSE
+	mse = mean_squared_error(y_true=y, y_pred=y_hat)
+	# RMSE
+	rmse = np.sqrt(mse)
+	# put into dictionary
+	dict_ = {'exp_var': exp_var,
+			 'mae': mae,
+			 'mse': mse,
+			 'rmse': rmse}
+	# if using logger
+	if logger:
+		logger.warning('Dictionary of continuous eval metrics generated')
+	# return dict_
+	return dict_
 
 # define function to get binary eval metrics
 def BIN_CLASS_EVAL_METRICS(model_classifier, X, y, logger=None):
