@@ -10,7 +10,7 @@ from sklearn.metrics import (accuracy_score, fowlkes_mallows_score, precision_sc
                              recall_score, f1_score, roc_auc_score, average_precision_score,
                              log_loss, brier_score_loss, precision_recall_curve, auc,
 	                         roc_curve)
-from sklearn.metric import (explained_variance_score, mean_absolute_error, mean_squared_error)
+from sklearn.metrics import (explained_variance_score, mean_absolute_error, mean_squared_error)
 from scipy.stats import zscore
 from .general import GET_NUMERIC_AND_NONNUMERIC
 from .algorithms import FIT_CATBOOST_MODEL
