@@ -25,7 +25,7 @@ def QQ_PLOT(arr_yhat, ser_actual, str_filename='./output/plt_qq.png', logger=Non
 	# create plot
 	sm.qqplot(res, line='45', fit=True, ax=ax)
 	# show it
-	plt.show()
+	#plt.show()
 	# save it
 	plt.savefig(str_filename, bbox_inches='tight')
 	# close it
