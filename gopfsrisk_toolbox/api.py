@@ -60,27 +60,29 @@ class ParsePayload:
 	# initialize
 	def __init__(self, list_feats_raw_app, 
 			           list_feats_raw_inc, 
-					   list_feats_inc_agg,
+					   list_feats_agg_inc,
 					   dict_income_agg,
 					   list_feats_raw_debt,
-					   list_feats_debt_agg,
+					   list_feats_agg_debt,
 					   dict_debt_agg,
 					   list_feats_raw_ln,
 					   list_feats_raw_tuaccept,
 					   list_feats_raw_cvlink,
-					   df_empty):
+					   df_empty,
+					   pipeline_pd=None):# se to None for testing
 		# args
 		self.list_feats_raw_app = list_feats_raw_app
 		self.list_feats_raw_inc = list_feats_raw_inc
-		self.list_feats_inc_agg = list_feats_inc_agg
+		self.list_feats_agg_inc = list_feats_agg_inc
 		self.dict_income_agg = dict_income_agg
 		self.list_feats_raw_debt = list_feats_raw_debt
-		self.list_feats_debt_agg = list_feats_debt_agg
+		self.list_feats_agg_debt = list_feats_agg_debt
 		self.dict_debt_agg = dict_debt_agg
 		self.list_feats_raw_ln = list_feats_raw_ln
 		self.list_feats_raw_tuaccept = list_feats_raw_tuaccept
 		self.list_feats_raw_cvlink = list_feats_raw_cvlink
 		self.df_empty = df_empty
+		self.pipeline_pd = pipeline_pd
 	# payload for each applicant
 	def get_payload_df(self, json_str_request):
 		# get the payload for each applicant
@@ -94,18 +96,18 @@ class ParsePayload:
 			payload = applicant['sources']
 			list_payload.append(payload)
 		# create df with payload
-		df_payload =  pd.DataFrame({'payload': list_payload})
+		df_payload =  pd.DataFrame({'list_payload': list_payload})
 		# save output to self
 		self.list_unique_id = list_unique_id
 		self.df_payload = df_payload
 		# return object
 		return self
 	# define parse_application
-	def parse_application(self, values):
+	def parse_application(self, str_values):
 		# create error
 		self.error_app = ''
 		# put into df
-		df_app = pd.read_csv(StringIO(values), delimiter=',', usecols=lambda col: col in self.list_feats_raw_app)
+		df_app = pd.read_csv(StringIO(str_values), delimiter=',', usecols=lambda col: col in self.list_feats_raw_app)
 		# append __app to each column name except ApplicationDate
 		df_app.columns = [f'{col}__app' for col in df_app.columns]
 		# if df_app is all na append an error
@@ -118,17 +120,17 @@ class ParsePayload:
 		# return object
 		return self
 	# define parse_income
-	def parse_income(self, values):
+	def parse_income(self, str_values):
 		# create error
 		self.error_inc = ''
 		# put into df
-		df_inc = pd.read_csv(StringIO(values), delimiter=',', usecols=lambda col: col in self.list_feats_raw_inc)
+		df_inc = pd.read_csv(StringIO(str_values), delimiter=',', usecols=lambda col: col in self.list_feats_raw_inc)
 		# check if df is empty
 		if df_inc.empty:
 			# create error
 			self.error_inc = 'No income data'
 			# create empty df with list_feats_inc_agg as cols
-			df_inc = pd.DataFrame(columns=self.list_feats_inc_agg)
+			df_inc = pd.DataFrame(columns=self.list_feats_agg_inc)
 			# create row with nan
 			df_inc = df_inc.append(pd.Series(), ignore_index=True)
 		else:
@@ -139,7 +141,7 @@ class ParsePayload:
 				# create error
 				self.error_inc = 'No income data due to bit filter'
 				# create empty df with list_feats_inc_agg as cols
-				df_inc = pd.DataFrame(columns=self.list_feats_inc_agg)
+				df_inc = pd.DataFrame(columns=self.list_feats_agg_inc)
 				# create row with nan
 				df_inc = df_inc.append(pd.Series(), ignore_index=True)
 			else:
@@ -158,17 +160,17 @@ class ParsePayload:
 		# return object
 		return self	
 	# define parse_debt
-	def parse_debt(self, values):
+	def parse_debt(self, str_values):
 		# create error
 		self.error_debt = ''
 		# put into df
-		df_debt = pd.read_csv(StringIO(values), delimiter=',', usecols=lambda col: col in self.list_feats_raw_debt)
+		df_debt = pd.read_csv(StringIO(str_values), delimiter=',', usecols=lambda col: col in self.list_feats_raw_debt)
 		# check if df is empty
 		if df_debt.empty:
 			# create error
 			self.error_debt = 'No debt data'
 			# create empty df with list_feats_debt_agg as cols
-			df_debt = pd.DataFrame(columns=self.list_feats_debt_agg)
+			df_debt = pd.DataFrame(columns=self.list_feats_agg_debt)
 			# create row with nan
 			df_debt = df_debt.append(pd.Series(), ignore_index=True)
 		else:
@@ -179,7 +181,7 @@ class ParsePayload:
 				# create errors
 				self.error_debt = 'No debt data due to bit filter'
 				# create empty df with list_feats_debt_agg as cols
-				df_debt = pd.DataFrame(columns=self.list_feats_debt_agg)
+				df_debt = pd.DataFrame(columns=self.list_feats_agg_debt)
 				# create row with nan
 				df_debt = df_debt.append(pd.Series(), ignore_index=True)
 			else:
@@ -198,11 +200,11 @@ class ParsePayload:
 		# return object
 		return self
 	# define parse_ln
-	def parse_ln(self, values):
+	def parse_ln(self, str_values):
 		# create error
 		self.error_ln = ''
 		# put into df
-		df_ln = pd.read_csv(StringIO(values), delimiter=',', usecols=lambda col: col in self.list_feats_raw_ln)
+		df_ln = pd.read_csv(StringIO(str_values), delimiter=',', usecols=lambda col: col in self.list_feats_raw_ln)
 		# append __ln to each column name
 		df_ln.columns = [f'{col}__ln' for col in df_ln.columns]
 		# check if df is empty
@@ -220,7 +222,7 @@ class ParsePayload:
 		# return object
 		return self
 	# define parse_tuxml
-	def parse_tuxml(self, values):
+	def parse_tuxml(self, str_values):
 		# create error
 		self.error_tuxml = ''
 		# define helper function for parsing XML
@@ -289,7 +291,7 @@ class ParsePayload:
 			# put into df
 			return pd.DataFrame(dict_, index=[0])
 		# read data from string
-		root = ET.fromstring(values)
+		root = ET.fromstring(str_values)
 		# parse xml
 		df_tuxml = parse_xml(root=root, 
 							 list_feats_raw_tuaccept=self.list_feats_raw_tuaccept,
@@ -316,45 +318,45 @@ class ParsePayload:
 		list_list_errors = []
 		list_list_df = []
 		# iterate through payloads
-		for list_payload in self.df_payload['payload']:
+		for list_payload in self.df_payload['list_payload']:
 			# empty lists
 			list_errors = []
 			list_df = []
 			# iterate through the tables
 			for dict_data in list_payload:
 				# get values
-				values = dict_data['values']
+				str_values = dict_data['values']
 				# application
 				if dict_data['name'] == 'Application':
-					self.parse_application(values=values)
+					self.parse_application(str_values=str_values)
 					# append
 					list_errors.append(self.error_app)
 					list_df.append(self.df_app)
 				# income
 				if dict_data['name'] == 'Incomes':
 					# parse income
-					self.parse_income(values=values)
+					self.parse_income(str_values=str_values)
 					# append 
 					list_errors.append(self.error_inc)
 					list_df.append(self.df_inc)
 				# debt
 				if dict_data['name'] == 'Debts':
 					# parse debt
-					self.parse_debt(values=values)
+					self.parse_debt(str_values=str_values)
 					# append 
 					list_errors.append(self.error_debt)
 					list_df.append(self.df_debt)
 				# ln
 				if dict_data['name'] == 'Lexis Nexis Risk View 5':
 					# parse ln
-					self.parse_ln(values=values)
+					self.parse_ln(str_values=str_values)
 					# append
 					list_errors.append(self.error_ln)
 					list_df.append(self.df_ln)
 				# tu
 				if dict_data['name'] == 'TUXML':
 					# parse xml
-					self.parse_tuxml(values=values)
+					self.parse_tuxml(str_values=str_values)
 					# append
 					list_errors.append(self.error_tuxml)
 					list_df.append(self.df_tuxml)
