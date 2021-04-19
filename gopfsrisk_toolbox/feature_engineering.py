@@ -4,6 +4,38 @@
 class FeatureEngineeringAaron:
 	# transform
 	def transform(self, X):
+		# Month relative to year
+		# sin
+		try:
+			X['ENG_ApplicationMonth__app_sin'] = np.sin((X['ApplicationMonth__app']-1) * (2*np.pi/12))
+		except:
+			pass
+		# cos
+		try:
+			X['ENG_ApplicationMonth__app_cos'] = np.cos((X['ApplicationMonth__app']-1) * (2*np.pi/12))
+		except:
+			pass
+		# tan
+		try:
+			X['ENG_ApplicationMonth__app_tan'] = X['ENG_ApplicationMonth__app_sin'] / X['ENG_ApplicationMonth__app_cos']
+		except:
+			pass
+		# quarter relative to year
+		# sin
+		try:
+			X['ENG_ApplicationQuarter__app_sin'] = np.sin((X['ApplicationQuarter__app']-1) * (2*np.pi/4))
+		except:
+			pass
+		# cos
+		try:
+			X['ENG_ApplicationQuarter__app_cos'] = np.cos((X['ApplicationQuarter__app']-1) * (2*np.pi/4))
+		except:
+			pass
+		# tan
+		try:
+			X['ENG_ApplicationQuarter__app_tan'] = X['ENG_ApplicationQuarter__app_sin'] / X['ENG_ApplicationQuarter__app_cos']
+		except:
+			pass
 		# loan to value
 		try:
 			X['ENG_loan_to_value'] = X['fltAmountFinanced__app'] / X['fltApprovedPriceWholesale__app']
@@ -12,31 +44,6 @@ class FeatureEngineeringAaron:
 		# debt to income
 		try:
 			X['ENG_debt_to_income'] = X['fltMonthlyPayment__debt_mean'] / X['fltGrossMonthly__income_sum']
-		except:
-			pass
-		# day relative to year
-		try:
-			X['ENG_ApplicationDate_day_year_tan'] = X['ApplicationDate_day_year_sin'] / X['ApplicationDate_day_year_cos']
-		except:
-			pass
-		# day relative to month
-		try:
-			X['ENG_ApplicationDate_day_month_tan'] = X['ApplicationDate_day_month_sin'] / X['ApplicationDate_day_month_cos']
-		except:
-			pass
-		# day relative to week
-		try:
-			X['ENG_ApplicationDate_day_week_tan'] = X['ApplicationDate_day_week_sin'] / X['ApplicationDate_day_week_cos']
-		except:
-			pass
-		# month relative to year
-		try:
-			X['ENG_ApplicationDate_month_year_tan'] = X['ApplicationDate_month_year_sin'] / X['ApplicationDate_month_year_cos']
-		except:
-			pass
-		# hour relative to day
-		try:
-			X['ENG_ApplicationDate_hour_day_tan'] = X['ApplicationDate_hour_day_sin'] / X['ApplicationDate_hour_day_cos']
 		except:
 			pass
 		# return
