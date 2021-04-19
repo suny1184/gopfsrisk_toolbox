@@ -5,7 +5,7 @@ import numpy as np
 class FeatureEngineeringAaron:
 	# transform
 	def transform(self, X):
-		# Day relative to week
+		# Cyclic: Day relative to week
 		# sin
 		try:
 			X['ENG_ApplicationDayOfWeek__app_sin'] = np.sin((X['ApplicationDayOfWeek__app']-1) * (2*np.pi/7))
@@ -21,7 +21,7 @@ class FeatureEngineeringAaron:
 			X['ENG_ApplicationDayOfWeek__app_tan'] = X['ENG_ApplicationDayOfWeek__app_sin'] / X['ENG_ApplicationDayOfWeek__app_cos']
 		except:
 			pass
-		# Month relative to year
+		# Cyclic: Month relative to year
 		# sin
 		try:
 			X['ENG_ApplicationMonth__app_sin'] = np.sin((X['ApplicationMonth__app']-1) * (2*np.pi/12))
@@ -37,7 +37,7 @@ class FeatureEngineeringAaron:
 			X['ENG_ApplicationMonth__app_tan'] = X['ENG_ApplicationMonth__app_sin'] / X['ENG_ApplicationMonth__app_cos']
 		except:
 			pass
-		# quarter relative to year
+		# Cyclic: Quarter relative to year
 		# sin
 		try:
 			X['ENG_ApplicationQuarter__app_sin'] = np.sin((X['ApplicationQuarter__app']-1) * (2*np.pi/4))
