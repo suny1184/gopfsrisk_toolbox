@@ -17,7 +17,7 @@ def TUNE_LEARNING_RATE(X_train, y_train, X_valid, y_valid, list_non_numeric,
 						int_n_rounds_no_improve_thresh=3, logger=None,
 						str_filename_model='./output/model.sav',
 						dict_monotone_constraints=None, str_task_type='GPU',
-						bool_classifier=True):
+						bool_classifier=True, flt_rsm=None):
 	# make sure flt_learning_rate < 1
 	if flt_learning_rate > 1:
 		raise Exception('flt_learning_rate must be less than 1.0')
@@ -53,7 +53,8 @@ def TUNE_LEARNING_RATE(X_train, y_train, X_valid, y_valid, list_non_numeric,
 					               bool_classifier=bool_classifier,
 		                           list_class_weights=list_class_weights,
 		                           flt_learning_rate=flt_learning_rate,
-		                           dict_monotone_constraints=dict_monotone_constraints)
+		                           dict_monotone_constraints=dict_monotone_constraints,
+		                           flt_rsm=flt_rsm)
 		# append to list
 		list_model.append(model)
 		# if Precision
