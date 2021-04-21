@@ -32,8 +32,9 @@ def TUNE_LEARNING_RATE(X_train, y_train, X_valid, y_valid, list_non_numeric,
 	# set a to 1 and use as counter
 	a = 1
 	while int_n_rounds_no_improve < int_n_rounds_no_improve_thresh:
-		# assert that flt_learning_rate <= 1
-		assert flt_learning_rate <= 1
+		# raise exception if flt_learning_rate >= 1 or <= 0
+		if (flt_learning_rate <= 0) or (flt_learning_rate >= 1):
+			raise ValueError('flt_learning_rate must be >0 and <1'):
 		# append flt_learning_rate to list_flt_learning_rate
 		list_flt_learning_rate.append(flt_learning_rate)
 		# print model parameters
@@ -98,15 +99,13 @@ def TUNE_LEARNING_RATE(X_train, y_train, X_valid, y_valid, list_non_numeric,
 
 		# if first iteration
 		if a == 1:
-			# set max flt_metric
+			# set flt_metric_max
 			flt_metric_max = flt_metric
 			# set max learning rate
 			flt_learning_rate_max = flt_learning_rate
 			# add flt_learning_rate_increment to flt_learning_rate
 			flt_learning_rate += flt_learning_rate_increment
-			# if flt_learning_rate > 1:
-			if flt_learning_rate > 1:
-				break           
+		# if after first iteration         
 		else:
 			# if the flt_metric > flt_metric_max
 			if flt_metric > flt_metric_max:
@@ -123,23 +122,10 @@ def TUNE_LEARNING_RATE(X_train, y_train, X_valid, y_valid, list_non_numeric,
 				int_n_rounds_no_improve = 0
 			# if the flt_metric is not better than flt_metric_max
 			else:
-				# if a == 2 and there was no increaese in flt_metric we want to subtract from 
-				if a == 2:
-					# change flt_learning_rate_increment to negative
-					flt_learning_rate_increment = -flt_learning_rate_increment
-					# subtract 2 * flt_learning_rate_increment from flt_learning_rate_max because if we just subtract flt_learning_rate_increment we are back at the start
-					flt_learning_rate += (flt_learning_rate_increment * 2)
-					# if flt_learning_rate_max <= 0:
-					if flt_learning_rate <= 0:
-						break
 				# get an average of the current flt_learning_rate and the previous learning_rate
 				flt_learning_rate = np.mean([flt_learning_rate, flt_learning_rate_max])
-				# if flt_learning_rate > 1:
-				if (flt_learning_rate > 1) or (flt_learning_rate <= 0):
-					break
 				# add 1 to int_n_rounds_no_improve
 				int_n_rounds_no_improve += 1
-
 		# plot it
 		fig, ax = plt.subplots(figsize=tpl_figsize)
 		# plot
@@ -156,13 +142,22 @@ def TUNE_LEARNING_RATE(X_train, y_train, X_valid, y_valid, list_non_numeric,
 		fig.savefig(str_filename_plot, bbox_inches='tight')
 		# close
 		plt.close()
-		# add 1 to a
-		a += 1
-
+		
 		# get best model so far
 		best_model = list_model[list_flt_metric.index(np.max(list_flt_metric))]
 		# pickle best_model
 		pickle.dump(best_model, open(str_filename_model, 'wb'))
+
+		# add 1 to a
+		a += 1
+
+		# logic
+		if (flt_learning_rate <= 0) or (flt_learning_rate >= 1):
+			# if using logger
+			if logger:
+				logger.warning('Finished tuning learning rate')
+			# end loop
+			break
 
 	# if using logger
 	if logger:
