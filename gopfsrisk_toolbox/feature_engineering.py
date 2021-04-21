@@ -21,11 +21,6 @@ class FeatureEngineeringAaronLGD:
 			X['ENG_down_to_wholesale'] = X['fltApprovedDownTotal__app'] / X['fltApprovedPriceWholesale__app']
 		except:
 			pass
-		# amount financed over price wholesale
-		try:
-			X['ENG_financed_to_wholesale'] = X['fltAmountFinanced__app'] / X['fltApprovedPriceWholesale__app']
-		except:
-			pass
 		# Cyclic: Month relative to year
 		# sin
 		try:
