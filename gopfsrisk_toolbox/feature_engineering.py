@@ -2,6 +2,77 @@
 import numpy as np
 
 # create fe class
+class FeatureEngineeringAaronLGD:
+	# transform
+	def transform(self, X):
+		# from James
+		# down payment to amount financed
+		try:
+			X['ENG_down_to_financed'] = X['fltApprovedDownTotal__app'] / X['fltAmountFinanced__app']
+		except:
+			pass
+		# down payment over gross monthly
+		try:
+			X['ENG_down_to_income'] = X['fltApprovedDownTotal__app'] / X['fltGrossMonthly__income_sum']
+		except:
+			pass
+		# down payment to price wholesale
+		try:
+			X['ENG_down_to_wholesale'] = X['fltApprovedDownTotal__app'] / X['fltApprovedPriceWholesale__app']
+		except:
+			pass
+		# amount financed over price wholesale
+		try:
+			X['ENG_financed_to_wholesale'] = X['fltAmountFinanced__app'] / X['fltApprovedPriceWholesale__app']
+		except:
+			pass
+		# Cyclic: Month relative to year
+		# sin
+		try:
+			X['ENG_ApplicationMonth__app_sin'] = np.sin((X['ApplicationMonth__app']-1) * (2*np.pi/12))
+		except:
+			pass
+		# cos
+		try:
+			X['ENG_ApplicationMonth__app_cos'] = np.cos((X['ApplicationMonth__app']-1) * (2*np.pi/12))
+		except:
+			pass
+		# tan
+		try:
+			X['ENG_ApplicationMonth__app_tan'] = X['ENG_ApplicationMonth__app_sin'] / X['ENG_ApplicationMonth__app_cos']
+		except:
+			pass
+		# Cyclic: Quarter relative to year
+		# sin
+		try:
+			X['ENG_ApplicationQuarter__app_sin'] = np.sin((X['ApplicationQuarter__app']-1) * (2*np.pi/4))
+		except:
+			pass
+		# cos
+		try:
+			X['ENG_ApplicationQuarter__app_cos'] = np.cos((X['ApplicationQuarter__app']-1) * (2*np.pi/4))
+		except:
+			pass
+		# tan
+		try:
+			X['ENG_ApplicationQuarter__app_tan'] = X['ENG_ApplicationQuarter__app_sin'] / X['ENG_ApplicationQuarter__app_cos']
+		except:
+			pass
+		# loan to value
+		try:
+			X['ENG_loan_to_value'] = X['fltAmountFinanced__app'] / X['fltApprovedPriceWholesale__app']
+		except:
+			pass
+		# debt to income
+		try:
+			X['ENG_debt_to_income'] = X['fltMonthlyPayment__debt_mean'] / X['fltGrossMonthly__income_sum']
+		except:
+			pass
+		# return
+		return X
+
+
+# create fe class
 class FeatureEngineeringAaron:
 	# transform
 	def transform(self, X):
