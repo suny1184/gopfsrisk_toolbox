@@ -34,7 +34,7 @@ def TUNE_LEARNING_RATE(X_train, y_train, X_valid, y_valid, list_non_numeric,
 	while int_n_rounds_no_improve < int_n_rounds_no_improve_thresh:
 		# raise exception if flt_learning_rate >= 1 or <= 0
 		if (flt_learning_rate <= 0) or (flt_learning_rate >= 1):
-			raise ValueError('flt_learning_rate must be >0 and <1'):
+			raise ValueError('flt_learning_rate must be >0 and <1')
 		# append flt_learning_rate to list_flt_learning_rate
 		list_flt_learning_rate.append(flt_learning_rate)
 		# print model parameters
