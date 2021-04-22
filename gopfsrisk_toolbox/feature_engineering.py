@@ -2,7 +2,7 @@
 import numpy as np
 
 # create fe class
-class FeatureEngineeringAaronLGD:
+class FeatureEngineeringAaronPD:
 	# transform
 	def transform(self, X):
 		# from James
@@ -66,25 +66,24 @@ class FeatureEngineeringAaronLGD:
 		# return
 		return X
 
-
 # create fe class
-class FeatureEngineeringAaron:
+class FeatureEngineeringAaronLGD:
 	# transform
 	def transform(self, X):
-		# Cyclic: Day relative to week
-		# sin
+		# from James
+		# down payment to amount financed
 		try:
-			X['ENG_ApplicationDayOfWeek__app_sin'] = np.sin((X['ApplicationDayOfWeek__app']-1) * (2*np.pi/7))
+			X['ENG_down_to_financed'] = X['fltApprovedDownTotal__app'] / X['fltAmountFinanced__app']
 		except:
 			pass
-		# cos
+		# down payment over gross monthly
 		try:
-			X['ENG_ApplicationDayOfWeek__app_cos'] = np.cos((X['ApplicationDayOfWeek__app']-1) * (2*np.pi/7))
+			X['ENG_down_to_income'] = X['fltApprovedDownTotal__app'] / X['fltGrossMonthly__income_sum']
 		except:
 			pass
-		# tan
+		# down payment to price wholesale
 		try:
-			X['ENG_ApplicationDayOfWeek__app_tan'] = X['ENG_ApplicationDayOfWeek__app_sin'] / X['ENG_ApplicationDayOfWeek__app_cos']
+			X['ENG_down_to_wholesale'] = X['fltApprovedDownTotal__app'] / X['fltApprovedPriceWholesale__app']
 		except:
 			pass
 		# Cyclic: Month relative to year
