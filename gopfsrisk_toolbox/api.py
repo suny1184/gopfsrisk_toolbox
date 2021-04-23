@@ -49,6 +49,8 @@ class PipelineDataPrep:
 		for transformer in self.list_transformers:
 			# transform
 			X = transformer.transform(X)
+		# save to object
+		self.X = X
 		# logic
 		if self.bool_classifier:
 			# make predictions
