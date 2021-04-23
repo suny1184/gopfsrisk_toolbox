@@ -39,17 +39,22 @@ class Subsetter(BaseEstimator, TransformerMixin):
 # define pipeline class
 class PipelineDataPrep:
 	# initialize
-	def __init__(self, list_transformers, model):
+	def __init__(self, list_transformers, model, bool_classifier=True):
 		self.list_transformers = list_transformers
 		self.model = model
+		self.bool_classifier = bool_classifier
 	# prep predict
 	def prep_predict(self, X):
 		# loop through transformers
 		for transformer in self.list_transformers:
 			# transform
 			X = transformer.transform(X)
-		# make predictions
-		y_hat = self.model.predict_proba(X[self.model.feature_names_])[:,1]
+		# logic
+		if self.bool_classifier:
+			# make predictions
+			y_hat = self.model.predict_proba(X[self.model.feature_names_])[:,1]
+		else:
+			y_hat = self.model.predict(X[self.model.feature_names_])
 		# get mean
 		y_hat = np.mean(y_hat)
 		# return
