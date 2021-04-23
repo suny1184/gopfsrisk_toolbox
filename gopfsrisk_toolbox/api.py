@@ -65,7 +65,7 @@ class PipelineDataPrep:
 		# return
 		return y_hat
 
-# define class
+# define function for payload parsing and generating output
 class ParsePayload:
 	# initialize
 	def __init__(self, list_feats_raw_app, 
@@ -80,7 +80,9 @@ class ParsePayload:
 					   list_feats_raw_cvlink,
 					   df_empty,
 					   pipeline_pd,
-					   pipeline_lgd):
+					   pipeline_lgd,
+					   list_non_numeric_pd,
+					   dict_aa_pd):
 		# args
 		self.list_feats_raw_app = list_feats_raw_app
 		self.list_feats_raw_inc = list_feats_raw_inc
@@ -95,6 +97,8 @@ class ParsePayload:
 		self.df_empty = df_empty
 		self.pipeline_pd = pipeline_pd
 		self.pipeline_lgd = pipeline_lgd
+		self.list_non_numeric_pd = list_non_numeric_pd
+		self.dict_aa_pd = dict_aa_pd
 	# payload for each applicant
 	def get_payload_df(self, json_str_request):
 		# get the payload for each applicant
@@ -417,5 +421,63 @@ class ParsePayload:
 		self.y_hat_lgd = y_hat_lgd
 		self.y_hat_pd_x_lgd = y_hat_pd_x_lgd
 		self.y_hat_pd_x_lgd_contr = y_hat_pd_x_lgd_contr
+		# return object
+		return self
+	# define adverse_action
+	def adverse_action(self, json_str_request):
+		# define get_reasons so we can apply using lambda on df_shap_vals below
+		def get_reasons(ser_shap_vals, int_n_reasons=5):
+			# set index
+			ser_shap_vals.index = list_x_feats
+			# sort descending
+			ser_shap_vals.sort_values(ascending=False, inplace=True)
+			# get top n features
+			list_reasons = list(ser_shap_vals.iloc[:int_n_reasons].index)
+			# return
+			return list_reasons
+		# generate predictions
+		self.generate_predictions(json_str_request=json_str_request)
+		# get list of feats in model
+		list_x_feats = self.pipeline_pd.model.feature_names_
+		# pool X for readability
+		X_pooled = cb.Pool(self.pipeline_pd.X[list_x_feats], cat_features=self.list_non_numeric_pd)
+		# generate shap vals
+		df_shap_vals = pd.DataFrame(self.pipeline_pd.model.get_feature_importance(data=X_pooled,
+																			      type='ShapValues',
+																			      prettified=False,
+																				  thread_count=-1,
+																			      verbose=False)).iloc[:, :-1]
+		# apply get_reasons
+		list_reasons = list(df_shap_vals.apply(lambda x: get_reasons(ser_shap_vals=x), axis=1))
+		# map features to reasons
+		list_list_reasons = [list(pd.Series(tpl).map(self.dict_aa_pd)) for tpl in list_reasons]
+		# save to object
+		self.list_list_reasons = list_list_reasons
+		# return object
+		return self
+	# define generate output
+	def generate_output(self, json_str_request):
+		# get adverse action
+		self.adverse_action(json_str_request=json_str_request)
+		# create df
+		df_output = pd.DataFrame({'Row_id': self.list_unique_id,
+							      'Score': self.y_hat_pd_x_lgd_contr,
+								  'Key_factors': self.list_list_reasons,
+								  'Outlier_score': [0.0 for id_ in self.list_unique_id]})
+		# convert to json
+		str_output_ = df_output.to_json(orient='records')
+		# convert to list
+		list_output = ast.literal_eval(str_output_)
+		# combine list of errors
+		list_errors_final = list(chain(*self.list_list_errors))
+		# create final output
+		output_final = {"Request_id": "",
+				        "Zaml_processing_id": "",
+						"Response": [{"Model_name":"prestige-GenXI",
+					                  "Model_version":"v2",
+									  "Results":list_output,
+									  "Errors":list_errors_final}]}
+		# save to object
+		self.output_final = output_final
 		# return object
 		return self
