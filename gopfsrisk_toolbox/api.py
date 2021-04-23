@@ -74,7 +74,8 @@ class ParsePayload:
 					   list_feats_raw_tuaccept,
 					   list_feats_raw_cvlink,
 					   df_empty,
-					   pipeline_pd=None):# se to None for testing
+					   pipeline_pd,
+					   pipeline_lgd):
 		# args
 		self.list_feats_raw_app = list_feats_raw_app
 		self.list_feats_raw_inc = list_feats_raw_inc
@@ -88,6 +89,7 @@ class ParsePayload:
 		self.list_feats_raw_cvlink = list_feats_raw_cvlink
 		self.df_empty = df_empty
 		self.pipeline_pd = pipeline_pd
+		self.pipeline_lgd = pipeline_lgd
 	# payload for each applicant
 	def get_payload_df(self, json_str_request):
 		# get the payload for each applicant
@@ -391,5 +393,18 @@ class ParsePayload:
 		X = pd.concat([self.df_empty, X], axis=0, sort=False) # WORKING PROPERLY
 		# save to object
 		self.X = X
+		# return object
+		return self
+	# define generate_predictions
+	def generate_predictions(self, json_str_request):
+		# create X
+		self.create_x(json_str_request=json_str_request)
+		# predict PD
+		y_hat_pd = self.pipeline_pd.prep_predict(X=self.X)
+		# predict LGD
+		y_hat_lgd = self.pipeline_lgd.prep_predict(X=self.X)
+		# save to object
+		self.y_hat_pd = y_hat_pd
+		self.y_hat_lgd = y_hat_lgd
 		# return object
 		return self
