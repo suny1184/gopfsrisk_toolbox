@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import catboost as cb
 import ast
+from itertools import chain
 
 # define dropper class
 class FinalImputer(BaseEstimator, TransformerMixin):
