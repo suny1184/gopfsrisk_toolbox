@@ -403,8 +403,14 @@ class ParsePayload:
 		y_hat_pd = self.pipeline_pd.prep_predict(X=self.X)
 		# predict LGD
 		y_hat_lgd = self.pipeline_lgd.prep_predict(X=self.X)
+		# multiply the two
+		y_hat_pd_x_lgd = y_hat_pd * y_hat_lgd
+		# control for amount financed
+		y_hat_pd_x_lgd_contr = y_hat_pd_x_lgd / np.nanmean(self.X['fltAmountFinanced__app'])
 		# save to object
 		self.y_hat_pd = y_hat_pd
 		self.y_hat_lgd = y_hat_lgd
+		self.y_hat_pd_x_lgd = y_hat_pd_x_lgd
+		self.y_hat_pd_x_lgd_contr = y_hat_pd_x_lgd_contr
 		# return object
 		return self
