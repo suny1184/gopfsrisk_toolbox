@@ -9,7 +9,24 @@ import catboost as cb
 import ast
 from itertools import chain
 
-# define dropper class
+# define generic transformer class
+class GenericTransformer(BaseEstimator, TransformerMixin):
+	# initialize
+	def __init__(self, list_transformers):
+		self.list_transformers = list_transformers
+	# fit
+	def fit(self, X, y=None):
+		return self
+	# transform
+	def transform(self, X):
+		# loop through transformers
+		for transformer in self.list_transformers:
+			# transform
+			X = transformer.transform(X)
+		# return
+		return X
+
+# define imputer class
 class FinalImputer(BaseEstimator, TransformerMixin):
 	# initialize
 	def __init__(self, dict_imputations):
