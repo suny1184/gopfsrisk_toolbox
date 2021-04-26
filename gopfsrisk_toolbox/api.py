@@ -478,7 +478,7 @@ class ParsePayload:
 			# append to list_list_reasons
 			list_list_reasons.append(list_reasons)
 		# map features to reasons
-		list_list_reasons = [list(pd.Series(list_).map(self.dict_aa_pd)) for list_ in list_reasons]
+		list_list_reasons = [list(pd.Series(list_reasons).map(self.dict_aa_pd)) for list_reasons in list_list_reasons]
 		# save to object
 		self.list_list_reasons = list_list_reasons
 		# return object
