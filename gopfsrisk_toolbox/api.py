@@ -454,16 +454,6 @@ class ParsePayload:
 		return self
 	# define adverse_action
 	def adverse_action(self, json_str_request):
-		# define get_reasons so we can apply using lambda on df_shap_vals below
-		def get_reasons(ser_shap_vals, int_n_reasons=5):
-			# set index
-			ser_shap_vals.index = list_x_feats
-			# sort descending
-			ser_shap_vals.sort_values(ascending=False, inplace=True)
-			# get top n features
-			list_reasons = list(ser_shap_vals.iloc[:int_n_reasons].index)
-			# return
-			return list_reasons
 		# generate predictions
 		self.generate_predictions(json_str_request=json_str_request)
 		# get list of feats in model
@@ -476,10 +466,19 @@ class ParsePayload:
 																			      prettified=False,
 																				  thread_count=-1,
 																			      verbose=False)).iloc[:, :-1]
-		# apply get_reasons
-		list_reasons = list(df_shap_vals.apply(lambda x: get_reasons(ser_shap_vals=x), axis=1))
+		# set col names in df_shap_vals (setting to adverse actions could be faster)
+		df_shap_vals.columns = list_x_feats
+		# get reasons
+		list_list_reasons = []
+		for a, row in df_shap_vals.iterrows():
+			# sort descending
+			row_sorted = row.sort_values(ascending=False, inplace=False)
+			# get top 5 features
+			list_reasons = list(row_sorted[:5].index)
+			# append to list_list_reasons
+			list_list_reasons.append(list_reasons)
 		# map features to reasons
-		list_list_reasons = [list(pd.Series(tpl).map(self.dict_aa_pd)) for tpl in list_reasons]
+		list_list_reasons = [list(pd.Series(list_).map(self.dict_aa_pd)) for list_ in list_reasons]
 		# save to object
 		self.list_list_reasons = list_list_reasons
 		# return object
