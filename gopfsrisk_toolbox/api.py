@@ -64,11 +64,15 @@ class PipelineDataPrep:
 		self.model = model
 		self.bool_classifier = bool_classifier
 	# prep predict
-	def prep_predict(self, X):
+	def prep_predict(self, X, bool_lower=True):
 		# loop through transformers
 		for transformer in self.list_transformers:
 			# transform
 			X = transformer.transform(X)
+		# logic
+		if bool_lower:
+			# make all cols lower
+			X.columns = X.columns.str.lower()
 		# save to object
 		self.X = X
 		# logic
