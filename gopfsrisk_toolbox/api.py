@@ -96,6 +96,7 @@ class ParsePayload:
 					   list_feats_raw_tuaccept,
 					   list_feats_raw_cvlink,
 					   df_empty,
+					   pipeline_shared,
 					   pipeline_pd,
 					   pipeline_lgd,
 					   list_non_numeric_pd,
@@ -112,6 +113,7 @@ class ParsePayload:
 		self.list_feats_raw_tuaccept = list_feats_raw_tuaccept
 		self.list_feats_raw_cvlink = list_feats_raw_cvlink
 		self.df_empty = df_empty
+		self.pipeline_shared = pipeline_shared
 		self.pipeline_pd = pipeline_pd
 		self.pipeline_lgd = pipeline_lgd
 		self.list_non_numeric_pd = list_non_numeric_pd
@@ -417,6 +419,16 @@ class ParsePayload:
 		X = pd.concat(list_df_concat, axis=0, sort=False)
 		# ensure there is a field for every feature
 		X = pd.concat([self.df_empty, X], axis=0, sort=False) # WORKING PROPERLY
+		# save to object
+		self.X = X
+		# return object
+		return self
+	# define shared preprocessing
+	def shared_preprocessing(self, json_str_request):
+		# create X
+		self.create_x(json_str_request=json_str_request)
+		# transform
+		X = self.pipeline_shared.transform(X=self.X)
 		# save to object
 		self.X = X
 		# return object
