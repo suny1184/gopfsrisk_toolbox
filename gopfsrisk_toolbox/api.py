@@ -143,6 +143,8 @@ class ParsePayload:
 		self.error_app = ''
 		# put into df
 		df_app = pd.read_csv(StringIO(str_values), delimiter=',', usecols=lambda col: col.lower() in self.list_feats_raw_app)
+		# convert to lower
+		df_app.columns = df_app.columns.str.lower()
 		# append __app to each column name except ApplicationDate
 		df_app.columns = [f'{col}__app' for col in df_app.columns]
 		# if df_app is all na append an error
@@ -160,6 +162,8 @@ class ParsePayload:
 		self.error_inc = ''
 		# put into df
 		df_inc = pd.read_csv(StringIO(str_values), delimiter=',', usecols=lambda col: col.lower() in self.list_feats_raw_inc)
+		# convert to lower
+		df_inc.columns = df_inc.columns.str.lower()
 		# check if df is empty
 		if df_inc.empty:
 			# create error
@@ -200,6 +204,8 @@ class ParsePayload:
 		self.error_debt = ''
 		# put into df
 		df_debt = pd.read_csv(StringIO(str_values), delimiter=',', usecols=lambda col: col.lower() in self.list_feats_raw_debt)
+		# convert to lower
+		df_debt.columns = df_debt.columns.str.lower()
 		# check if df is empty
 		if df_debt.empty:
 			# create error
@@ -240,6 +246,8 @@ class ParsePayload:
 		self.error_ln = ''
 		# put into df
 		df_ln = pd.read_csv(StringIO(str_values), delimiter=',', usecols=lambda col: col.lower() in self.list_feats_raw_ln)
+		# convert to lower
+		df_ln.columns = df_ln.columns.str.lower()
 		# append __ln to each column name
 		df_ln.columns = [f'{col}__ln' for col in df_ln.columns]
 		# check if df is empty
@@ -271,15 +279,17 @@ class ParsePayload:
 			for child in root.iter(tag='{http://www.transunion.com/namespace}characteristic'): # child table
 				# get col name
 				col_name = child.find('{http://www.transunion.com/namespace}id').text # child table cols
-				# logic
+				# if col in cv link
 				if col_name.lower() in list_feats_raw_cvlink:
 					# append __cvlink
 					col_name = f'{col_name.lower()}__tucvlink'
 					bool_in_payload = True
+				# if col in tuaccept
 				elif col_name.lower() in list_feats_raw_tuaccept:
 					# append __tuaccept
 					col_name = f'{col_name.upper()}__tuaccept'
 					bool_in_payload = True
+				# if not in either
 				else:
 					bool_in_payload = False
 				# logic
