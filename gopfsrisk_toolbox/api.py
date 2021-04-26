@@ -291,7 +291,7 @@ class ParsePayload:
 				# if col in tuaccept
 				elif col_name.lower() in list_feats_raw_tuaccept:
 					# append __tuaccept
-					col_name = f'{col_name.upper()}__tuaccept'
+					col_name = f'{col_name.lower()}__tuaccept'
 					bool_in_payload = True
 				# if not in either
 				else:
