@@ -435,8 +435,8 @@ class ParsePayload:
 		return self
 	# define generate_predictions
 	def generate_predictions(self, json_str_request):
-		# create X
-		self.create_x(json_str_request=json_str_request)
+		# shared preprocessing
+		self.shared_preprocessing(json_str_request=json_str_request)
 		# predict PD
 		y_hat_pd = self.pipeline_pd.prep_predict(X=self.X)
 		# predict LGD
