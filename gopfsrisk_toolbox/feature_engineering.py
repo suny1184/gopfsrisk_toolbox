@@ -2,6 +2,71 @@
 import numpy as np
 
 # create fe class
+class FeatureEngineeringAaronPDLGDLower:
+	# transform
+	def transform(self, X):
+		# from James
+		# down payment to amount financed
+		try:
+			X['eng_down_to_financed'] = X['fltapproveddowntotal__app'] / X['fltamountfinanced__app']
+		except:
+			pass
+		# down payment over gross monthly
+		try:
+			X['eng_down_to_income'] = X['fltapproveddowntotal__app'] / X['fltgrossmonthly__income_sum']
+		except:
+			pass
+		# down payment to price wholesale
+		try:
+			X['eng_down_to_wholesale'] = X['fltapproveddowntotal__app'] / X['fltapprovedpricewholesale__app']
+		except:
+			pass
+		# Cyclic: Month relative to year
+		# sin
+		try:
+			X['eng_applicationmonth__app_sin'] = np.sin((X['applicationmonth__app']-1) * (2*np.pi/12))
+		except:
+			pass
+		# cos
+		try:
+			X['eng_applicationmonth__app_cos'] = np.cos((X['applicationmonth__app']-1) * (2*np.pi/12))
+		except:
+			pass
+		# tan
+		try:
+			X['eng_applicationmonth__app_tan'] = X['eng_applicationmonth__app_sin'] / X['eng_applicationmonth__app_cos']
+		except:
+			pass
+		# Cyclic: Quarter relative to year
+		# sin
+		try:
+			X['eng_applicationquarter__app_sin'] = np.sin((X['applicationquarter__app']-1) * (2*np.pi/4))
+		except:
+			pass
+		# cos
+		try:
+			X['eng_applicationquarter__app_cos'] = np.cos((X['applicationquarter__app']-1) * (2*np.pi/4))
+		except:
+			pass
+		# tan
+		try:
+			X['eng_applicationquarter__app_tan'] = X['eng_applicationquarter__app_sin'] / X['eng_applicationquarter__app_cos']
+		except:
+			pass
+		# loan to value
+		try:
+			X['eng_loan_to_value'] = X['fltamountfinanced__app'] / X['fltapprovedpricewholesale__app']
+		except:
+			pass
+		# debt to income
+		try:
+			X['eng_debt_to_income'] = X['fltmonthlypayment__debt_mean'] / X['fltgrossmonthly__income_sum']
+		except:
+			pass
+		# return
+		return X
+
+# create fe class
 class FeatureEngineeringAaronPD:
 	# transform
 	def transform(self, X):
