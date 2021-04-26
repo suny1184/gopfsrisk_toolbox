@@ -504,6 +504,8 @@ class ParsePayload:
 		list_output = ast.literal_eval(str_output_)
 		# combine list of errors
 		list_errors_final = list(chain(*self.list_list_errors))
+		# remove empty strings from list_errors_final
+		list_errors_final = [err for err in list_errors_final if err != '']
 		# create final output
 		output_final = {"Request_id": "",
 				        "Zaml_processing_id": "",
