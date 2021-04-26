@@ -142,7 +142,7 @@ class ParsePayload:
 		# create error
 		self.error_app = ''
 		# put into df
-		df_app = pd.read_csv(StringIO(str_values), delimiter=',', usecols=lambda col: col in self.list_feats_raw_app)
+		df_app = pd.read_csv(StringIO(str_values), delimiter=',', usecols=lambda col: col.lower() in self.list_feats_raw_app)
 		# append __app to each column name except ApplicationDate
 		df_app.columns = [f'{col}__app' for col in df_app.columns]
 		# if df_app is all na append an error
@@ -159,7 +159,7 @@ class ParsePayload:
 		# create error
 		self.error_inc = ''
 		# put into df
-		df_inc = pd.read_csv(StringIO(str_values), delimiter=',', usecols=lambda col: col in self.list_feats_raw_inc)
+		df_inc = pd.read_csv(StringIO(str_values), delimiter=',', usecols=lambda col: col.lower() in self.list_feats_raw_inc)
 		# check if df is empty
 		if df_inc.empty:
 			# create error
@@ -170,7 +170,7 @@ class ParsePayload:
 			df_inc = df_inc.append(pd.Series(), ignore_index=True)
 		else:
 			# filter rows
-			df_inc = df_inc[(df_inc['bitInvalid']==False) & (df_inc['bitUse']==True)]
+			df_inc = df_inc[(df_inc['bitinvalid']==False) & (df_inc['bituse']==True)]
 			# if df_inc is empty after filtering on bit cols
 			if df_inc.empty:
 				# create error
@@ -183,7 +183,7 @@ class ParsePayload:
 				# append __income to each column name
 				df_inc.columns = [f'{col}__income' for col in df_inc.columns]
 				# aggregate
-				df_inc = df_inc.groupby('UniqueID__income', as_index=False).agg(self.dict_income_agg)
+				df_inc = df_inc.groupby('uniqueid__income', as_index=False).agg(self.dict_income_agg)
 				# rename columns
 				df_inc.columns = [f'{tpl_col[0]}_{tpl_col[1]}' for tpl_col in list(df_inc.columns)]
 		# make sure bottom row is selected
@@ -199,7 +199,7 @@ class ParsePayload:
 		# create error
 		self.error_debt = ''
 		# put into df
-		df_debt = pd.read_csv(StringIO(str_values), delimiter=',', usecols=lambda col: col in self.list_feats_raw_debt)
+		df_debt = pd.read_csv(StringIO(str_values), delimiter=',', usecols=lambda col: col.lower() in self.list_feats_raw_debt)
 		# check if df is empty
 		if df_debt.empty:
 			# create error
@@ -210,7 +210,7 @@ class ParsePayload:
 			df_debt = df_debt.append(pd.Series(), ignore_index=True)
 		else:
 			# filter rows
-			df_debt = df_debt[(df_debt['bitInvalid']==False) & (df_debt['bitUse']==True)]
+			df_debt = df_debt[(df_debt['bitinvalid']==False) & (df_debt['bituse']==True)]
 			# if df_debt is empty after filtering on bit cols
 			if df_debt.empty:
 				# create errors
@@ -223,7 +223,7 @@ class ParsePayload:
 				# append __debt to each column name
 				df_debt.columns = [f'{col}__debt' for col in df_debt.columns]
 				# aggregate
-				df_debt = df_debt.groupby('UniqueID__debt', as_index=False).agg(self.dict_debt_agg)
+				df_debt = df_debt.groupby('uniqueid__debt', as_index=False).agg(self.dict_debt_agg)
 				# rename columns
 				df_debt.columns = [f'{tpl_col[0]}_{tpl_col[1]}' for tpl_col in list(df_debt.columns)]
 		# make sure bottom row is selected
@@ -239,7 +239,7 @@ class ParsePayload:
 		# create error
 		self.error_ln = ''
 		# put into df
-		df_ln = pd.read_csv(StringIO(str_values), delimiter=',', usecols=lambda col: col in self.list_feats_raw_ln)
+		df_ln = pd.read_csv(StringIO(str_values), delimiter=',', usecols=lambda col: col.lower() in self.list_feats_raw_ln)
 		# append __ln to each column name
 		df_ln.columns = [f'{col}__ln' for col in df_ln.columns]
 		# check if df is empty
@@ -272,21 +272,13 @@ class ParsePayload:
 				# get col name
 				col_name = child.find('{http://www.transunion.com/namespace}id').text # child table cols
 				# logic
-				if col_name.upper() in list_feats_raw_cvlink:
+				if col_name.lower() in list_feats_raw_cvlink:
 					# append __cvlink
-					col_name = f'{col_name.upper()}__tucvlink'
-					bool_in_payload = True
-				elif col_name.lower() in list_feats_raw_cvlink:
-					# append __cvlink
-					col_name = f'{col_name.upper()}__tucvlink'
-					bool_in_payload = True
-				elif col_name.upper() in list_feats_raw_tuaccept:
-					# append __tuaccept
-					col_name = f'{col_name.upper()}__tuaccept'
+					col_name = f'{col_name.lower()}__tucvlink'
 					bool_in_payload = True
 				elif col_name.lower() in list_feats_raw_tuaccept:
 					# append __tuaccept
-					col_name = f'{col_name.lower()}__tuaccept'
+					col_name = f'{col_name.upper()}__tuaccept'
 					bool_in_payload = True
 				else:
 					bool_in_payload = False
@@ -444,7 +436,7 @@ class ParsePayload:
 		# multiply the two
 		y_hat_pd_x_lgd = y_hat_pd * y_hat_lgd
 		# control for amount financed
-		y_hat_pd_x_lgd_contr = y_hat_pd_x_lgd / self.X['fltAmountFinanced__app'].iloc[0]
+		y_hat_pd_x_lgd_contr = y_hat_pd_x_lgd / self.X['fltamountfinanced__app'].iloc[0]
 		# save to object
 		self.y_hat_pd = y_hat_pd
 		self.y_hat_lgd = y_hat_lgd
