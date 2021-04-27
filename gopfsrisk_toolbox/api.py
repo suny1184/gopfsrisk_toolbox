@@ -93,9 +93,7 @@ class ParsePayload:
 			           list_feats_raw_inc, 
 					   list_feats_agg_inc,
 					   dict_income_agg,
-					   list_feats_raw_debt,
-					   list_feats_agg_debt,
-					   dict_debt_agg,
+					   
 					   list_feats_raw_ln,
 					   list_feats_raw_tuaccept,
 					   list_feats_raw_cvlink,
@@ -104,7 +102,11 @@ class ParsePayload:
 					   pipeline_pd,
 					   pipeline_lgd,
 					   list_non_numeric_pd,
-					   dict_aa_pd):
+					   dict_aa_pd,
+					   bool_debt=False,
+					   list_feats_raw_debt=None,
+					   list_feats_agg_debt=None,
+					   dict_debt_agg=None):
 		# args
 		self.list_feats_raw_app = list_feats_raw_app
 		self.list_feats_raw_inc = list_feats_raw_inc
@@ -122,6 +124,7 @@ class ParsePayload:
 		self.pipeline_lgd = pipeline_lgd
 		self.list_non_numeric_pd = list_non_numeric_pd
 		self.dict_aa_pd = dict_aa_pd
+		self.bool_debt = bool_debt
 	# payload for each applicant
 	def get_payload_df(self, json_str_request):
 		# get the payload for each applicant
@@ -381,7 +384,7 @@ class ParsePayload:
 					list_errors.append(self.error_inc)
 					list_df.append(self.df_inc)
 				# debt
-				if dict_data['name'] == 'Debts':
+				if (dict_data['name'] == 'Debts') and (self.bool_debt):
 					# parse debt
 					self.parse_debt(str_values=str_values)
 					# append 
