@@ -105,31 +105,30 @@ def TUNE_LEARNING_RATE(X_train, y_train, X_valid, y_valid, list_non_numeric,
 			flt_learning_rate_max = flt_learning_rate
 			# add flt_learning_rate_increment to flt_learning_rate
 			flt_learning_rate += flt_learning_rate_increment
-		# if after first iteration         
-		else:
-			# if the flt_metric > flt_metric_max
-			if flt_metric > flt_metric_max:
-				# save new value for flt_metric _max
-				flt_metric_max = flt_metric
-				# save new value for flt_learning_rate_max
-				flt_learning_rate_max = flt_learning_rate
-				# add 0.01 to flt_learning_rate
-				flt_learning_rate += flt_learning_rate_increment
-				# if flt_learning_rate > 1:
-				if (flt_learning_rate > 1) or (flt_learning_rate <= 0):
-					break
-				# set int_n_rounds_no_improve to 0
-				int_n_rounds_no_improve = 0
-			# if the flt_metric is not better than flt_metric_max
-			else:
-				# get an average of the current flt_learning_rate and the previous learning_rate
-				flt_learning_rate = np.mean([flt_learning_rate, flt_learning_rate_max])
-				# add 1 to int_n_rounds_no_improve
-				int_n_rounds_no_improve += 1
+		# if after first iteration and there was improvement from max         
+		elif (a > 1) and (flt_metric > flt_metric_max):
+			# save new value for flt_metric _max
+			flt_metric_max = flt_metric
+			# save new value for flt_learning_rate_max
+			flt_learning_rate_max = flt_learning_rate
+			# add 0.01 to flt_learning_rate
+			flt_learning_rate += flt_learning_rate_increment
+			# if flt_learning_rate > 1:
+			if (flt_learning_rate > 1) or (flt_learning_rate <= 0):
+				break
+			# set int_n_rounds_no_improve to 0
+			int_n_rounds_no_improve = 0
+		# if after first iteration and there is no improvement from max
+		elif (a > 1) and (flt_metric <= flt_metric_max):
+			# get an average of the current flt_learning_rate and the previous learning_rate
+			flt_learning_rate = np.mean([flt_learning_rate, flt_learning_rate_max])
+			# add 1 to int_n_rounds_no_improve
+			int_n_rounds_no_improve += 1
+
 		# plot it
 		fig, ax = plt.subplots(figsize=tpl_figsize)
 		# plot
-		ax.plot([str(lr)[0:5] for lr in list_flt_learning_rate],list_flt_metric)
+		ax.plot([str(lr)[0:5] for lr in list_flt_learning_rate], list_flt_metric)
 		# x ticks
 		ax.set_xticks([str(lr)[0:5] for lr in list_flt_learning_rate])
 		# title
