@@ -78,8 +78,9 @@ def TUNE_LEARNING_RATE(X_train, y_train, X_valid, y_valid, list_non_numeric,
 			flt_metric = mean_squared_error(y_true=y_valid, y_pred=y_hat)
 			# get RMSE
 			flt_metric = np.sqrt(flt_metric)
-			# print this metric
-			print(f'RMSE: {flt_metric}')
+			# log the metric
+			if logger:
+				logger.warning(f'Model: {a}; LR: {flt_learning_rate}; RMSE: {flt_metric}')
 			# make negative so less negative is better (i.e., so our logic works)
 			flt_metric = -flt_metric
 		# if money
