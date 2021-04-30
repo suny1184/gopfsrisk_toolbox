@@ -125,6 +125,9 @@ def TUNE_LEARNING_RATE(X_train, y_train, X_valid, y_valid, list_non_numeric,
 		elif (a > 1) and (flt_metric <= flt_metric_max):
 			# get an average of the current flt_learning_rate and the previous learning_rate
 			flt_learning_rate = np.mean([flt_learning_rate, flt_learning_rate_max])
+			# make sure we don't repeat LR
+			while flt_learning_rate in list_flt_learning_rate:
+				flt_learning_rate -= (flt_learning_rate_increment/2) # might want to improve this logic later
 			# add 1 to int_n_rounds_no_improve
 			int_n_rounds_no_improve += 1
 
