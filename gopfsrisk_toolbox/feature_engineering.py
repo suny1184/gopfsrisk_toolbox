@@ -5,6 +5,11 @@ import numpy as np
 class FeatureEngineeringAaronPDLGDLower:
 	# transform
 	def transform(self, X):
+		# controlling for mean amount financed in df_train
+		try:
+			X['ENG_amt_financed'] = X['fltamountfinanced__app'] / 18125.087
+		except:
+			pass
 		# from James
 		# down payment to amount financed
 		try:
@@ -135,6 +140,11 @@ class FeatureEngineeringAaronPD:
 class FeatureEngineeringAaronLGD:
 	# transform
 	def transform(self, X):
+		# controlling for mean amount financed in df_train
+		try:
+			X['ENG_amt_financed'] = X['fltAmountFinanced__app'] / 18125.087
+		except:
+			pass
 		# from James
 		# down payment to amount financed
 		try:
