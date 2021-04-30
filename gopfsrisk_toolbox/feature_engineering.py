@@ -5,9 +5,9 @@ import numpy as np
 class FeatureEngineeringAaronPDLGDLower:
 	# transform
 	def transform(self, X):
-		# controlling for mean amount financed in df_train
+		# controlling for mean amount financed in df_train (LGD only)
 		try:
-			X['ENG_amt_financed'] = X['fltamountfinanced__app'] / 18125.087
+			X['eng_amt_financed'] = X['fltamountfinanced__app'] / 18125.087
 		except:
 			pass
 		# from James
