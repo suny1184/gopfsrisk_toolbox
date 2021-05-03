@@ -438,6 +438,8 @@ class ParsePayload:
 		self.create_x(json_str_request=json_str_request)
 		# transform
 		X = self.pipeline_shared.transform(X=self.X)
+		# lowercase cols names
+		X.columns = [col.lower() for col in X.columns]
 		# save to object
 		self.X = X
 		# return object
