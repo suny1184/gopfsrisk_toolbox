@@ -93,7 +93,6 @@ class ParsePayload:
 			           list_feats_raw_inc, 
 					   list_feats_agg_inc,
 					   dict_income_agg,
-					   
 					   list_feats_raw_ln,
 					   list_feats_raw_tuaccept,
 					   list_feats_raw_cvlink,
@@ -448,10 +447,13 @@ class ParsePayload:
 	def generate_predictions(self, json_str_request):
 		# shared preprocessing
 		self.shared_preprocessing(json_str_request=json_str_request)
+		# make copies of X to make sure X is not over-written
+		X_pd = self.X.copy()
+		X_lgd = self.X.copy()
 		# predict PD
-		y_hat_pd = self.pipeline_pd.prep_predict(X=self.X)
+		y_hat_pd = self.pipeline_pd.prep_predict(X=X_pd)
 		# predict LGD
-		y_hat_lgd = self.pipeline_lgd.prep_predict(X=self.X)
+		y_hat_lgd = self.pipeline_lgd.prep_predict(X=X_lgd)
 		# multiply the two
 		y_hat_pd_x_lgd = y_hat_pd * y_hat_lgd
 		# control for amount financed
