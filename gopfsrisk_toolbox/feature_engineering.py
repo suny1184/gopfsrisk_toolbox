@@ -1,10 +1,12 @@
 # feature engineering
 import numpy as np
+import time
 
 # create fe class
 class FeatureEngineeringAaronPDLGDLower:
 	# transform
 	def transform(self, X):
+		time_start = time.perf_counter()
 		# controlling for mean amount financed in df_train (LGD only)
 		try:
 			X['eng_amt_financed'] = X['fltamountfinanced__app'] / 18125.087
@@ -68,6 +70,7 @@ class FeatureEngineeringAaronPDLGDLower:
 			X['eng_debt_to_income'] = X['fltmonthlypayment__debt_mean'] / X['fltgrossmonthly__income_sum']
 		except:
 			pass
+		print(f'Time to feature engineer: {(time.perf_counter()-time_start):0.5} sec.')
 		# return
 		return X
 
@@ -75,6 +78,7 @@ class FeatureEngineeringAaronPDLGDLower:
 class FeatureEngineeringAaronPD:
 	# transform
 	def transform(self, X):
+		time_start = time.perf_counter()
 		# from James
 		# down payment to amount financed
 		try:
@@ -133,6 +137,7 @@ class FeatureEngineeringAaronPD:
 			X['ENG_debt_to_income'] = X['fltMonthlyPayment__debt_mean'] / X['fltGrossMonthly__income_sum']
 		except:
 			pass
+		print(f'Time to feature engineer: {(time.perf_counter()-time_start):0.5} sec.')
 		# return
 		return X
 
@@ -140,6 +145,7 @@ class FeatureEngineeringAaronPD:
 class FeatureEngineeringAaronLGD:
 	# transform
 	def transform(self, X):
+		time_start = time.perf_counter()
 		# controlling for mean amount financed in df_train
 		try:
 			X['ENG_amt_financed'] = X['fltAmountFinanced__app'] / 18125.087
@@ -203,6 +209,7 @@ class FeatureEngineeringAaronLGD:
 			X['ENG_debt_to_income'] = X['fltMonthlyPayment__debt_mean'] / X['fltGrossMonthly__income_sum']
 		except:
 			pass
+		print(f'Time to feature engineer: {(time.perf_counter()-time_start):0.5} sec.')
 		# return
 		return X
 
