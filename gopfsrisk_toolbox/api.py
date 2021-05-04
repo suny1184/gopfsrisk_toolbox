@@ -9,7 +9,6 @@ import catboost as cb
 import ast
 from itertools import chain
 import time
-import threading
 
 # define generic transformer class
 class GenericTransformer(BaseEstimator, TransformerMixin):
@@ -468,17 +467,11 @@ class ParsePayload:
 		X_pd = self.X.copy()
 		X_lgd = self.X.copy()
 		# predict PD
-		def predict_pd(self):
-			self.y_hat_pd = self.pipeline_pd.prep_predict(X=X_pd)
-			return self
+		y_hat_pd = self.pipeline_pd.prep_predict(X=X_pd)
 		# predict LGD
-		def predict_lgd(self):
-			self.y_hat_lgd = self.pipeline_lgd.prep_predict(X=X_lgd)
-			return self
-		threading.Thread(target=predict_pd).start()
-		threading.Thread(target=predict_lgd).start()
+		y_hat_lgd = self.pipeline_lgd.prep_predict(X=X_lgd)
 		# multiply the two
-		y_hat_pd_x_lgd = self.y_hat_pd * self.y_hat_lgd
+		y_hat_pd_x_lgd = y_hat_pd * y_hat_lgd
 		# control for amount financed
 		y_hat_pd_x_lgd_contr = y_hat_pd_x_lgd / self.X['fltamountfinanced__app'].iloc[0]
 		# save to object
