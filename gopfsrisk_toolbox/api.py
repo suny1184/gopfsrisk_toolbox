@@ -468,11 +468,13 @@ class ParsePayload:
 		X_pd = self.X.copy()
 		X_lgd = self.X.copy()
 		# predict PD
-		def predict_pd():
+		def predict_pd(self):
 			self.y_hat_pd = self.pipeline_pd.prep_predict(X=X_pd)
+			return self
 		# predict LGD
-		def predict_lgd():
+		def predict_lgd(self):
 			self.y_hat_lgd = self.pipeline_lgd.prep_predict(X=X_lgd)
+			return self
 		threading.Thread(target=predict_pd).start()
 		threading.Thread(target=predict_lgd).start()
 		# multiply the two
