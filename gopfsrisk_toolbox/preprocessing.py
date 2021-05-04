@@ -24,7 +24,9 @@ class FeatureValueReplacer(BaseEstimator, TransformerMixin):
 		return self
 	# transform
 	def transform(self, X):
+		time_start = time.perf_counter()
 		X.replace(self.dict_value_replace, inplace=True)
+		print(f'Time to impute: {(time.perf_counter()-time_start):0.5} sec.')
 		# return
 		return X
 
