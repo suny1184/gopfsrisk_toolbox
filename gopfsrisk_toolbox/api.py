@@ -9,6 +9,7 @@ import catboost as cb
 import ast
 from itertools import chain
 import time
+import threading
 
 # define generic transformer class
 class GenericTransformer(BaseEstimator, TransformerMixin):
@@ -146,11 +147,9 @@ class ParsePayload:
 			# get data tables
 			payload = applicant['sources']
 			list_payload.append(payload)
-		# create df with payload
-		df_payload =  pd.DataFrame({'list_payload': list_payload})
 		# save output to self
 		self.list_unique_id = list_unique_id
-		self.df_payload = df_payload
+		self.list_payload = list_payload
 		print(f'Time to get payloads: {(time.perf_counter()-time_start):0.5} sec.')
 		# return object
 		return self
@@ -373,12 +372,12 @@ class ParsePayload:
 		list_list_errors = []
 		list_list_df = []
 		# iterate through payloads
-		for list_payload in self.df_payload['list_payload']:
+		for payload in self.list_payload:
 			# empty lists
 			list_errors = []
 			list_df = []
 			# iterate through the tables
-			for dict_data in list_payload:
+			for dict_data in payload:
 				# get values
 				str_values = dict_data['values']
 				# application
@@ -469,11 +468,15 @@ class ParsePayload:
 		X_pd = self.X.copy()
 		X_lgd = self.X.copy()
 		# predict PD
-		y_hat_pd = self.pipeline_pd.prep_predict(X=X_pd)
+		def predict_pd():
+			self.y_hat_pd = self.pipeline_pd.prep_predict(X=X_pd)
 		# predict LGD
-		y_hat_lgd = self.pipeline_lgd.prep_predict(X=X_lgd)
+		def predict_lgd():
+			self.y_hat_lgd = self.pipeline_lgd.prep_predict(X=X_lgd)
+		threading.Thread(target=predict_pd).start()
+		threading.Thread(target=predict_lgd).start()
 		# multiply the two
-		y_hat_pd_x_lgd = y_hat_pd * y_hat_lgd
+		y_hat_pd_x_lgd = self.y_hat_pd * self.y_hat_lgd
 		# control for amount financed
 		y_hat_pd_x_lgd_contr = y_hat_pd_x_lgd / self.X['fltamountfinanced__app'].iloc[0]
 		# save to object
