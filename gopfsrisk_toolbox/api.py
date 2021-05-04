@@ -8,6 +8,7 @@ import pandas as pd
 import catboost as cb
 import ast
 from itertools import chain
+import time
 
 # define generic transformer class
 class GenericTransformer(BaseEstimator, TransformerMixin):
@@ -20,9 +21,11 @@ class GenericTransformer(BaseEstimator, TransformerMixin):
 	# transform
 	def transform(self, X):
 		# loop through transformers
+		time_start = time.perf_counter()
 		for transformer in self.list_transformers:
 			# transform
 			X = transformer.transform(X)
+		print(f'Time to transform: {(time.perf_counter()-time_start):0.5} sec.')
 		# return
 		return X
 
@@ -37,7 +40,9 @@ class FinalImputer(BaseEstimator, TransformerMixin):
 	# transform
 	def transform(self, X):
 		# fillna
+		time_start = time.perf_counter()
 		X.fillna(self.dict_imputations, inplace=True)
+		print(f'Time to impute: {(time.perf_counter()-time_start):0.5} sec.')
 		# return
 		return X
 
@@ -66,9 +71,11 @@ class PipelineDataPrep:
 	# prep predict
 	def prep_predict(self, X, bool_lower=True):
 		# loop through transformers
+		time_start = time.perf_counter()
 		for transformer in self.list_transformers:
 			# transform
 			X = transformer.transform(X)
+		print(f'Time to transform: {(time.perf_counter()-time_start):0.5} sec.')
 		# logic
 		if bool_lower:
 			# make all cols lower
@@ -76,6 +83,7 @@ class PipelineDataPrep:
 		# save to object
 		self.X = X
 		# logic
+		time_start = time.perf_counter()
 		if self.bool_classifier:
 			# make predictions
 			y_hat = self.model.predict_proba(X[self.model.feature_names_])[:,1]
@@ -83,6 +91,7 @@ class PipelineDataPrep:
 			y_hat = self.model.predict(X[self.model.feature_names_])
 		# get mean
 		y_hat = np.mean(y_hat)
+		print(f'Time to predict: {(time.perf_counter()-time_start):0.5} sec.')
 		# return
 		return y_hat
 
@@ -127,6 +136,7 @@ class ParsePayload:
 	# payload for each applicant
 	def get_payload_df(self, json_str_request):
 		# get the payload for each applicant
+		time_start = time.perf_counter()
 		list_unique_id = []
 		list_payload = []
 		for applicant in json_str_request['rows']:
@@ -141,6 +151,7 @@ class ParsePayload:
 		# save output to self
 		self.list_unique_id = list_unique_id
 		self.df_payload = df_payload
+		print(f'Time to get payloads: {(time.perf_counter()-time_start):0.5} sec.')
 		# return object
 		return self
 	# define parse_application
@@ -358,6 +369,7 @@ class ParsePayload:
 		# get payload df
 		self.get_payload_df(json_str_request=json_str_request)
 		# empty lists of lists
+		time_start = time.perf_counter()
 		list_list_errors = []
 		list_list_df = []
 		# iterate through payloads
@@ -410,6 +422,7 @@ class ParsePayload:
 		# save lists to object
 		self.list_list_errors = list_list_errors
 		self.list_list_df = list_list_df
+		print(f'Time to parse data: {(time.perf_counter()-time_start):0.5} sec.')
 		# return object
 		return self
 	# define create_x
@@ -417,6 +430,7 @@ class ParsePayload:
 		# parse all
 		self.parse_all(json_str_request=json_str_request)
 		# concatenate columns of each df in each list (horizontally i.e., axis=1)
+		time_start = time.perf_counter()
 		list_df_concat = []
 		for list_dfs in self.list_list_df:
 			# concatenate columns (i.e., column bind)
@@ -429,18 +443,21 @@ class ParsePayload:
 		X = pd.concat([self.df_empty, X], axis=0, sort=False) # WORKING PROPERLY
 		# save to object
 		self.X = X
+		print(f'Time to create X: {(time.perf_counter()-time_start):0.5} sec.')
 		# return object
 		return self
 	# define shared preprocessing
 	def shared_preprocessing(self, json_str_request):
 		# create X
 		self.create_x(json_str_request=json_str_request)
+		time_start = time.perf_counter()
 		# transform
 		X = self.pipeline_shared.transform(X=self.X)
 		# lowercase cols names
 		X.columns = [col.lower() for col in X.columns]
 		# save to object
 		self.X = X
+		print(f'Time to complete shared preprocessing: {(time.perf_counter()-time_start):0.5} sec.')
 		# return object
 		return self
 	# define generate_predictions
@@ -448,6 +465,7 @@ class ParsePayload:
 		# shared preprocessing
 		self.shared_preprocessing(json_str_request=json_str_request)
 		# make copies of X to make sure X is not over-written
+		time_start = time.perf_counter()
 		X_pd = self.X.copy()
 		X_lgd = self.X.copy()
 		# predict PD
@@ -463,12 +481,14 @@ class ParsePayload:
 		self.y_hat_lgd = y_hat_lgd
 		self.y_hat_pd_x_lgd = y_hat_pd_x_lgd
 		self.y_hat_pd_x_lgd_contr = y_hat_pd_x_lgd_contr
+		print(f'Time to generate predictions: {(time.perf_counter()-time_start):0.5} sec.')
 		# return object
 		return self
 	# define adverse_action
 	def adverse_action(self, json_str_request):
 		# generate predictions
 		self.generate_predictions(json_str_request=json_str_request)
+		time_start = time.perf_counter()
 		# get list of feats in model
 		list_x_feats = self.pipeline_pd.model.feature_names_
 		# pool X for readability
@@ -494,6 +514,7 @@ class ParsePayload:
 		list_list_reasons = [list(pd.Series(list_reasons).map(self.dict_aa_pd)) for list_reasons in list_list_reasons]
 		# save to object
 		self.list_list_reasons = list_list_reasons
+		print(f'Time to get adverse action: {(time.perf_counter()-time_start):0.5} sec.')
 		# return object
 		return self
 	# define generate output
@@ -501,6 +522,7 @@ class ParsePayload:
 		# get adverse action
 		self.adverse_action(json_str_request=json_str_request)
 		# create df
+		time_start = time.perf_counter()
 		df_output = pd.DataFrame({'Row_id': self.list_unique_id,
 							      'Score': self.y_hat_pd_x_lgd_contr,
 								  'Key_factors': self.list_list_reasons,
@@ -522,5 +544,6 @@ class ParsePayload:
 									  "Errors":list_errors_final}]}
 		# save to object
 		self.output_final = output_final
+		print(f'Time to generate output: {(time.perf_counter()-time_start):0.5} sec.')
 		# return object
 		return self
