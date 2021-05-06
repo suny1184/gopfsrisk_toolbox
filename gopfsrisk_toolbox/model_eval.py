@@ -333,6 +333,9 @@ def PARTIAL_DEPENDENCE_PLOTS(model, X_train, y_train, list_cols, tpl_figsize=(15
 		# group df
 		X_train_grouped = X_train.groupby(by=col, as_index=False).agg({'predicted': 'mean',
 		                                                               'actual': 'mean'})
+		# incase we have inf -inf or nan
+		X_train_grouped = X_train_grouped[~X_train_grouped.isin([np.nan, np.inf, -np.inf]).any(1)]
+
 		# sort
 		X_train_grouped = X_train_grouped.sort_values(by=col, ascending=True)
 		
