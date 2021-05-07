@@ -47,14 +47,25 @@ class QuantileBinning(BaseEstimator, TransformerMixin):
 		# zip list_dict_bin_name list_list_bins
 		list_dict_bin_name_list_bins = list(zip(list_dict_bin_name, list_list_bins))
 		# zip list cols
-		dict_quantiles = dict(zip(self.list_cols, list_dict_bin_name_list_bins)
+		dict_quantiles = dict(zip(self.list_cols, list_dict_bin_name_list_bins))
 		# save to object
 		self.dict_quantiles = dict_quantiles
 		# return object
 		return self
-
-
-
+	# transform
+	def transform(self, X):
+		# make sure all cols are in X
+		time_start = time.perf_counter()
+		list_cols = [col for col in self.list_cols if col in list(X.columns)]
+		# iterate through columns
+		for col in list_cols:
+			# get dictionary and list_bins
+			dict_bin_name, list_bins = self.dict_quantiles[col]
+			# convert column to bin
+			X[col] = np.vectorize(dict_bin_name.get)(np.digitize(X[col], list_bins))
+		print(f'Time to bin: {time.perf_counter()-time_start:0.5} sec.')
+		# return
+		return X
 
 # define feature mapper class
 class FeatureValueReplacer(BaseEstimator, TransformerMixin):
