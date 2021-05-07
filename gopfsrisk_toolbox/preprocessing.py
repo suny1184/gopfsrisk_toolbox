@@ -47,7 +47,7 @@ class QuantileBinning(BaseEstimator, TransformerMixin):
 		# zip list_dict_bin_name list_list_bins
 		list_dict_bin_name_list_bins = list(zip(list_dict_bin_name, list_list_bins))
 		# zip list cols
-		dict_quantiles = dict(zip(self.list_cols), list_dict_bin_name_list_bins)
+		dict_quantiles = dict(zip(self.list_cols, list_dict_bin_name_list_bins)
 		# save to object
 		self.dict_quantiles = dict_quantiles
 		# return object
