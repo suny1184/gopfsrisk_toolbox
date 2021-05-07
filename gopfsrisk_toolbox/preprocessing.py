@@ -28,7 +28,7 @@ class QuantileBinning(BaseEstimator, TransformerMixin):
 		# iterate through list cols
 		for col in self.list_cols:
 			# get bins
-			list_bins = list(pd.qcut(X[col], self.int_n_bins, retbins=True))[1]
+			list_bins = list(pd.qcut(X[col], self.int_n_bins, retbins=True, duplicates='drop'))[1]
 			# make bin names
 			list_bin_name = []
 			for a in range(len(list_bins)):
