@@ -319,8 +319,11 @@ def SENSITIVITY_PLOT(df, str_eval_metric='PR-AUC', str_filename='./output/plt_se
 # define function for pd plots
 def PARTIAL_DEPENDENCE_PLOTS(model, X_train, y_train, list_cols, tpl_figsize=(15,10), 
 	                         str_dirname='./output/pd_plots', str_filename='./output/df_trends.csv', logger=None):
-	# generate predicted probabilities
-	y_hat_train = model.predict_proba(X_train)[:,1]
+	# generate predictions
+	try:
+		y_hat_train = model.predict_proba(X_train)[:,1]
+	except AttributeError:
+		y_hat_train = model.predict(X_train)
 	# create dataframe
 	X_train['predicted'] = y_hat_train
 	X_train['actual'] = y_train
