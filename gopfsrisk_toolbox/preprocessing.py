@@ -14,6 +14,48 @@ from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer
 from sklearn.linear_model import BayesianRidge
 
+# define class for quantile binning
+class QuantileBinning(BaseEstimator, TransformerMixin):
+	# initialize
+	def __init__(self, list_cols, int_n_bins=10):
+		self.list_cols = list_cols
+		self.int_n_bins = int_n_bins
+	# fit
+	def fit(self, X):
+		# empty lists
+		list_list_bins = []
+		list_dict_bin_name = []
+		# iterate through list cols
+		for col in self.list_cols:
+			# get bins
+			list_bins = list(pd.qcut(X[col], self.int_n_bins, retbins=True))
+			# make bin names
+			list_bin_name = []
+			for a in range(len(list_bins)):
+				# calculate mean
+				try:
+					bin_name = (list_bins[a] + list_bins[a+1]) / 2
+				except IndexError:
+					bin_name = list_bins[a]
+				# append
+				list_bin_name.append(bin_name)
+			# create dictionary
+			dict_bin_name = dict(enumerate(list_bin_name))
+			# append
+			list_list_bins.append(list_bins)
+			list_dict_bin_name.append(dict_bin_name)
+		# zip list_dict_bin_name list_list_bins
+		list_dict_bin_name_list_bins = list(zip(list_dict_bin_name, list_list_bins))
+		# zip list cols
+		dict_quantiles = dict(zip(self.list_cols), list_dict_bin_name_list_bins)
+		# save to object
+		self.dict_quantiles = dict_quantiles
+		# return object
+		return self
+
+
+
+
 # define feature mapper class
 class FeatureValueReplacer(BaseEstimator, TransformerMixin):
 	# initialize
