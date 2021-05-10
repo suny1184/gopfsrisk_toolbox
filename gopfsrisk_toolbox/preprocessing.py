@@ -37,7 +37,7 @@ class QuantileBinning(BaseEstimator, TransformerMixin):
 		time_start = time.perf_counter()
 		list_cols = [col for col in self.list_cols if col in list(X.columns)]
 		# transform
-		X_train_scaled = cls_quant_trans.transform(X[list_cols])
+		X_train_scaled = self.cls_quant_trans.transform(X[list_cols])
 		# put into df
 		X_train_scaled = pd.DataFrame(X_train_scaled, columns=list_cols)
 		# assign to X
