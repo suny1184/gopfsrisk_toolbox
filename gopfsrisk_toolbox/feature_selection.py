@@ -103,7 +103,7 @@ def ITER_IMP_THRESH_FEAT_SELECT(X_train, y_train, X_valid, y_valid, list_non_num
 		# get importance
 		list_feature_importance = list(model.feature_importances_)
 		# put in df
-		df_imp = pd.DataFrame({'feature': list_model_features,
+		df_imp = pd.DataFrame({'feature': model.feature_names_,
 		                       'importance': list_feature_importance})
 		# subset to importance > threshold
 		df_imp = df_imp[df_imp['importance']>flt_thresh_imp]
