@@ -9,6 +9,103 @@ from sklearn.metrics import f1_score, roc_auc_score, mean_squared_error
 from scipy.special import expit
 import matplotlib.pyplot as plt
 
+# define function for importance threshold feat select
+def ITER_IMP_THRESH_FEAT_SELECT(X_train, y_train, X_valid, y_valid, list_non_numeric,
+								list_class_weights, flt_thresh_imp=0.0,
+								int_iterations=1000, int_early_stopping_rounds=100,
+								str_eval_metric='RMSE', int_random_state=42,
+								str_filename='./output/df_output.csv',
+								logger=None, tpl_figsize=(12,10), str_filename_plot='./output/plt_n_feats.png',
+								flt_learning_rate=None, dict_monotone_constraints=None, str_task_type='GPU',
+							 	bool_classifier=False, flt_rsm=None):
+	
+	# set initial list_features
+	list_features = list(X_train.columns)
+	# set n_imp_thresh to 1
+	n_imp_thresh = 1
+	# list n features
+	list_int_n_feats = []
+	# list features
+	list_list_features = []
+	# list flt_metric
+	list_flt_metric = []
+	# while loop
+	while n_imp_thresh > 0:
+		# append to list
+		list_int_n_feats.append(len(list_features[:]))
+		# append to list
+		list_list_features.append(list_features[:])
+		# if using constraints
+		if dict_monotone_constraints:
+			# remove any monotone constraints not in list features
+			for col in list(dict_monotone_constraints.keys()):
+				if col not in list_features:
+					del dict_monotone_constraints[col]
+		# fit model
+		model = FIT_CATBOOST_MODEL(X_train=X_train[list_features], 
+								   y_train=y_train, 
+					               X_valid=X_valid[list_features], 
+					               y_valid=y_valid, 
+					               list_non_numeric=[col for col in list_non_numeric if col in list_features], 
+					               int_iterations=int_iterations, 
+					               str_eval_metric=str_eval_metric, 
+					               int_early_stopping_rounds=int_early_stopping_rounds, 
+					               str_task_type=str_task_type, 
+					               bool_classifier=bool_classifier,
+					               list_class_weights=list_class_weights,
+					               int_random_state=int_random_state,
+					               flt_learning_rate=flt_learning_rate,
+					               dict_monotone_constraints=dict_monotone_constraints,
+					               flt_rsm=flt_rsm)
+		# get metric
+		if str_eval_metric == 'RMSE':
+			# predict
+			y_hat = model.predict(X_valid[list_features])
+			flt_metric = np.sqrt(mean_squared_error(y_true=y_valid, y_pred=y_hat))
+
+		# append to list
+		list_flt_metric.append(flt_metric)
+		# create a data frame
+		df_output = pd.DataFrame({'n_feats': list_int_n_feats,
+								  'eval_metric': list_flt_metric,
+								  'list_features': list_list_features})
+		# sort ascending by n_feats
+		df_output.sort_values(by='n_feats', ascending=True, inplace=True)
+		# write to csv
+		df_output.to_csv(str_filename, index=False)
+
+		# get max eval_metric
+		flt_metric_max = np.max(df_output['eval_metric'])
+		# subset to only those rows
+		df_output_max = df_output[df_output['eval_metric']==flt_metric_max]
+		# get n_feats
+		int_n_feats_max = df_output_max['n_feats'].iloc[0]
+
+		# plot
+		fig, ax = plt.subplots(figsize=tpl_figsize)
+		# title
+		ax.set_title(f'Max {str_eval_metric} of {flt_metric_max:0.6} with {int_n_feats_max} Features')
+		# y
+		ax.set_ylabel(str_eval_metric)
+		# x
+		ax.set_xlabel('N Features')
+		# plot
+		ax.plot(df_output['n_feats'], df_output['eval_metric'])
+		# save plot
+		plt.savefig(str_filename_plot, bbox_inches='tight')
+		# close
+		plt.close()
+
+		# get importance
+		list_feature_importance = list(model.feature_importances_)
+		# put in df
+		df_imp = pd.DataFrame({'feature': list_model_features,
+		                       'importance': list_feature_importance})
+		# subset to importance > threshold
+		df_imp = df_imp[df_imp['importance']>flt_thresh_imp]
+		# create list
+		list_features = list(df_imp['feature'])
+
 # define function for iterative feature selection
 def ITERATIVE_FEAT_SELECTION(X_train, y_train, X_valid, y_valid, list_non_numeric, 
 							 list_class_weights, int_n_models=50,
