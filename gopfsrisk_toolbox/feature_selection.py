@@ -78,17 +78,10 @@ def ITER_IMP_THRESH_FEAT_SELECT(X_train, y_train, X_valid, y_valid, list_non_num
 		# write to csv
 		df_output.to_csv(str_filename, index=False)
 
-		# get max eval_metric
-		flt_metric_max = np.max(df_output['eval_metric'])
-		# subset to only those rows
-		df_output_max = df_output[df_output['eval_metric']==flt_metric_max]
-		# get n_feats
-		int_n_feats_max = df_output_max['n_feats'].iloc[0]
-
 		# plot
 		fig, ax = plt.subplots(figsize=tpl_figsize)
 		# title
-		ax.set_title(f'Max {str_eval_metric} of {flt_metric_max:0.6} with {int_n_feats_max} Features')
+		ax.set_title(f'{str_eval_metric} by N Features')
 		# y
 		ax.set_ylabel(str_eval_metric)
 		# x
