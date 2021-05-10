@@ -13,7 +13,6 @@ from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
 from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer
 from sklearn.linear_model import BayesianRidge
-from sklearn.preprocessing import QuantileTransformer
 
 # define class for quantile binning
 class QuantileBinning(BaseEstimator, TransformerMixin):
@@ -23,12 +22,34 @@ class QuantileBinning(BaseEstimator, TransformerMixin):
 		self.int_n_bins = int_n_bins
 	# fit
 	def fit(self, X):
-		# intiialize class
-		cls_quant_trans = QuantileTransformer(n_quantiles=self.int_n_bins, output_distribution='uniform')
-		# fit
-		cls_quant_trans.fit(X[self.list_cols])
+		# empty lists
+		list_list_bins = []
+		list_dict_bin_name = []
+		# iterate through list cols
+		for col in self.list_cols:
+			# get bins
+			list_bins = list(pd.qcut(X[col], self.int_n_bins, retbins=True, duplicates='drop'))[1]
+			# make bin names
+			list_bin_name = []
+			for a in range(len(list_bins)):
+				# calculate mean
+				try:
+					bin_name = (list_bins[a] + list_bins[a+1]) / 2
+				except IndexError:
+					bin_name = list_bins[a]
+				# append
+				list_bin_name.append(bin_name)
+			# create dictionary
+			dict_bin_name = dict(enumerate(list_bin_name))
+			# append
+			list_list_bins.append(list_bins)
+			list_dict_bin_name.append(dict_bin_name)
+		# zip list_dict_bin_name list_list_bins
+		list_dict_bin_name_list_bins = list(zip(list_dict_bin_name, list_list_bins))
+		# zip list cols
+		dict_quantiles = dict(zip(self.list_cols, list_dict_bin_name_list_bins))
 		# save to object
-		self.cls_quant_trans = cls_quant_trans
+		self.dict_quantiles = dict_quantiles
 		# return object
 		return self
 	# transform
@@ -36,12 +57,12 @@ class QuantileBinning(BaseEstimator, TransformerMixin):
 		# make sure all cols are in X
 		time_start = time.perf_counter()
 		list_cols = [col for col in self.list_cols if col in list(X.columns)]
-		# transform
-		X_train_scaled = cls_quant_trans.transform(X[list_cols])
-		# put into df
-		X_train_scaled = pd.DataFrame(X_train_scaled, columns=list_cols)
-		# assign to X
-		X[list_cols] = X_train_scaled
+		# iterate through columns
+		for col in list_cols:
+			# get dictionary and list_bins
+			dict_bin_name, list_bins = self.dict_quantiles[col]
+			# convert column to bin
+			X[col] = np.vectorize(dict_bin_name.get)(np.digitize(X[col], list_bins))
 		print(f'Time to bin: {time.perf_counter()-time_start:0.5} sec.')
 		# return
 		return X
