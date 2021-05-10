@@ -62,6 +62,10 @@ def ITER_IMP_THRESH_FEAT_SELECT(X_train, y_train, X_valid, y_valid, list_non_num
 			# predict
 			y_hat = model.predict(X_valid[list_features])
 			flt_metric = np.sqrt(mean_squared_error(y_true=y_valid, y_pred=y_hat))
+		elif str_eval_metric == 'AUC':
+			# predict
+			y_hat = model.predict_proba(X_valid[list_features])[:,1]
+			flt_metric = roc_auc_score(y_true=y_valid, y_scorey_hat)
 
 		# append to list
 		list_flt_metric.append(flt_metric)
