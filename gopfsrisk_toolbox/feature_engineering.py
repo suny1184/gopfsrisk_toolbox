@@ -7,11 +7,6 @@ class FeatureEngineeringAaronPDLGDLower:
 	# transform
 	def transform(self, X):
 		time_start = time.perf_counter()
-		# controlling for mean amount financed in df_train (LGD only)
-		try:
-			X['eng_amt_financed'] = X['fltamountfinanced__app'] / 18125.087
-		except:
-			pass
 		# from James
 		# down payment to amount financed
 		try:
@@ -146,11 +141,6 @@ class FeatureEngineeringAaronLGD:
 	# transform
 	def transform(self, X):
 		time_start = time.perf_counter()
-		# controlling for mean amount financed in df_train
-		try:
-			X['ENG_amt_financed'] = X['fltAmountFinanced__app'] / 18125.087
-		except:
-			pass
 		# from James
 		# down payment to amount financed
 		try:
