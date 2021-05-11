@@ -30,7 +30,7 @@ class RoundBinning(BaseEstimator, TransformerMixin):
 		# get list of keys
 		list_keys = list(dict_round.keys())
 		# rm any key val combo where key not in X
-		for key, val in dict_round.items():
+		for key in list_keys:
 			if key not in list(X.columns):
 				# delete key val combo
 				del dict_round[key]
