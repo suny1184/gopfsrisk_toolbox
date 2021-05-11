@@ -14,6 +14,31 @@ from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer
 from sklearn.linear_model import BayesianRidge
 
+# rounding binner
+class RoundBinning(BaseEstimator, TransformerMixin):
+	# initialize
+	def __init__(self, dict_round):
+		self.dict_round = dict_round
+	# fit
+	def fit(self, X):
+		return self
+	# transform
+	def transform(self, X):
+		# make copy of dict_round
+		dict_round = self.dict_round.copy()
+		# get list of keys
+		list_keys = list(dict_round.keys())
+		# rm any key val combo where key not in X
+		for key, val in dict_round.items():
+			if key not in list(X.columns):
+				# delete key val combo
+				del dict_round[key]
+		# iterate through dictionary
+		for key, val in dict_round.items():
+			X[key] = val * round(X[key] / val)
+		# return X
+		return X
+
 # define class for quantile binning
 class QuantileBinning(BaseEstimator, TransformerMixin):
 	# initialize
