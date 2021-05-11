@@ -87,7 +87,7 @@ def ITER_IMP_THRESH_FEAT_SELECT(X_train, y_train, X_valid, y_valid, list_non_num
 		# x
 		ax.set_xlabel('N Features')
 		# plot
-		ax.plot(df_output['n_feats'], df_output['eval_metric'])
+		ax.plot([str(feat) for feat in df_output['n_feats']], df_output['eval_metric'])
 		# save plot
 		plt.savefig(str_filename_plot, bbox_inches='tight')
 		# close
