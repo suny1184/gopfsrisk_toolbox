@@ -24,6 +24,7 @@ class RoundBinning(BaseEstimator, TransformerMixin):
 		return self
 	# transform
 	def transform(self, X):
+		time_start = time.perf_counter()
 		# make copy of dict_round
 		dict_round = self.dict_round.copy()
 		# get list of keys
@@ -36,6 +37,7 @@ class RoundBinning(BaseEstimator, TransformerMixin):
 		# iterate through dictionary
 		for key, val in dict_round.items():
 			X[key] = val * round(X[key] / val)
+		print(f'Time to bin: {time.perf_counter()-time_start:0.5} sec.')
 		# return X
 		return X
 
