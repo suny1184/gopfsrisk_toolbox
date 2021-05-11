@@ -134,9 +134,9 @@ def TUNE_LEARNING_RATE(X_train, y_train, X_valid, y_valid, list_non_numeric,
 		# plot it
 		fig, ax = plt.subplots(figsize=tpl_figsize)
 		# plot
-		ax.plot([str(lr)[0:5] for lr in list_flt_learning_rate], list_flt_metric)
+		ax.plot([str(lr)[0:7] for lr in list_flt_learning_rate], list_flt_metric)
 		# x ticks
-		ax.set_xticks([str(lr)[0:5] for lr in list_flt_learning_rate])
+		ax.set_xticks([str(lr)[0:7] for lr in list_flt_learning_rate])
 		# title
 		ax.set_title(f'{str_eval_metric} by Learning Rate')
 		# x
