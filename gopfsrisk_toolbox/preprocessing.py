@@ -29,10 +29,11 @@ class RoundBinning(BaseEstimator, TransformerMixin):
 		dict_round = self.dict_round.copy()
 		# get list of keys
 		list_keys = list(dict_round.keys())
-		# rm any key val combo where key not in X
+		# iterate through keys
 		for key in list_keys:
+			# if a key is not in the data frame
 			if key not in list(X.columns):
-				# delete key val combo
+				# delete key from dictionary
 				del dict_round[key]
 		# iterate through dictionary
 		for key, val in dict_round.items():
