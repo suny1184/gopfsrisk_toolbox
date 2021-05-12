@@ -280,7 +280,7 @@ def GET_SENSITIVITY_INFO(str_filename='../../09_feature_selection/aaron/output/d
 	return df_feats
 
 # define function for sensitivity plot
-def SENSITIVITY_PLOT(df, str_eval_metric='PR-AUC', str_filename='./output/plt_sensitivity.png', logger=None):
+def SENSITIVITY_PLOT(df_feats, str_eval_metric='PR-AUC', str_filename='./output/plt_sensitivity.png', logger=None):
 	# get min
 	flt_min_eval_metric = np.min(df_feats['eval_metric'])
 	# get max
