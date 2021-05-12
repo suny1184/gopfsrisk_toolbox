@@ -282,11 +282,11 @@ def GET_SENSITIVITY_INFO(str_filename='../../09_feature_selection/aaron/output/d
 # define function for sensitivity plot
 def SENSITIVITY_PLOT(df_feats, str_eval_metric='PR-AUC', str_filename='./output/plt_sensitivity.png', logger=None):
 	# get min
-	flt_min_eval_metric = np.min(df_feats['eval_metric'])
+	flt_min_eval_metric = np.min(df_feats[str_eval_metric])
 	# get max
-	flt_max_eval_metric = np.max(df_feats['eval_metric'])
+	flt_max_eval_metric = np.max(df_feats[str_eval_metric])
 	# get median
-	flt_mdn_eval_metric = np.median(df_feats['eval_metric'])
+	flt_mdn_eval_metric = np.median(df_feats[str_eval_metric])
 	# create axis
 	fig, ax = plt.subplots(figsize=(df_feats.shape[0], 10))
 	# title
