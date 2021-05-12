@@ -36,6 +36,17 @@ def LOG_EVENTS(str_filename='./logs/db_pull.log'):
 	# return logger
 	return logger
 
+# define function for rm keys of dictionary not in list
+def RM_KEYS_NOT_IN_LIST(dict_, list_):
+	# make list of keys
+	list_keys = list(dict_.keys())
+	# rm key val pairs not in list_
+	for col in list_keys:
+		if col not in list_:
+			del dict_[col]
+	# return dict_
+	return dict_
+
 # define function for loadin#g from pickle
 def LOAD_FROM_PICKLE(logger=None, str_filename='../06_preprocessing/output/dict_imputations.pkl'):
 	# get file
