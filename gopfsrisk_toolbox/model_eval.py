@@ -407,7 +407,8 @@ def PARTIAL_DEPENDENCE_PLOTS(model, X_train, y_train, list_cols, tpl_figsize=(15
 def SENSITIVITY_ANALYSIS(X_train, X_valid, y_train, y_valid, list_cols, list_class_weights=None, 
 	                     str_filename_df='./output/df_sensitivity.csv', str_eval_metric='F1',
 	                     logger=None, int_iterations=1000, int_early_stopping_rounds=100,
-	                     str_task_type='GPU', bool_classifier=True): 
+	                     str_task_type='GPU', bool_classifier=True, int_random_state=42,
+	                     flt_learning_rate=None): 
 	# create empty df
 	df_sensitivity = pd.DataFrame(columns=['feature_removed', str_eval_metric]) 
 	# iterate through columns in X_train
@@ -431,17 +432,28 @@ def SENSITIVITY_ANALYSIS(X_train, X_valid, y_train, y_valid, list_cols, list_cla
 	                       		   int_early_stopping_rounds=int_early_stopping_rounds,
 	                       		   str_task_type=str_task_type,
 	                       		   bool_classifier=bool_classifier,
-	                       		   list_class_weights=list_class_weights)
+	                       		   list_class_weights=list_class_weights,
+	                       		   int_random_state=int_random_state)
 		# get eval metric
-		metric_ = BIN_CLASS_EVAL_METRICS(model_classifier=model,
-	                                     X=X_valid[list_columns],
-	                                     y=y_valid).get(str_eval_metric.lower()) # this could cause bugs in the future
+		if str_eval_metric == 'RMSE':
+			# predictions
+			y_hat = model.predict(X_valid[list_columns])
+			# metric
+			metric_ = np.sqrt(mean_squared_error(y_true=y_valid, y_pred=y_hat))
+		elif str_eval_metric == 'AUC':
+			# predictions
+			y_hat = model.predict_proba(X_valid[list_columns])[:,1]
+			# metric
+			metric_ = roc_auc_score(y_true=y_valid, y_score=y_hat)
 		# create dictionary
 		dict_ = {'feature_removed':col, str_eval_metric:metric_}
 		# append dict_ to df_sensitivity
 		df_sensitivity = df_sensitivity.append(dict_, ignore_index=True)
 		# sort it
-		df_sensitivity.sort_values(by=str_eval_metric, ascending=True, inplace=True)
+		if str_eval_metric == 'RMSE':
+			df_sensitivity.sort_values(by=str_eval_metric, ascending=False, inplace=True)
+		elif str_eval_metric == 'AUC':
+			df_sensitivity.sort_values(by=str_eval_metric, ascending=True, inplace=True)
 		# write to csv
 		df_sensitivity.to_csv(str_filename_df, index=False)
 	# if using logger
