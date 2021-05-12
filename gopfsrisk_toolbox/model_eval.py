@@ -299,13 +299,13 @@ def SENSITIVITY_PLOT(df_feats, str_eval_metric='PR-AUC', str_filename='./output/
 	# ylabel
 	ax.set_ylabel(str_eval_metric)
 	# line plot of sensitivity analysis
-	ax.plot(df_feats['removed_feat'], df_feats[str_eval_metric], color='red', label=str_eval_metric)
+	ax.plot(df_feats['feature_removed'], df_feats[str_eval_metric], color='red', label=str_eval_metric)
 	# line of min
-	ax.plot(df_feats['removed_feat'], [flt_min_eval_metric for x in df_feats[str_eval_metric]], linestyle=':', color='blue', label=f'Minimum {str_eval_metric} ({flt_min_eval_metric:0.4})')
+	ax.plot(df_feats['feature_removed'], [flt_min_eval_metric for x in df_feats[str_eval_metric]], linestyle=':', color='blue', label=f'Minimum {str_eval_metric} ({flt_min_eval_metric:0.4})')
 	# line of max
-	ax.plot(df_feats['removed_feat'], [flt_max_eval_metric for x in df_feats[str_eval_metric]], linestyle=':', color='red', label=f'Maximum {str_eval_metric} ({flt_max_eval_metric:0.4})')
+	ax.plot(df_feats['feature_removed'], [flt_max_eval_metric for x in df_feats[str_eval_metric]], linestyle=':', color='red', label=f'Maximum {str_eval_metric} ({flt_max_eval_metric:0.4})')
 	# line of median
-	ax.plot(df_feats['removed_feat'], [flt_mdn_eval_metric for x in df_feats[str_eval_metric]], linestyle=':', color='green', label=f'Median {str_eval_metric} ({flt_mdn_eval_metric:0.4})')
+	ax.plot(df_feats['feature_removed'], [flt_mdn_eval_metric for x in df_feats[str_eval_metric]], linestyle=':', color='green', label=f'Median {str_eval_metric} ({flt_mdn_eval_metric:0.4})')
 	# rotate xticks 90 degrees
 	plt.xticks(rotation=90)
 	# legend
