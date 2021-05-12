@@ -290,7 +290,10 @@ def SENSITIVITY_PLOT(df, str_eval_metric='PR-AUC', str_filename='./output/plt_se
 	# create axis
 	fig, ax = plt.subplots(figsize=(df_feats.shape[0], 10))
 	# title
-	ax.set_title(f'{str_eval_metric} (ascending) by Removed Feature')
+	if str_eval_metric == 'AUC':
+		ax.set_title(f'{str_eval_metric} (ascending) by Removed Feature')
+	elif str_eval_metric == 'RMSE':
+		ax.set_title(f'{str_eval_metric} (descending) by Removed Feature')
 	# xlabel
 	ax.set_xlabel('Removed Feature')
 	# ylabel
@@ -313,8 +316,6 @@ def SENSITIVITY_PLOT(df, str_eval_metric='PR-AUC', str_filename='./output/plt_se
 	if logger:
 		# log it
 		logger.warning(f'Sensitivity analysis plot saved to {str_filename}')
-	# return
-	return fig
 
 # define function for pd plots
 def PARTIAL_DEPENDENCE_PLOTS(model, X_train, y_train, list_cols, tpl_figsize=(15,10), 
