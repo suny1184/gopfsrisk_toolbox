@@ -432,7 +432,11 @@ def SENSITIVITY_ANALYSIS(X_train, X_valid, y_train, y_valid, list_cols, list_cla
 			for key in list_keys:
 				if key not in list_columns:
 					del dict_monotone_constraints_copy[key]
-		# make sure there are no keys in
+			# save to alias
+			dict_monotone_constraints_for_model = dict_monotone_constraints_copy.copy()
+		else:
+			# save to alias
+			dict_monotone_constraints_for_model = None
 		# fit cb model
 		model = FIT_CATBOOST_MODEL(X_train=X_train[list_columns],
 	                       		   y_train=y_train,
@@ -446,7 +450,7 @@ def SENSITIVITY_ANALYSIS(X_train, X_valid, y_train, y_valid, list_cols, list_cla
 	                       		   bool_classifier=bool_classifier,
 	                       		   list_class_weights=list_class_weights,
 	                       		   int_random_state=int_random_state,
-	                       		   dict_monotone_constraints=dict_monotone_constraints_copy)
+	                       		   dict_monotone_constraints=dict_monotone_constraints_for_model)
 		# get eval metric
 		if str_eval_metric == 'RMSE':
 			# predictions
