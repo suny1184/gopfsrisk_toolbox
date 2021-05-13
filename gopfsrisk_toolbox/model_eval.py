@@ -409,7 +409,7 @@ def SENSITIVITY_ANALYSIS(X_train, X_valid, y_train, y_valid, list_cols, list_cla
 	                     str_filename_df='./output/df_sensitivity.csv', str_eval_metric='F1',
 	                     logger=None, int_iterations=1000, int_early_stopping_rounds=100,
 	                     str_task_type='GPU', bool_classifier=True, int_random_state=42,
-	                     flt_learning_rate=None): 
+	                     flt_learning_rate=None, dict_monotone_constraints=None): 
 	# create empty df
 	df_sensitivity = pd.DataFrame(columns=['feature_removed', str_eval_metric]) 
 	# iterate through columns in X_train
@@ -422,6 +422,18 @@ def SENSITIVITY_ANALYSIS(X_train, X_valid, y_train, y_valid, list_cols, list_cla
 		list_non_numeric = GET_NUMERIC_AND_NONNUMERIC(df=X_train, 
 			                                          list_columns=list_columns, 
 			                                          logger=None)[1]
+		# if using monotone constraints
+		if dict_monotone_constraints:
+			# make copy of dict_monotone constraints
+			dict_monotone_constraints_copy = dict_monotone_constraints.copy()
+			# list keys
+			list_keys = list(dict_monotone_constraints_copy.keys())
+			# rm keys not in list_columns
+			for key in list_keys:
+				if key not in list_columns:
+					del dict_monotone_constraints_copy[key]
+
+		# make sure there are no keys in
 		# fit cb model
 		model = FIT_CATBOOST_MODEL(X_train=X_train[list_columns],
 	                       		   y_train=y_train,
@@ -434,7 +446,8 @@ def SENSITIVITY_ANALYSIS(X_train, X_valid, y_train, y_valid, list_cols, list_cla
 	                       		   str_task_type=str_task_type,
 	                       		   bool_classifier=bool_classifier,
 	                       		   list_class_weights=list_class_weights,
-	                       		   int_random_state=int_random_state)
+	                       		   int_random_state=int_random_state,
+	                       		   dict_monotone_constraints=dict_monotone_constraints)
 		# get eval metric
 		if str_eval_metric == 'RMSE':
 			# predictions
