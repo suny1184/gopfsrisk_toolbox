@@ -432,7 +432,6 @@ def SENSITIVITY_ANALYSIS(X_train, X_valid, y_train, y_valid, list_cols, list_cla
 			for key in list_keys:
 				if key not in list_columns:
 					del dict_monotone_constraints_copy[key]
-
 		# make sure there are no keys in
 		# fit cb model
 		model = FIT_CATBOOST_MODEL(X_train=X_train[list_columns],
