@@ -447,7 +447,7 @@ def SENSITIVITY_ANALYSIS(X_train, X_valid, y_train, y_valid, list_cols, list_cla
 	                       		   bool_classifier=bool_classifier,
 	                       		   list_class_weights=list_class_weights,
 	                       		   int_random_state=int_random_state,
-	                       		   dict_monotone_constraints=dict_monotone_constraints)
+	                       		   dict_monotone_constraints=dict_monotone_constraints_copy)
 		# get eval metric
 		if str_eval_metric == 'RMSE':
 			# predictions
