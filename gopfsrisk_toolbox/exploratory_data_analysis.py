@@ -12,7 +12,7 @@ from sklearn.cluster import KMeans
 import os
 
 # define class to make plot comparisons
-class BinaryTargetComparison:
+class ContinuousTargetComparison:
 	# get y
 	def get_y(self, ser_y, str_df_name='train'):
 		if str_df_name == 'train':
