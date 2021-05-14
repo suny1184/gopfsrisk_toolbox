@@ -24,18 +24,17 @@ class BinaryTargetComparison:
 	# make plot
 	def make_and_save_plot(self, str_filename='./output/plt_targetcompare.png', tpl_figsize=(12,8)):
 		# make ax
-		fig, ax = plt.subplots(nrows=1, ncols=3, figsize=tpl_figsize)
+		fig, ax = plt.subplots(figsize=tpl_figsize)
+		# title
+		ax.set_title('Target Distributions')
 		# train
-		ax[0].set_title('Train')
-		sns.distplot(self.y_train, ax=0)
+		sns.distplot(self.y_train, ax=ax, kde=True, label='Train', color='r')
 		# valid
-		ax[1].set_title('Valid')
-		sns.distplot(self.y_valid, ax=1)
+		sns.distplot(self.y_valid, ax=ax, kde=True, label='Valid', color='g')
 		# test
-		ax[2].set_title('Test')
-		sns.distplot(self.y_test, ax=2)
-		# fix overlap
-		plt.tight_layout()
+		sns.distplot(self.y_test, ax=ax, kde=True, label='Test', color='b')
+		# legend
+		plt.legend()
 		# save
 		plt.savefig(str_filename, bbox_inches='tight')
 		# close plot
