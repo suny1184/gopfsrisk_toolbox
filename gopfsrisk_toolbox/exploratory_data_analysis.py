@@ -11,6 +11,36 @@ from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
 import os
 
+# define class to make plot comparisons
+class BinaryTargetComparison:
+	# get y
+	def get_y(self, ser_y, str_df_name='train'):
+		if str_df_name == 'train':
+			self.y_train = ser_y
+		elif str_df_name == 'valid':
+			self.y_valid = ser_y
+		else:
+			self.y_test = ser_y
+	# make plot
+	def make_and_save_plot(self, str_filename='./output/plt_targetcompare.png', tpl_figsize=(12,8)):
+		# make ax
+		fig, ax = plt.subplots(nrows=1, ncols=3, figsize=tpl_figsize)
+		# train
+		ax[0].set_title('Train')
+		sns.distplot(self.y_train, ax=0)
+		# valid
+		ax[1].set_title('Valid')
+		sns.distplot(self.y_valid, ax=1)
+		# test
+		ax[2].set_title('Test')
+		sns.distplot(self.y_test, ax=2)
+		# fix overlap
+		plt.tight_layout()
+		# save
+		plt.savefig(str_filename, bbox_inches='tight')
+		# close plot
+		plt.close()
+
 # create common cols class
 class CommonColumChecker:
 	# get cols
