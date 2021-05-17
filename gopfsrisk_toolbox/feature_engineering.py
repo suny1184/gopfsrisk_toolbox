@@ -859,6 +859,25 @@ class FeatureEngineeringJQ:
 		# return
 		return X
 
+class FeatureBucketingJQ:
+	# init
+	def __init__(self, int_base=100, bool_inplace=True):
+		self.int_base = int_base
+		self.bool_inplace = bool_inplace
+	# define helper
+	def custom_round(self, int_y):
+		return int(self.int_base * round(float(int_y)/self.int_base))
+	# transform
+	def transform(self, X, str_colname='col2'):
+		# logic
+		if self.bool_inplace:
+			# apply
+			X[str_colname] = X[str_colname].apply(lambda x: self.custom_round(x))
+		else:
+			#apply
+			X[f'{str_colname}_bucket_{self.int_base}'] = X[str_colname].apply(lambda x: self.custom_round(x))
+		# return
+		return X
 
 """
 class FeatureEngineeringAndrew:
