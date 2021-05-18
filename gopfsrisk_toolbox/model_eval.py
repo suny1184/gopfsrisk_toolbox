@@ -62,9 +62,9 @@ def CONTINUOUS_EVAL_METRICS(model_regressor, X, y, logger=None):
 # define function to get binary eval metrics
 def BIN_CLASS_EVAL_METRICS(model_classifier, X, y, logger=None):
 	# generate predicted class
-	y_hat_class = model_classifier.predict(X)
+	y_hat_class = model_classifier.predict(X[model_classifier.feature_names_])
 	# generate predicted probabilities
-	y_hat_proba = model_classifier.predict_proba(X)[:,1]
+	y_hat_proba = model_classifier.predict_proba(X[model_classifier.feature_names_])[:,1]
 	# metrics
 	# accuracy
 	accuracy = accuracy_score(y_true=y, y_pred=y_hat_class)
