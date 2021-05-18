@@ -39,7 +39,7 @@ def QQ_PLOT(arr_yhat, ser_actual, str_filename='./output/plt_qq.png', logger=Non
 # define function to get continuous eval metrics
 def CONTINUOUS_EVAL_METRICS(model_regressor, X, y, logger=None):
 	# generate predictions
-	y_hat = model_regressor.predict(X)
+	y_hat = model_regressor.predict(X[model_regressor.feature_names_])
 	# explained variance
 	exp_var = explained_variance_score(y_true=y, y_pred=y_hat)
 	# MAE
