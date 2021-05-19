@@ -5,6 +5,38 @@ import time
 class FeatureEngineeringAaronJQPDLGD:
 	# transform
 	def transform(self, X):
+		# Cyclic: Month relative to year
+		# sin
+		try:
+			X['ENG_ApplicationMonth__app_sin'] = np.sin((X['ApplicationMonth__app']-1) * (2*np.pi/12))
+		except:
+			pass
+		# cos
+		try:
+			X['ENG_ApplicationMonth__app_cos'] = np.cos((X['ApplicationMonth__app']-1) * (2*np.pi/12))
+		except:
+			pass
+		# tan
+		try:
+			X['ENG_ApplicationMonth__app_tan'] = X['ENG_ApplicationMonth__app_sin'] / X['ENG_ApplicationMonth__app_cos']
+		except:
+			pass
+		# Cyclic: Quarter relative to year
+		# sin
+		try:
+			X['ENG_ApplicationQuarter__app_sin'] = np.sin((X['ApplicationQuarter__app']-1) * (2*np.pi/4))
+		except:
+			pass
+		# cos
+		try:
+			X['ENG_ApplicationQuarter__app_cos'] = np.cos((X['ApplicationQuarter__app']-1) * (2*np.pi/4))
+		except:
+			pass
+		# tan
+		try:
+			X['ENG_ApplicationQuarter__app_tan'] = X['ENG_ApplicationQuarter__app_sin'] / X['ENG_ApplicationQuarter__app_cos']
+		except:
+			pass
 		# loan to value
 		try:
 			X['ENG_loan_to_value'] = X['fltAmountFinanced__app'] / X['fltApprovedPriceWholesale__app']
@@ -656,8 +688,6 @@ class FeatureEngineeringAaronJQPDLGD:
 				
 		# return
 		return X
-
-
 
 # create fe class
 class FeatureEngineeringAaronPDLGDLower:
