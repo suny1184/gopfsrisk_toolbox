@@ -49,7 +49,7 @@ class TimeParsing:
 		# ax
 		fig, ax = plt.subplots(nrows=4, ncols=1, figsize=tpl_figsize)
 		# altogether
-		flt_mean_all = np.mean(self.df_output['sec']
+		flt_mean_all = np.mean(self.df_output['sec'])
 		ax[0].set_title(f"All Debtors (mean = {flt_mean_all:0.5} sec)")
 		sns.distplot(self.df_output['sec'], kde=True, ax=ax[0])
 		# 1 debtor
