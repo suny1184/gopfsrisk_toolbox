@@ -99,7 +99,7 @@ class TimeParsing:
 		ax[2].set_title(f"Two Debtors (mean = {flt_mean_2:0.5} sec; N = {df_output_2.shape[0]})")
 		sns.distplot(df_output_2['sec'], kde=True, ax=ax[2])
 		# bar plot
-		ax[3].set_title('Comparison')
+		ax[3].set_title('Mean Seconds by N Debtors')
 		ax[3].bar(['All', '1 Debtor', '2 Debtors'], [flt_mean_all, flt_mean_1, flt_mean_2])
 		# create df for grouped bar plot
 		list_int_n_debtors = []
