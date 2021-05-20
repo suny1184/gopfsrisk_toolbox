@@ -149,7 +149,10 @@ class ParsePayload:
 		# save output to self
 		self.list_unique_id = list_unique_id
 		self.list_payload = list_payload
-		print(f'Time to get payloads: {(time.perf_counter()-time_start):0.5} sec.')
+		# time to get payloads
+		flt_sec_get_payloads = time.perf_counter()-time_start
+		self.flt_sec_get_payloads = flt_sec_get_payloads
+		print(f'Time to get payloads: {flt_sec_get_payloads:0.5} sec.')
 		# return object
 		return self
 	# define parse_application
@@ -420,7 +423,10 @@ class ParsePayload:
 		# save lists to object
 		self.list_list_errors = list_list_errors
 		self.list_list_df = list_list_df
-		print(f'Time to parse data: {(time.perf_counter()-time_start):0.5} sec.')
+		# time
+		flt_sec_parse = time.perf_counter()-time_start
+		self.flt_sec_parse = flt_sec_parse
+		print(f'Time to parse data: {flt_sec_parse:0.5} sec.')
 		# return object
 		return self
 	# define create_x
@@ -441,7 +447,10 @@ class ParsePayload:
 		X = pd.concat([self.df_empty, X], axis=0, sort=False) # WORKING PROPERLY
 		# save to object
 		self.X = X
-		print(f'Time to create X: {(time.perf_counter()-time_start):0.5} sec.')
+		# time
+		flt_sec_create_x = time.perf_counter()-time_start
+		self.flt_sec_create_x = flt_sec_create_x
+		print(f'Time to create X: {flt_sec_create_x:0.5} sec.')
 		# return object
 		return self
 	# define shared preprocessing
@@ -455,7 +464,10 @@ class ParsePayload:
 		X.columns = [col.lower() for col in X.columns]
 		# save to object
 		self.X = X
-		print(f'Time to complete shared preprocessing: {(time.perf_counter()-time_start):0.5} sec.')
+		# time
+		flt_sec_preprocessing = time.perf_counter()-time_start
+		self.flt_sec_preprocessing = flt_sec_preprocessing
+		print(f'Time to complete shared preprocessing: {flt_sec_preprocessing:0.5} sec.')
 		# return object
 		return self
 	# define generate_predictions
@@ -479,7 +491,10 @@ class ParsePayload:
 		self.y_hat_lgd = y_hat_lgd
 		self.y_hat_pd_x_lgd = y_hat_pd_x_lgd
 		self.y_hat_pd_x_lgd_contr = y_hat_pd_x_lgd_contr
-		print(f'Time to generate predictions: {(time.perf_counter()-time_start):0.5} sec.')
+		# time
+		flt_sec_predict = time.perf_counter()-time_start
+		self.flt_sec_predict = flt_sec_predict
+		print(f'Time to generate predictions: {flt_sec_predict:0.5} sec.')
 		# return object
 		return self
 	# define adverse_action
@@ -512,7 +527,10 @@ class ParsePayload:
 		list_list_reasons = [list(pd.Series(list_reasons).map(self.dict_aa_pd)) for list_reasons in list_list_reasons]
 		# save to object
 		self.list_list_reasons = list_list_reasons
-		print(f'Time to get adverse action: {(time.perf_counter()-time_start):0.5} sec.')
+		# time
+		flt_sec_adv_act = time.perf_counter()-time_start
+		self.flt_sec_adv_act = flt_sec_adv_act
+		print(f'Time to get adverse action: {flt_sec_adv_act:0.5} sec.')
 		# return object
 		return self
 	# define generate output
@@ -542,6 +560,9 @@ class ParsePayload:
 									  "Errors":list_errors_final}]}
 		# save to object
 		self.output_final = output_final
-		print(f'Time to generate output: {(time.perf_counter()-time_start):0.5} sec.')
+		# time
+		flt_sec_gen_output = time.perf_counter()-time_start
+		self.flt_sec_gen_output = flt_sec_gen_output
+		print(f'Time to generate output: {flt_sec_gen_output:0.5} sec.')
 		# return object
 		return self
