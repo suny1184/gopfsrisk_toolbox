@@ -60,11 +60,13 @@ class TimeParsing:
 		# 2 debtors
 		df_output_2 = self.df_output[self.df_output['n_debtors']==2]
 		flt_mean_2 = np.mean(df_output_2['sec'])
-		ax[2].set_title(f"Two Debtors (mean = {df_output_2['sec']:0.5} sec)")
+		ax[2].set_title(f"Two Debtors (mean = {flt_mean_2:0.5} sec)")
 		sns.distplot(df_output_2['sec'], kde=True, ax=ax[2])
 		# bar plot
 		ax[3].set_title('Comparison')
 		ax[3].bar(['All', '1 Debtor', '2 Debtors'], [flt_mean_all, flt_mean_1, flt_mean_2])
+		# fix overlap
+		plt.tight_layout()
 		# save to object
 		self.df_output_1 = df_output_1
 		self.df_output_2 = df_output_2
