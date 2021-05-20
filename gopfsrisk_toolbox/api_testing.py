@@ -5,7 +5,8 @@ import pandas as pd
 # define class
 class TimeParsing:
 	# initialize
-	def __init__(self, ser_payloads):
+	def __init__(self, cls_parse_payload, ser_payloads):
+		self.cls_parse_payload = cls_parse_payload
 		self.ser_payloads = ser_payloads
 	# parse
 	def parse_payloads(self):
@@ -22,13 +23,13 @@ class TimeParsing:
 			# start timer
 			time_start = time.perf_counter()
 			# generate output
-			cls_parse_payload.generate_output(json_str_request=json_str_request)
+			self.cls_parse_payload.generate_output(json_str_request=json_str_request)
 			# get time in sec
 			flt_sec = time.perf_counter() - time_start
 			# append to list_flt_sec
 			list_flt_sec.append(flt_sec)
 			# get int_n_debtors
-			int_n_debtors = len(cls_parse_payload.list_unique_id)
+			int_n_debtors = len(self.cls_parse_payload.list_unique_id)
 			# append to list_int_n_debtors
 			list_int_n_debtors.append(int_n_debtors)
 			# print current mean time
