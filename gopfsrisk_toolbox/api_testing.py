@@ -49,15 +49,15 @@ class TimeParsing:
 		# ax
 		fig, ax = plt.subplots(nrows=3, ncols=1, figsize=tpl_figsize)
 		# altogether
-		ax[0].set_title(f'All Debtors (mean = {np.mean(self.df_output['sec']):5} sec)')
+		ax[0].set_title(f"All Debtors (mean = {np.mean(self.df_output['sec']):5} sec)")
 		sns.histplot(data=self.df_output['sec'], kde=True, ax=[0])
 		# 1 debtor
 		df_output_1 = self.df_output[self.def_output['n_debtors']==1]
-		ax[1].set_title(f'One Debtor (mean = {df_output_1['sec']} sec)')
+		ax[1].set_title(f"One Debtor (mean = {df_output_1['sec']} sec)")
 		sns.histplot(data=df_output_1['sec'], kde=True, ax=[1])
 		# 2 debtors
 		df_output_2 = self.df_output[self.def_output['n_debtors']==2]
-		ax[2].set_title(f'Two Debtors (mean = {df_output_2['sec']} sec)')
+		ax[2].set_title(f"Two Debtors (mean = {df_output_2['sec']} sec)")
 		sns.histplot(data=df_output_2['sec'], kde=True, ax=[2])
 		# save to object
 		self.df_output_1 = df_output_1
