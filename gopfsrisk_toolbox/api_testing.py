@@ -73,6 +73,10 @@ class TimeParsing:
 		self.fig = fig
 		# return
 		return self
+	# save plot
+	def save_plot(self, str_filename='./output/plt_parsing_time.png'):
+		# save
+		plt.savefig(str_filename, bbox_inches='tight')
 
 
 
