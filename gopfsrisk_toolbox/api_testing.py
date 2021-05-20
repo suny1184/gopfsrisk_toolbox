@@ -1,6 +1,7 @@
 import ast
 import time
 import pandas as pd
+import numpy as np
 
 # define class
 class TimeParsing:
