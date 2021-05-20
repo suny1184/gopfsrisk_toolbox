@@ -13,7 +13,22 @@ class TimeParsing:
 		self.ser_payloads = ser_payloads
 	# parse
 	def parse_payloads(self):
-		# list of time
+		# list of time to get payloads
+		list_flt_sec_get_payloads = []
+		# list of time to parse
+		list_flt_sec_parse = []
+		# list of time to create x
+		list_flt_sec_create_x = []
+		# list of time to preprocess
+		list_flt_sec_preprocessing = []
+		# list of time to predict
+		list_flt_sec_predict = []
+		# list of time to get adverse action
+		list_flt_sec_adv_act = []
+		# list of time to get output
+		list_flt_sec_gen_output = []
+
+		# list of time (overall)
 		list_flt_sec = []
 		# list of n debtors
 		list_int_n_debtors = []
@@ -34,6 +49,14 @@ class TimeParsing:
 				flt_sec = time.perf_counter() - time_start
 				# append to list_flt_sec
 				list_flt_sec.append(flt_sec)
+				# append to lists
+				list_flt_sec_get_payloads.append(self.cls_parse_payload.flt_sec_get_payloads)
+				list_flt_sec_parse.append(self.cls_parse_payload.flt_sec_parse)
+				list_flt_sec_create_x.append(self.cls_parse_payload.flt_sec_create_x)
+				list_flt_sec_preprocessing.append(self.cls_parse_payload.flt_sec_preprocessing)
+				list_flt_sec_predict.append(self.cls_parse_payload.flt_sec_predict)
+				list_flt_sec_adv_act.append(self.cls_parse_payload.flt_sec_adv_act)
+				list_flt_sec_gen_output.append(self.cls_parse_payload.flt_sec_gen_output)
 				# get int_n_debtors
 				int_n_debtors = len(self.cls_parse_payload.list_unique_id)
 				# append to list_int_n_debtors
@@ -44,6 +67,13 @@ class TimeParsing:
 				list_idx_errors.append(a)
 		# create df
 		df_output = pd.DataFrame({'sec': list_flt_sec,
+								  'sec_get_payloads': list_flt_sec_get_payloads,
+								  'sec_parse': list_flt_sec_parse,
+								  'sec_create_x': list_flt_sec_create_x,
+								  'sec_preprocessing': list_flt_sec_preprocessing,
+								  'sec_predict': list_flt_sec_predict,
+								  'sec_adv_act': list_flt_sec_adv_act,
+								  'sec_gen_output': list_flt_sec_gen_output,
 			                      'n_debtors': list_int_n_debtors})
 		# save to object
 		self.list_idx_errors = list_idx_errors
@@ -53,7 +83,7 @@ class TimeParsing:
 	# plot
 	def create_plot(self, tpl_figsize, str_filename=None):
 		# ax
-		fig, ax = plt.subplots(nrows=4, ncols=1, figsize=tpl_figsize)
+		fig, ax = plt.subplots(nrows=5, ncols=1, figsize=tpl_figsize)
 		# altogether
 		flt_mean_all = np.mean(self.df_output['sec'])
 		ax[0].set_title(f"All Debtors (mean = {flt_mean_all:0.5} sec; N = {self.df_output.shape[0]})")
@@ -71,6 +101,32 @@ class TimeParsing:
 		# bar plot
 		ax[3].set_title('Comparison')
 		ax[3].bar(['All', '1 Debtor', '2 Debtors'], [flt_mean_all, flt_mean_1, flt_mean_2])
+		# create df for grouped bar plot
+		list_int_n_debtors = []
+		list_str_step_name = []
+		list_flt_sec_mean = []
+		for int_n_debtors in [1,2]:
+			for str_step_name in ['sec_get_payloads','sec_parse','sec_create_x','sec_preprocessing','sec_predict','sec_adv_act','sec_gen_output']:
+				# subset
+				df_tmp = self.df_output[self.df_output['n_debtors']==int_n_debtors]
+				# get mean of step
+				flt_sec_mean = np.mean(df_tmp[str_step_name])
+				# append to lists
+				list_int_n_debtors.append(int_n_debtors)
+				list_str_step_name.append(str_step_name)
+				list_flt_sec_mean.append(flt_sec_mean)
+		# make df
+		df_for_plot = pd.DataFrame({'N Debtors': list_int_n_debtors,
+			                        'Steps': list_str_step_name,
+			                        'Mean Seconds': list_flt_sec_mean})
+		# title
+		ax[4].set_title('Mean Seconds by Parsing Step by N Debtors')
+		# create plot
+		sns.barplot(x='Steps',
+			        y='Mean Seconds',
+			        hue='N Debtors',
+			        data=df_for_plot,
+			        ax=ax[4])
 		# fix overlap
 		plt.tight_layout()
 		# save
