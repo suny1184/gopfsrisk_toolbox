@@ -47,18 +47,24 @@ class TimeParsing:
 	# plot
 	def create_plot(self, tpl_figsize):
 		# ax
-		fig, ax = plt.subplots(nrows=3, ncols=1, figsize=tpl_figsize)
+		fig, ax = plt.subplots(nrows=4, ncols=1, figsize=tpl_figsize)
 		# altogether
-		ax[0].set_title(f"All Debtors (mean = {np.mean(self.df_output['sec']):5} sec)")
-		sns.distplot(self.df_output['sec'], kde=True, ax=[0])
+		flt_mean_all = np.mean(self.df_output['sec']
+		ax[0].set_title(f"All Debtors (mean = {flt_mean_all:0.5} sec)")
+		sns.distplot(self.df_output['sec'], kde=True, ax=ax[0])
 		# 1 debtor
-		df_output_1 = self.df_output[self.def_output['n_debtors']==1]
-		ax[1].set_title(f"One Debtor (mean = {df_output_1['sec']} sec)")
-		sns.distplot(df_output_1['sec'], kde=True, ax=[1])
+		df_output_1 = self.df_output[self.df_output['n_debtors']==1]
+		flt_mean_1 = np.mean(df_output_1['sec'])
+		ax[1].set_title(f"One Debtor (mean = {flt_mean_1:0.5} sec)")
+		sns.distplot(df_output_1['sec'], kde=True, ax=ax[1])
 		# 2 debtors
-		df_output_2 = self.df_output[self.def_output['n_debtors']==2]
-		ax[2].set_title(f"Two Debtors (mean = {df_output_2['sec']} sec)")
-		sns.distplot(df_output_2['sec'], kde=True, ax=[2])
+		df_output_2 = self.df_output[self.df_output['n_debtors']==2]
+		flt_mean_2 = np.mean(df_output_2['sec'])
+		ax[2].set_title(f"Two Debtors (mean = {df_output_2['sec']:0.5} sec)")
+		sns.distplot(df_output_2['sec'], kde=True, ax=ax[2])
+		# bar plot
+		ax[3].set_title('Comparison')
+		ax[3].bar(['All', '1 Debtor', '2 Debtors'], [flt_mean_all, flt_mean_1, flt_mean_2])
 		# save to object
 		self.df_output_1 = df_output_1
 		self.df_output_2 = df_output_2
