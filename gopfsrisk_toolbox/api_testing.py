@@ -63,7 +63,8 @@ class TimeParsing:
 				list_int_n_debtors.append(int_n_debtors)
 				# print current mean time
 				print(f'Mean parsing time: {np.mean(list_flt_sec):0.5}')
-			except ValueError: # malformed node or string
+			#except ValueError: # malformed node or string
+			except:
 				list_idx_errors.append(a)
 		# create df
 		df_output = pd.DataFrame({'sec': list_flt_sec,
