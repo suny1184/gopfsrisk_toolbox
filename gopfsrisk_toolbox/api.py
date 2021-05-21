@@ -546,8 +546,7 @@ class ParsePayload:
 		# convert to json
 		str_output_ = df_output.to_json(orient='records')
 		# convert to list
-		list_output = eval(str_output_)
-		#list_output = ast.literal_eval(str_output_)
+		list_output = ast.literal_eval(str_output_)
 		# combine list of errors
 		list_errors_final = list(chain(*self.list_list_errors))
 		# remove empty strings from list_errors_final
