@@ -492,6 +492,7 @@ class ParsePayload:
 		# control for amount financed
 		y_hat_pd_x_lgd_contr = y_hat_pd_x_lgd / flt_amt_financed
 		# save to object
+		self.flt_amt_financed = flt_amt_financed
 		self.y_hat_pd = y_hat_pd
 		self.y_hat_lgd = y_hat_lgd
 		self.y_hat_pd_x_lgd = y_hat_pd_x_lgd
