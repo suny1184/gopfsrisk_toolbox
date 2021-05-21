@@ -81,7 +81,7 @@ class TimeParsing:
 		# return
 		return self
 	# plot
-	def create_plot(self, tpl_figsize, str_filename=None):
+	def create_plot(self, tpl_figsize, str_filename):
 		# ax
 		fig, ax = plt.subplots(nrows=5, ncols=1, figsize=tpl_figsize)
 		# altogether
@@ -130,11 +130,10 @@ class TimeParsing:
 		# fix overlap
 		plt.tight_layout()
 		# save
-		if str_filename:
-			plt.savefig(str_filename, bbox_inches='tight')
+		plt.savefig(str_filename, bbox_inches='tight')
 		# save to object
 		self.df_output_1 = df_output_1
 		self.df_output_2 = df_output_2
-		self.fig = fig
+		#self.fig = fig
 		# return
 		return self
