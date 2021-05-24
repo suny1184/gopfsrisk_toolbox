@@ -84,7 +84,7 @@ class TimeParsing:
 		df_output = pd.DataFrame({'x_parsed': list_x_parsed,
 								  'n_miss': list_dict_n_miss,
 								  'errors': list_list_errors_flat,
-								  'reasons': list_list_reasons,
+								  'reasons': list_list_reasons_flat,
 								  'sec': list_flt_sec,
 								  'sec_get_payloads': list_flt_sec_get_payloads,
 								  'sec_parse': list_flt_sec_parse,
