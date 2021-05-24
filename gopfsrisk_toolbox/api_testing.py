@@ -61,7 +61,7 @@ class TimeParsing:
 				# append to lists
 				list_x_parsed.append(self.cls_parse_payload.X)
 				list_dict_n_miss.append(self.cls_parse_payload.dict_n_miss)
-				list_list_errors.append(list_errors_flat)
+				list_list_errors_flat.append(list_errors_flat)
 				list_list_reasons.append(list_reasons_flat)
 				list_flt_sec_get_payloads.append(self.cls_parse_payload.flt_sec_get_payloads)
 				list_flt_sec_parse.append(self.cls_parse_payload.flt_sec_parse)
@@ -81,7 +81,7 @@ class TimeParsing:
 		# create df
 		df_output = pd.DataFrame({'x_parsed': list_x_parsed,
 								  'n_miss': list_dict_n_miss,
-								  'errors': list_list_errors,
+								  'errors': list_list_errors_flat,
 								  'reasons': list_list_reasons,
 								  'sec': list_flt_sec,
 								  'sec_get_payloads': list_flt_sec_get_payloads,
