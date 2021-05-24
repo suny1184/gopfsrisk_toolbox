@@ -555,6 +555,7 @@ class ParsePayload:
 		# create df
 		time_start = time.perf_counter()
 		df_output = pd.DataFrame({'Row_id': self.list_unique_id,
+								  'Score_pd': self.pipeline_pd.y_hat,
 							      'Score_ecnl': self.ecnl,
 							      'Score_ecnl_mod': self.ecnl_mod,
 								  'Key_factors': self.list_list_reasons,
