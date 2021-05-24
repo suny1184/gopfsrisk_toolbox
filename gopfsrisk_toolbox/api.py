@@ -496,13 +496,16 @@ class ParsePayload:
 		# get amount financed
 		flt_amt_financed = self.X['fltamountfinanced__app'].iloc[0]
 		# control for amount financed
-		y_hat_pd_x_lgd_contr = y_hat_pd_x_lgd / flt_amt_financed
+		ecnl = y_hat_pd_x_lgd / flt_amt_financed
+		# get modified ecnl
+		ecnl_mod = -0.03007 + (1.583321 * ecnl)
 		# save to object
 		self.flt_amt_financed = flt_amt_financed
 		self.y_hat_pd = y_hat_pd
 		self.y_hat_lgd = y_hat_lgd
 		self.y_hat_pd_x_lgd = y_hat_pd_x_lgd
-		self.y_hat_pd_x_lgd_contr = y_hat_pd_x_lgd_contr
+		self.ecnl = ecnl
+		self.ecnl_mod = ecnl_mod
 		# time
 		flt_sec_predict = time.perf_counter()-time_start
 		self.flt_sec_predict = flt_sec_predict
@@ -552,7 +555,8 @@ class ParsePayload:
 		# create df
 		time_start = time.perf_counter()
 		df_output = pd.DataFrame({'Row_id': self.list_unique_id,
-							      'Score': self.y_hat_pd_x_lgd_contr,
+							      'Score_ecnl': self.ecnl,
+							      'Score_ecnl_mod': self.ecnl_mod,
 								  'Key_factors': self.list_list_reasons,
 								  'Outlier_score': [0.0 for id_ in self.list_unique_id]})
 		# convert to json
