@@ -18,7 +18,7 @@ class TimeParsing:
 		# list of dictionaries missing
 		list_dict_n_miss = []
 		# list of errors
-		list_list_list_errors = []
+		list_list_errors_flat = []
 		# list of time to get payloads
 		list_flt_sec_get_payloads = []
 		# list of time to parse
