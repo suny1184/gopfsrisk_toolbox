@@ -138,6 +138,16 @@ class TimeParsing:
 		df_for_plot = pd.DataFrame({'N Debtors': list_int_n_debtors,
 			                        'Steps': list_str_step_name,
 			                        'Mean Seconds': list_flt_sec_mean})
+		# dictionary for mapping steps
+		dict_map_steps = {'sec_get_payloads': 'Get Payloads',
+						  'sec_parse': 'Parse',
+						  'sec_create_x': 'Create X',
+						  'sec_preprocessing': 'Preprocessing',
+						  'sec_predict': 'Predict',
+						  'sec_adv_act': 'Adverse Action',
+						  'sec_gen_output': 'Generate Output'}
+		# map
+		df_for_plot['Steps'] = df_for_plots['Steps'].map(dict_map_steps)
 		# title
 		ax[4].set_title('Mean Seconds by Parsing Step by N Debtors')
 		# create plot
