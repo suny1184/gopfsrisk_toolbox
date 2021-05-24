@@ -147,7 +147,7 @@ class TimeParsing:
 						  'sec_adv_act': 'Adverse Action',
 						  'sec_gen_output': 'Generate Output'}
 		# map
-		df_for_plot['Steps'] = df_for_plots['Steps'].map(dict_map_steps)
+		df_for_plot['Steps'] = df_for_plot['Steps'].map(dict_map_steps)
 		# title
 		ax[4].set_title('Mean Seconds by Parsing Step by N Debtors')
 		# create plot
