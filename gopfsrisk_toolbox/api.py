@@ -89,11 +89,13 @@ class PipelineDataPrep:
 			y_hat = self.model.predict_proba(X[self.model.feature_names_])[:,1]
 		else:
 			y_hat = self.model.predict(X[self.model.feature_names_])
+		# save to object
+		self.y_hat = y_hat
 		# get mean
-		y_hat = np.mean(y_hat)
+		y_hat_mean = np.mean(y_hat)
 		print(f'Time to predict: {(time.perf_counter()-time_start):0.5} sec.')
 		# return
-		return y_hat
+		return y_hat_mean
 
 # define function for payload parsing and generating output
 class ParsePayload:
