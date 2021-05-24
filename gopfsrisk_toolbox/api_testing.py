@@ -19,6 +19,8 @@ class TimeParsing:
 		list_dict_n_miss = []
 		# list of errors
 		list_list_errors_flat = []
+		# list of adverse action reasons
+		list_list_reasons_flat = []
 		# list of time to get payloads
 		list_flt_sec_get_payloads = []
 		# list of time to parse
@@ -62,7 +64,7 @@ class TimeParsing:
 				list_x_parsed.append(self.cls_parse_payload.X)
 				list_dict_n_miss.append(self.cls_parse_payload.dict_n_miss)
 				list_list_errors_flat.append(list_errors_flat)
-				list_list_reasons.append(list_reasons_flat)
+				list_list_reasons_flat.append(list_reasons_flat)
 				list_flt_sec_get_payloads.append(self.cls_parse_payload.flt_sec_get_payloads)
 				list_flt_sec_parse.append(self.cls_parse_payload.flt_sec_parse)
 				list_flt_sec_create_x.append(self.cls_parse_payload.flt_sec_create_x)
