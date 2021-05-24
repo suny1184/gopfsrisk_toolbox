@@ -445,8 +445,15 @@ class ParsePayload:
 		X = pd.concat(list_df_concat, axis=0, sort=False)
 		# ensure there is a field for every feature
 		X = pd.concat([self.df_empty, X], axis=0, sort=False) # WORKING PROPERLY
+		# get list of feats missing
+		ser_na = X.isnull().sum()
+		# get those missing
+		ser_na = ser_na[ser_na>0]
+		# zip into dictionary
+		dict_n_miss = dict(zip(ser_na.index, ser_na.values))
 		# save to object
 		self.X = X
+		self.dict_n_miss = dict_n_miss
 		# time
 		flt_sec_create_x = time.perf_counter()-time_start
 		self.flt_sec_create_x = flt_sec_create_x

@@ -13,6 +13,12 @@ class TimeParsing:
 		self.ser_payloads = ser_payloads
 	# parse
 	def parse_payloads(self):
+		# list of parsed dfs
+		list_x_parsed = []
+		# list of dictionaries missing
+		list_dict_n_miss = []
+		# list of errors
+		list_list_list_errors = []
 		# list of time to get payloads
 		list_flt_sec_get_payloads = []
 		# list of time to parse
@@ -27,7 +33,6 @@ class TimeParsing:
 		list_flt_sec_adv_act = []
 		# list of time to get output
 		list_flt_sec_gen_output = []
-
 		# list of time (overall)
 		list_flt_sec = []
 		# list of n debtors
@@ -49,7 +54,15 @@ class TimeParsing:
 				flt_sec = time.perf_counter() - time_start
 				# append to list_flt_sec
 				list_flt_sec.append(flt_sec)
+				# flatten
+				list_errors_flat = [item for sublist in self.cls_parse_payload.list_list_errors for item in sublist]
+				# flatten
+				list_reasons_flat = [item for sublist in self.cls_parse_payload.list_list_reasons for item in sublist]
 				# append to lists
+				list_x_parsed.append(self.cls_parse_payload.X)
+				list_dict_n_miss.append(self.cls_parse_payload.dict_n_miss)
+				list_list_errors.append(list_errors_flat)
+				list_list_reasons.append(list_reasons_flat)
 				list_flt_sec_get_payloads.append(self.cls_parse_payload.flt_sec_get_payloads)
 				list_flt_sec_parse.append(self.cls_parse_payload.flt_sec_parse)
 				list_flt_sec_create_x.append(self.cls_parse_payload.flt_sec_create_x)
@@ -66,7 +79,11 @@ class TimeParsing:
 			except ValueError: # malformed node or string
 				list_idx_errors.append(a)
 		# create df
-		df_output = pd.DataFrame({'sec': list_flt_sec,
+		df_output = pd.DataFrame({'x_parsed': list_x_parsed,
+								  'n_miss': list_dict_n_miss,
+								  'errors': list_list_errors,
+								  'reasons': list_list_reasons,
+								  'sec': list_flt_sec,
 								  'sec_get_payloads': list_flt_sec_get_payloads,
 								  'sec_parse': list_flt_sec_parse,
 								  'sec_create_x': list_flt_sec_create_x,
