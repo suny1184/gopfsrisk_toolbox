@@ -486,9 +486,6 @@ class ParsePayload:
 		y_hat_pd_x_lgd = y_hat_pd * y_hat_lgd
 		# get amount financed
 		flt_amt_financed = self.X['fltamountfinanced__app'].iloc[0]
-		# logic in case we get a zero
-		if flt_amt_financed == 0:
-			flt_amt_financed = 35000
 		# control for amount financed
 		y_hat_pd_x_lgd_contr = y_hat_pd_x_lgd / flt_amt_financed
 		# save to object
