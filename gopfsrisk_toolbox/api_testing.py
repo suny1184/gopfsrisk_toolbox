@@ -8,45 +8,41 @@ import seaborn as sns
 # define class
 class TimeParsing:
 	# initialize
-	def __init__(self, cls_parse_payload, ser_payloads):
+	def __init__(self, cls_parse_payload, df_payloads):
 		self.cls_parse_payload = cls_parse_payload
-		self.ser_payloads = ser_payloads
+		self.df_payloads = df_payloads
 	# parse
 	def parse_payloads(self):
-		# list of parsed dfs
+		# parsed X
 		list_x_parsed = []
-		# list of dictionaries missing
+		# missing, errors, reasons
 		list_dict_n_miss = []
-		# list of errors
 		list_list_errors_flat = []
-		# list of adverse action reasons
 		list_list_reasons_flat = []
-		# list of time to get payloads
-		list_flt_sec_get_payloads = []
-		# list of time to parse
-		list_flt_sec_parse = []
-		# list of time to create x
-		list_flt_sec_create_x = []
-		# list of time to preprocess
-		list_flt_sec_preprocessing = []
-		# list of time to predict
-		list_flt_sec_predict = []
-		# list of time to get adverse action
-		list_flt_sec_adv_act = []
-		# list of time to get output
-		list_flt_sec_gen_output = []
-		# list of time (overall)
-		list_flt_sec = []
-		# list of n debtors
+		# times
+		list_flt_sec = [] # overall
+		list_flt_sec_get_payloads = [] # get payloads
+		list_flt_sec_parse = [] # parse
+		list_flt_sec_create_x = [] # create x
+		list_flt_sec_preprocessing = [] # preprocess
+		list_flt_sec_predict = [] # predict
+		list_flt_sec_adv_act = [] # adverse action
+		list_flt_sec_gen_output = [] # generate output
+		# n debtors
 		list_int_n_debtors = []
 		# list of error indices
 		list_idx_errors = []
-		# iterate 
-		for a, json_str_request in enumerate(self.ser_payloads):
+		# get n rows
+		int_n_rows = self.df_payloads.shape[0]
+		# iterate
+		for a in range(int_n_rows):
 			# print message
-			print(f'Payload {a+1}/{len(self.ser_payloads)}')
-			# convert to dictionary
+			print(f'Payload {a+1}/{int_n_rows}')
+			# try parsing
 			try:
+				# get json_str_request
+				json_str_request = self.df_payloads['strZestRequest'].iloc[a]
+				# convert to dict
 				json_str_request = ast.literal_eval(json_str_request)
 				# start timer
 				time_start = time.perf_counter()
@@ -54,28 +50,35 @@ class TimeParsing:
 				self.cls_parse_payload.generate_output(json_str_request=json_str_request)
 				# get time in sec
 				flt_sec = time.perf_counter() - time_start
-				# append to list_flt_sec
-				list_flt_sec.append(flt_sec)
-				# flatten
-				list_errors_flat = [item for sublist in self.cls_parse_payload.list_list_errors for item in sublist]
-				# flatten
-				list_reasons_flat = [item for sublist in self.cls_parse_payload.list_list_reasons for item in sublist]
+				# get parsed x
+				X_parsed = self.cls_parse_payload.X
+				# get rows in X
+				int_n_rows = X_parsed.shape[0]
+				# place identifiers
+				X_parsed['bigAccountId'] = [self.df_payloads['bigAccountId'].iloc[a] for i in range(int_n_rows)]
+				X_parsed['bigZestV2Id'] = [self.df_payloads['bigZestV2Id'].iloc[a] for i in range(int_n_rows)]
+				X_parsed['dtmCreatedDate'] = [self.df_payloads['dtmCreatedDate'].iloc[a] for i in range(int_n_rows)]
+				# place predictions
+				X_parsed['y_hat_pd'] = list(self.cls_parse_payload.pipeline_pd.y_hat)
+				X_parsed['y_hat_lgd'] = list(self.cls_parse_payload.pipeline_lgd.y_hat)
 				# append to lists
-				list_x_parsed.append(self.cls_parse_payload.X)
+				# X_parsed
+				list_x_parsed.append(X_parsed)
+				# missing, errors, reasons
 				list_dict_n_miss.append(self.cls_parse_payload.dict_n_miss)
-				list_list_errors_flat.append(list_errors_flat)
-				list_list_reasons_flat.append(list_reasons_flat)
-				list_flt_sec_get_payloads.append(self.cls_parse_payload.flt_sec_get_payloads)
-				list_flt_sec_parse.append(self.cls_parse_payload.flt_sec_parse)
-				list_flt_sec_create_x.append(self.cls_parse_payload.flt_sec_create_x)
-				list_flt_sec_preprocessing.append(self.cls_parse_payload.flt_sec_preprocessing)
-				list_flt_sec_predict.append(self.cls_parse_payload.flt_sec_predict)
-				list_flt_sec_adv_act.append(self.cls_parse_payload.flt_sec_adv_act)
-				list_flt_sec_gen_output.append(self.cls_parse_payload.flt_sec_gen_output)
-				# get int_n_debtors
-				int_n_debtors = len(self.cls_parse_payload.list_unique_id)
-				# append to list_int_n_debtors
-				list_int_n_debtors.append(int_n_debtors)
+				list_list_errors_flat.append([item for sublist in self.cls_parse_payload.list_list_errors for item in sublist])
+				list_list_reasons_flat.append([item for sublist in self.cls_parse_payload.list_list_reasons for item in sublist])
+				# times
+				list_flt_sec.append(flt_sec) # overall
+				list_flt_sec_get_payloads.append(self.cls_parse_payload.flt_sec_get_payloads) # get payloads
+				list_flt_sec_parse.append(self.cls_parse_payload.flt_sec_parse) # parse
+				list_flt_sec_create_x.append(self.cls_parse_payload.flt_sec_create_x) # create x
+				list_flt_sec_preprocessing.append(self.cls_parse_payload.flt_sec_preprocessing) # preprocess
+				list_flt_sec_predict.append(self.cls_parse_payload.flt_sec_predict) # predict
+				list_flt_sec_adv_act.append(self.cls_parse_payload.flt_sec_adv_act) # adverse action
+				list_flt_sec_gen_output.append(self.cls_parse_payload.flt_sec_gen_output) # generate output
+				# n debtors
+				list_int_n_debtors.append(int_n_rows)
 				# print current mean time
 				print(f'Mean parsing time: {np.mean(list_flt_sec):0.5}')
 			except ValueError: # malformed node or string
