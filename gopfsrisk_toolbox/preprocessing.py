@@ -37,7 +37,7 @@ class RoundBinning(BaseEstimator, TransformerMixin):
 				del dict_round[key]
 		# iterate through dictionary
 		for key, val in dict_round.items():
-			X[key] = val * round(X[key] / val)
+			X[key] = val * round(pd.to_numeric(X[key]) / val)
 		print(f'Time to bin: {time.perf_counter()-time_start:0.5} sec.')
 		# return X
 		return X
