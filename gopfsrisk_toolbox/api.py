@@ -479,10 +479,110 @@ class ParsePayload:
 		print(f'Time to complete shared preprocessing: {flt_sec_preprocessing:0.5} sec.')
 		# return object
 		return self
-	# define generate_predictions
-	def generate_predictions(self, json_str_request):
+	# define counter_offers
+	def counter_offers(self, json_str_request):
 		# shared preprocessing
 		self.shared_preprocessing(json_str_request=json_str_request)
+		time_start = time.perf_counter()
+		# create large df
+		X_lg = self.X.iloc[np.tile(np.arange(len(self.X)), 100)] # 100 rows
+		# make arry for keeping samples straight
+		list_sample = list(np.repeat(list(range(100)), X.shape[0]))
+		# set as sample
+		X_lg['sample'] = list_sample
+
+		# make array of loan to value
+		list_ltv = list(np.linspace(0, 1.6, 100))
+		# get n debtors
+		int_n_debtors = self.X.shape[0]
+		# duplicate each value
+		list_ltv = np.repeat(list_ltv, int_n_debtors)
+		# put into X
+		X_lg['eng_loan_to_value'] = list_ltv
+
+		# get amt financed (original)
+		flt_amt_financed = X_lg['fltamountfinanced__app'].iloc[0]
+		# calculate amount financed
+		X_lg['fltamountfinanced__app'] = X_lg['eng_loan_to_value'] * X_lg['fltapprovedpricewholesale__app']
+
+		# calculate down pmt
+		X_lg['fltapproveddowntotal__app'] = flt_amt_financed - X_lg['fltamountfinanced__app']
+		# replace negatives with 0
+		X_lg['fltapproveddowntotal__app'] = np.where(X_lg['fltapproveddowntotal__app'] < 0, 0, X_lg['fltapproveddowntotal__app'])
+
+		# get list_transformers
+		list_transformers = self.pipeline_shared.list_transformers
+
+		# get binner
+		cls_binner = list_transformers[5]
+		# bin
+		X_lg = cls_binner.transform(X_lg)
+
+		# get val replacer
+		cls_val_replacer = list_transformers[6]
+		# replace in case things are binned to 0
+		X_lg = cls_val_replacer.transform(X_lg)
+
+		# get feature engineering class
+		cls_feat_eng = list_transformers[7]
+		# FE
+		X_lg = cls_feat_eng.transform(X_lg)
+
+		# subset to LTV bounds
+		X_lg = X_lg[(X_lg['eng_loan_to_value']>=0) & (X_lg['eng_loan_to_value']<=1.6)]
+
+		# get pd model
+		model_pd = self.pipeline_pd.model
+		# predict
+		X_lg['y_hat_pd'] = list(model_pd.predict_proba(X_lg[model_pd.feature_names_])[:,1])
+
+		# get lgd model
+		model_lgd = self.pipeline_lgd.model
+		# predictions pd
+		X_lg['y_hat_lgd'] = model_lgd.predict(X_lg[model_lgd.feature_names_])
+
+		# group by sample so we cn get mean by account
+		X_lg_grouped = X_lg[['fltapproveddowntotal__app',
+							 'fltamountfinanced__app',
+							 'fltapprovedpricewholesale__app',
+							 'y_hat_pd',
+							 'y_hat_lgd',
+							 'sample']].groupby('sample', as_index=False).mean()
+
+		# drop sample
+		X_lg_grouped = X_lg_grouped[list(X_lg_grouped.columns)[1:]]
+
+		# calculate ecnl
+		X_lg_grouped['ecnl'] = (X_lg_grouped['y_hat_pd'] * X_lg_grouped['y_hat_lgd']) / X_lg_grouped['fltamountfinanced__app']
+		# sort descending
+		X_lg_grouped.sort_values(by='ecnl', ascending=False, inplace=True)
+
+		# create list of bin boundaries
+		list_bin_bounds = [0, 0.0423, 0.0823, 0.1583, 0.2014, 0.291]
+		# create list of bin names
+		list_bin_names = ['A1', 'A', 'B', 'C', 'D', 'Decline']
+		# create dictionary with names
+		dict_ = dict(enumerate(list_bin_names, 1))
+		# make tier
+		X_lg_grouped['tier'] = np.vectorize(dict_.get)(np.digitize(X_lg_grouped['ecnl'], list_bin_bounds))
+
+		# max ecnl by tier
+		X_lg_grouped_max = X_lg_grouped.drop_duplicates(subset='tier')
+
+		# sort by ecnl
+		X_lg_grouped_max.sort_values(by='ecnl', ascending=True, inplace=True)
+		# save to object
+		self.X_lg_grouped_max = X_lg_grouped_max
+		# time
+		flt_sec_counter = time.perf_counter()-time_start
+		self.flt_sec_counter = flt_sec_counter
+		print(f'Time to generate counter-offers: {flt_sec_counter:0.5} sec.')
+		# return object
+		return self
+	# define generate_predictions
+	def generate_predictions(self, json_str_request):
+		# counter_offers
+		self.counter_offers(json_str_request=json_str_request)
 		# make copies of X to make sure X is not over-written
 		time_start = time.perf_counter()
 		X_pd = self.X.copy()
@@ -559,6 +659,7 @@ class ParsePayload:
 								  'Score_lgd': self.pipeline_lgd.y_hat,
 							      'Score_ecnl': self.ecnl,
 							      'Score_ecnl_mod': self.ecnl_mod,
+							      'Counter-offers': self.X_lg_grouped_max,
 								  'Key_factors': self.list_list_reasons,
 								  'Outlier_score': [0.0 for id_ in self.list_unique_id]})
 		# convert to json
