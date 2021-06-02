@@ -655,23 +655,12 @@ class ParsePayload:
 		self.adverse_action(json_str_request=json_str_request)
 		# create df
 		time_start = time.perf_counter()
-		# subset to cols we want
-		X_lg_grouped_max_sub = self.X_lg_grouped_max[['fltapproveddowntotal__app',
-										 		 	  'fltamountfinanced__app',
-										 		   	  'fltapprovedpricewholesale__app',
-										 		 	  'tier']]
-		# rename columns
-		X_lg_grouped_max_sub.columns = ['Cash Down',
-										'Amount Financed',
-										'Price Wholesale',
-										'Tier']
 		# create df
 		df_output = pd.DataFrame({'Row_id': self.list_unique_id,
 								  'Score_pd': self.pipeline_pd.y_hat,
 								  'Score_lgd': self.pipeline_lgd.y_hat,
 							      'Score_ecnl': self.ecnl,
 							      'Score_ecnl_mod': self.ecnl_mod,
-							      'Counter-offers': X_lg_grouped_max_sub.to_dict('records'),
 								  'Key_factors': self.list_list_reasons,
 								  'Outlier_score': [0.0 for id_ in self.list_unique_id]})
 		# convert to json
@@ -682,13 +671,24 @@ class ParsePayload:
 		list_errors_final = list(chain(*self.list_list_errors))
 		# remove empty strings from list_errors_final
 		list_errors_final = [err for err in list_errors_final if err != '']
+		# subset to cols we want
+		X_lg_grouped_max_sub = self.X_lg_grouped_max[['fltapproveddowntotal__app',
+										 		 	  'fltamountfinanced__app',
+										 		   	  'fltapprovedpricewholesale__app',
+										 		 	  'tier']]
+		# rename columns
+		X_lg_grouped_max_sub.columns = ['Cash Down',
+										'Amount Financed',
+										'Price Wholesale',
+										'Tier']
 		# create final output
 		output_final = {"Request_id": "",
 				        "Zaml_processing_id": "",
 						"Response": [{"Model_name":"prestige-GenXI",
 					                  "Model_version":"v2",
 									  "Results":list_output,
-									  "Errors":list_errors_final}]}
+									  "Errors":list_errors_final,
+									  "Counter-Offers":X_lg_grouped_max_sub.to_dict('records')}]}
 		# save to object
 		self.output_final = output_final
 		# time
