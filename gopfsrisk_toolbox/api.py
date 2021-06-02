@@ -487,7 +487,7 @@ class ParsePayload:
 		# create large df
 		X_lg = self.X.iloc[np.tile(np.arange(len(self.X)), 100)] # 100 rows
 		# make arry for keeping samples straight
-		list_sample = list(np.repeat(list(range(100)), X.shape[0]))
+		list_sample = list(np.repeat(list(range(100)), self.X.shape[0]))
 		# set as sample
 		X_lg['sample'] = list_sample
 
