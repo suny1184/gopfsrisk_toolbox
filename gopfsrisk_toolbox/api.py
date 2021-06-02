@@ -9,6 +9,7 @@ import catboost as cb
 import ast
 from itertools import chain
 import time
+pd.set_option('mode.chained_assignment', None)
 
 # define generic transformer class
 class GenericTransformer(BaseEstimator, TransformerMixin):
