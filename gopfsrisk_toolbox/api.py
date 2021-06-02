@@ -655,12 +655,23 @@ class ParsePayload:
 		self.adverse_action(json_str_request=json_str_request)
 		# create df
 		time_start = time.perf_counter()
+		# subset to cols we want
+		X_lg_grouped_max_sub = self.X_lg_grouped_max[['fltapproveddowntotal__app',
+										 		 	  'fltamountfinanced__app',
+										 		   	  'fltapprovedpricewholesale__app',
+										 		 	  'tier']]
+		# rename columns
+		X_lg_grouped_max_sub.columns = ['Cash Down',
+										'Amount Financed',
+										'Price Wholesale',
+										'Tier']
+		# create df
 		df_output = pd.DataFrame({'Row_id': self.list_unique_id,
 								  'Score_pd': self.pipeline_pd.y_hat,
 								  'Score_lgd': self.pipeline_lgd.y_hat,
 							      'Score_ecnl': self.ecnl,
 							      'Score_ecnl_mod': self.ecnl_mod,
-							      'Counter-offers': self.X_lg_grouped_max,
+							      'Counter-offers': X_lg_grouped_max_sub.to_dict('records'),
 								  'Key_factors': self.list_list_reasons,
 								  'Outlier_score': [0.0 for id_ in self.list_unique_id]})
 		# convert to json
