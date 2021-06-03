@@ -17,8 +17,7 @@ def ITER_IMP_THRESH_FEAT_SELECT(X_train, y_train, X_valid, y_valid, list_non_num
 								str_filename='./output/df_output.csv',
 								logger=None, tpl_figsize=(12,10), str_filename_plot='./output/plt_n_feats.png',
 								flt_learning_rate=None, dict_monotone_constraints=None, str_task_type='GPU',
-							 	bool_classifier=False, flt_rsm=None):
-	
+							 	bool_classifier=False, flt_rsm=None, list_feat_force=None):
 	# set initial list_features
 	list_features = list(X_train.columns)
 	# set n_imp_thresh to 1
@@ -104,6 +103,11 @@ def ITER_IMP_THRESH_FEAT_SELECT(X_train, y_train, X_valid, y_valid, list_non_num
 		n_imp_thresh = len(list_features) - df_imp.shape[0]
 		# create list
 		list_features = list(df_imp['feature'])
+		# if we are forcing features
+		if list_feat_force:
+			for feat_force in list_feat_force:
+				if feat_force not in list_features:
+					list_features.append(feat_force)
 
 # define function for iterative feature selection
 def ITERATIVE_FEAT_SELECTION(X_train, y_train, X_valid, y_valid, list_non_numeric, 
