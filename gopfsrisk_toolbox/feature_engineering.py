@@ -850,7 +850,37 @@ class FeatureEngineeringJQ:
 			X['eng_mt35s_to_income'] = X['mt35s__tuaccept'] / X['fltGrossMonthly__income_sum']
 		except:
 			pass
-
+		#======================== Bankruptcy fields =========================================
+		#bankruptcy 24 months vs bankruptcy
+		try:
+			X['eng_g099s_to_g094s'] = X['g099s__tuaccept'] / X['g094s__tuaccept']
+		except:
+			pass
+		#number of trade bankruptcies vs number of trades
+		try:
+			X['eng_g100s_to_at01s'] = X['g100s__tuaccept'] / X['at01s__tuaccept']
+		except:
+			pass
+		#number of trade bankruptcies vs number of open trades
+		try:
+			X['eng_g100s_to_at02s'] = X['g100s__tuaccept'] / X['at02s__tuaccept']
+		except:
+			pass
+		#number of trade bankruptcies vs number of open/satisf trades
+		try:
+			X['eng_g100s_to_at03s'] = X['g100s__tuaccept'] / X['at03s__tuaccept']
+		except:
+			pass
+		#number of trade bankruptcies verified in past 24 months vs trades opened in past 24
+		try:
+			X['eng_g099a_to_at09s'] = X['g099a__tuaccept'] / X['at09s__tuaccept']
+		except:
+			pass
+		#number of trade bankruptcies verified in past 24 months vs open satisf trades 24
+		try:
+			X['eng_g099a_to_at27s'] = X['g099a__tuaccept'] / X['at27s__tuaccept']
+		except:
+			pass
 		# BK fields
 		# X['g094s__tuaccept'] number of public record bankruptcies
 		# X['g099s__tuaccept'] number of public BK past 24 months
