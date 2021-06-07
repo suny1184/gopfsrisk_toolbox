@@ -64,11 +64,9 @@ class TimeParsing:
 				# place predictions
 				X_parsed['y_hat_pd'] = list(self.cls_parse_payload.pipeline_pd.y_hat)
 				X_parsed['y_hat_lgd'] = list(self.cls_parse_payload.pipeline_lgd.y_hat)
-				# get X_lg_grouped
-				X_lg_grouped = self.cls_parse_payload.X_lg_grouped
 				# append to lists
 				# list_X_lg_grouped
-				list_X_lg_grouped.append(X_lg_grouped)
+				list_X_lg_grouped.append(self.cls_parse_payload.X_lg_grouped)
 				# X_parsed
 				list_x_parsed.append(X_parsed)
 				# missing, errors, reasons
