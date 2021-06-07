@@ -503,11 +503,14 @@ class ParsePayload:
 
 		# get amt financed (original)
 		flt_amt_financed = X_lg['fltamountfinanced__app'].iloc[0]
+		# get down total (original)
+		flt_down_total = X_lg['fltapproveddowntotal__app'].iloc[0]
+
 		# calculate amount financed
 		X_lg['fltamountfinanced__app'] = X_lg['eng_loan_to_value'] * X_lg['fltapprovedpricewholesale__app']
 
 		# calculate down pmt
-		X_lg['fltapproveddowntotal__app'] = flt_amt_financed - X_lg['fltamountfinanced__app']
+		X_lg['fltapproveddowntotal__app'] = flt_amt_financed - X_lg['fltamountfinanced__app'] + flt_down_total
 		# replace negatives with 0
 		X_lg['fltapproveddowntotal__app'] = np.where(X_lg['fltapproveddowntotal__app'] < 0, 0, X_lg['fltapproveddowntotal__app'])
 
@@ -519,10 +522,12 @@ class ParsePayload:
 		# bin
 		X_lg = cls_binner.transform(X_lg)
 
+		"""
 		# get val replacer
 		cls_val_replacer = list_transformers[6]
 		# replace in case things are binned to 0
 		X_lg = cls_val_replacer.transform(X_lg)
+		"""
 
 		# get feature engineering class
 		cls_feat_eng = list_transformers[7]
@@ -573,6 +578,7 @@ class ParsePayload:
 		# sort by ecnl
 		X_lg_grouped_max.sort_values(by='ecnl', ascending=True, inplace=True)
 		# save to object
+		self.X_lg_grouped = X_lg_grouped
 		self.X_lg_grouped_max = X_lg_grouped_max
 		# time
 		flt_sec_counter = time.perf_counter()-time_start
