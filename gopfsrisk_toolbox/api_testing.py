@@ -42,51 +42,51 @@ class TimeParsing:
 			# print message
 			print(f'Payload {a+1}/{int_n_rows}')
 			# try parsing
-			try:
-				# get json_str_request
-				json_str_request = self.df_payloads['strZestRequest'].iloc[a]
-				# convert to dict
-				json_str_request = ast.literal_eval(json_str_request)
-				# start timer
-				time_start = time.perf_counter()
-				# generate output
-				self.cls_parse_payload.generate_output(json_str_request=json_str_request)
-				# get time in sec
-				flt_sec = time.perf_counter() - time_start
-				# get parsed x
-				X_parsed = self.cls_parse_payload.X
-				# place identifiers
-				X_parsed['bigAccountId'] = [self.df_payloads['bigAccountId'].iloc[a] for i in range(int_n_rows)]
-				X_parsed['bigZestV2Id'] = [self.df_payloads['bigZestV2Id'].iloc[a] for i in range(int_n_rows)]
-				X_parsed['dtmCreatedDate'] = [self.df_payloads['dtmCreatedDate'].iloc[a] for i in range(int_n_rows)]
-				# place predictions
-				X_parsed['y_hat_pd'] = list(self.cls_parse_payload.pipeline_pd.y_hat)
-				X_parsed['y_hat_lgd'] = list(self.cls_parse_payload.pipeline_lgd.y_hat)
-				# append to lists
-				# list_X_lg_grouped
-				list_X_lg_grouped.append(self.cls_parse_payload.X_lg_grouped)
-				# X_parsed
-				list_x_parsed.append(X_parsed)
-				# missing, errors, reasons
-				list_dict_n_miss.append(self.cls_parse_payload.dict_n_miss)
-				list_list_errors_flat.append([item for sublist in self.cls_parse_payload.list_list_errors for item in sublist])
-				list_list_reasons_flat.append([item for sublist in self.cls_parse_payload.list_list_reasons for item in sublist])
-				# times
-				list_flt_sec.append(flt_sec) # overall
-				list_flt_sec_get_payloads.append(self.cls_parse_payload.flt_sec_get_payloads) # get payloads
-				list_flt_sec_parse.append(self.cls_parse_payload.flt_sec_parse) # parse
-				list_flt_sec_create_x.append(self.cls_parse_payload.flt_sec_create_x) # create x
-				list_flt_sec_preprocessing.append(self.cls_parse_payload.flt_sec_preprocessing) # preprocess
-				list_flt_sec_counter.append(self.cls_parse_payload.flt_sec_counter) # counter offers
-				list_flt_sec_predict.append(self.cls_parse_payload.flt_sec_predict) # predict
-				list_flt_sec_adv_act.append(self.cls_parse_payload.flt_sec_adv_act) # adverse action
-				list_flt_sec_gen_output.append(self.cls_parse_payload.flt_sec_gen_output) # generate output
-				# n debtors
-				list_int_n_debtors.append(X_parsed.shape[0])
-				# print current mean time
-				print(f'Mean parsing time: {np.mean(list_flt_sec):0.5}')
-			except ValueError: # malformed node or string
-				list_idx_errors.append(a)
+			#try:
+			# get json_str_request
+			json_str_request = self.df_payloads['strZestRequest'].iloc[a]
+			# convert to dict
+			json_str_request = ast.literal_eval(json_str_request)
+			# start timer
+			time_start = time.perf_counter()
+			# generate output
+			self.cls_parse_payload.generate_output(json_str_request=json_str_request)
+			# get time in sec
+			flt_sec = time.perf_counter() - time_start
+			# get parsed x
+			X_parsed = self.cls_parse_payload.X
+			# place identifiers
+			X_parsed['bigAccountId'] = [self.df_payloads['bigAccountId'].iloc[a] for i in range(int_n_rows)]
+			X_parsed['bigZestV2Id'] = [self.df_payloads['bigZestV2Id'].iloc[a] for i in range(int_n_rows)]
+			X_parsed['dtmCreatedDate'] = [self.df_payloads['dtmCreatedDate'].iloc[a] for i in range(int_n_rows)]
+			# place predictions
+			X_parsed['y_hat_pd'] = list(self.cls_parse_payload.pipeline_pd.y_hat)
+			X_parsed['y_hat_lgd'] = list(self.cls_parse_payload.pipeline_lgd.y_hat)
+			# append to lists
+			# list_X_lg_grouped
+			list_X_lg_grouped.append(self.cls_parse_payload.X_lg_grouped)
+			# X_parsed
+			list_x_parsed.append(X_parsed)
+			# missing, errors, reasons
+			list_dict_n_miss.append(self.cls_parse_payload.dict_n_miss)
+			list_list_errors_flat.append([item for sublist in self.cls_parse_payload.list_list_errors for item in sublist])
+			list_list_reasons_flat.append([item for sublist in self.cls_parse_payload.list_list_reasons for item in sublist])
+			# times
+			list_flt_sec.append(flt_sec) # overall
+			list_flt_sec_get_payloads.append(self.cls_parse_payload.flt_sec_get_payloads) # get payloads
+			list_flt_sec_parse.append(self.cls_parse_payload.flt_sec_parse) # parse
+			list_flt_sec_create_x.append(self.cls_parse_payload.flt_sec_create_x) # create x
+			list_flt_sec_preprocessing.append(self.cls_parse_payload.flt_sec_preprocessing) # preprocess
+			list_flt_sec_counter.append(self.cls_parse_payload.flt_sec_counter) # counter offers
+			list_flt_sec_predict.append(self.cls_parse_payload.flt_sec_predict) # predict
+			list_flt_sec_adv_act.append(self.cls_parse_payload.flt_sec_adv_act) # adverse action
+			list_flt_sec_gen_output.append(self.cls_parse_payload.flt_sec_gen_output) # generate output
+			# n debtors
+			list_int_n_debtors.append(X_parsed.shape[0])
+			# print current mean time
+			print(f'Mean parsing time: {np.mean(list_flt_sec):0.5}')
+			#except ValueError: # malformed node or string
+				#list_idx_errors.append(a)
 		# create df
 		df_output = pd.DataFrame({'counter_offers': list_X_lg_grouped,
 								  'x_parsed': list_x_parsed,
