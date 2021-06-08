@@ -57,7 +57,7 @@ def ITER_IMP_THRESH_FEAT_SELECT(X_train, y_train, X_valid, y_valid, list_non_num
 					               dict_monotone_constraints=dict_monotone_constraints,
 					               flt_rsm=flt_rsm)
 		# get metric
-		if str_eval_metric == 'RMSE':
+		if (str_eval_metric == 'RMSE') or (str_eval_metric.__class__.__name__ == 'LogitContinuous'):
 			# predict
 			y_hat = model.predict(X_valid[list_features])
 			flt_metric = np.sqrt(mean_squared_error(y_true=y_valid, y_pred=y_hat))
