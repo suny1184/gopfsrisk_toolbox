@@ -537,6 +537,11 @@ class ParsePayload:
 		# subset to LTV bounds
 		X_lg = X_lg[(X_lg['eng_loan_to_value']>=0) & (X_lg['eng_loan_to_value']<=1.6)]
 
+		# concatenate original X
+		X_lg = pd.concat([self.X, X_lg])
+		# fill na (sample)
+		X_lg['sample'].fillna(0, inplace=True)
+
 		# get pd model
 		model_pd = self.pipeline_pd.model
 		# predict
@@ -572,14 +577,15 @@ class ParsePayload:
 		# make tier
 		X_lg_grouped['tier'] = np.vectorize(dict_.get)(np.digitize(X_lg_grouped['ecnl'], list_bin_bounds))
 
+		"""
 		# max ecnl by tier
 		X_lg_grouped_max = X_lg_grouped.drop_duplicates(subset='tier')
-
 		# sort by ecnl
 		X_lg_grouped_max.sort_values(by='ecnl', ascending=True, inplace=True)
+		"""
 		# save to object
 		self.X_lg_grouped = X_lg_grouped
-		self.X_lg_grouped_max = X_lg_grouped_max
+		#self.X_lg_grouped_max = X_lg_grouped_max
 		# time
 		flt_sec_counter = time.perf_counter()-time_start
 		self.flt_sec_counter = flt_sec_counter
