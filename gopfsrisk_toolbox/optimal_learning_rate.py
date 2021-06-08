@@ -71,7 +71,7 @@ def TUNE_LEARNING_RATE(X_train, y_train, X_valid, y_valid, list_non_numeric,
 			# get roc auc
 			flt_metric = roc_auc_score(y_true=y_valid, y_score=y_hat)
 		# if RMSE
-		elif str_eval_metric == 'RMSE':
+		elif (str_eval_metric == 'RMSE') or (str_eval_metric.__class__.__name__ == 'LogitContinuous'):
 			# get predictions
 			y_hat = model.predict(X_valid)
 			# get MSE
