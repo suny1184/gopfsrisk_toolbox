@@ -55,10 +55,12 @@ class TimeParsing:
 			flt_sec = time.perf_counter() - time_start
 			# get parsed x
 			X_parsed = self.cls_parse_payload.X
+			# get n debtors
+			int_n_debtors = X_parsed.shape[0]
 			# place identifiers
-			X_parsed['bigAccountId'] = [self.df_payloads['bigAccountId'].iloc[a] for i in range(int_n_rows)]
-			X_parsed['bigZestV2Id'] = [self.df_payloads['bigZestV2Id'].iloc[a] for i in range(int_n_rows)]
-			X_parsed['dtmCreatedDate'] = [self.df_payloads['dtmCreatedDate'].iloc[a] for i in range(int_n_rows)]
+			X_parsed['bigAccountId'] = [self.df_payloads['bigAccountId'].iloc[a] for i in range(int_n_debtors)]
+			X_parsed['bigZestV2Id'] = [self.df_payloads['bigZestV2Id'].iloc[a] for i in range(int_n_debtors)]
+			X_parsed['dtmCreatedDate'] = [self.df_payloads['dtmCreatedDate'].iloc[a] for i in range(int_n_debtors)]
 			# place predictions
 			X_parsed['y_hat_pd'] = list(self.cls_parse_payload.pipeline_pd.y_hat)
 			X_parsed['y_hat_lgd'] = list(self.cls_parse_payload.pipeline_lgd.y_hat)
@@ -82,7 +84,7 @@ class TimeParsing:
 			list_flt_sec_adv_act.append(self.cls_parse_payload.flt_sec_adv_act) # adverse action
 			list_flt_sec_gen_output.append(self.cls_parse_payload.flt_sec_gen_output) # generate output
 			# n debtors
-			list_int_n_debtors.append(X_parsed.shape[0])
+			list_int_n_debtors.append(int_n_debtors)
 			# print current mean time
 			print(f'Mean parsing time: {np.mean(list_flt_sec):0.5}')
 			#except ValueError: # malformed node or string
