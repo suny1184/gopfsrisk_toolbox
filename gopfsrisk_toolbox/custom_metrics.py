@@ -19,7 +19,7 @@ class LogitContinuous:
 		# get predictions, fit to logistic sigmoid function, and set as float
 		y_pred = expit(approxes[0]).astype(float)
 		# get rmse
-		flt_rmse = np.sqrt(mean_squared_error(y_true, y_pred))
+		error = np.sqrt(mean_squared_error(y_true, y_pred))
 		# return
 		return error, 1
 	# get final error
