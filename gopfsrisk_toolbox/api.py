@@ -561,7 +561,7 @@ class ParsePayload:
 							 'sample']].groupby('sample', as_index=False).mean()
 
 		# drop sample
-		X_lg_grouped = X_lg_grouped[list(X_lg_grouped.columns)[1:]]
+		#X_lg_grouped = X_lg_grouped[list(X_lg_grouped.columns)[1:]]
 
 		# calculate ecnl
 		X_lg_grouped['ecnl'] = X_lg_grouped['y_hat_pd'] * X_lg_grouped['y_hat_lgd']
