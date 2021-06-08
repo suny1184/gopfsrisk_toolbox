@@ -41,8 +41,6 @@ class TimeParsing:
 		for a in range(int_n_rows):
 			# print message
 			print(f'Payload {a+1}/{int_n_rows}')
-			# try parsing
-			#try:
 			# get json_str_request
 			json_str_request = self.df_payloads['strZestRequest'].iloc[a]
 			# convert to dict
@@ -87,8 +85,6 @@ class TimeParsing:
 			list_int_n_debtors.append(int_n_debtors)
 			# print current mean time
 			print(f'Mean parsing time: {np.mean(list_flt_sec):0.5}')
-			#except ValueError: # malformed node or string
-				#list_idx_errors.append(a)
 		# create df
 		df_output = pd.DataFrame({'counter_offers': list_X_lg_grouped,
 								  'x_parsed': list_x_parsed,
