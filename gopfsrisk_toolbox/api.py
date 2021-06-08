@@ -564,7 +564,7 @@ class ParsePayload:
 		X_lg_grouped = X_lg_grouped[list(X_lg_grouped.columns)[1:]]
 
 		# calculate ecnl
-		X_lg_grouped['ecnl'] = (X_lg_grouped['y_hat_pd'] * X_lg_grouped['y_hat_lgd']) / X_lg_grouped['fltamountfinanced__app']
+		X_lg_grouped['ecnl'] = X_lg_grouped['y_hat_pd'] * X_lg_grouped['y_hat_lgd']
 		# sort descending
 		X_lg_grouped.sort_values(by='ecnl', ascending=False, inplace=True)
 
