@@ -1,8 +1,31 @@
 # custom metrics
-from sklearn.metrics import average_precision_score
 import numpy as np
 from scipy.special import expit
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, average_precision_score, mean_squared_error
+
+# define custom metric for converting to logit
+class LogitContinuous:
+	# returns whether greater values of metric error are better
+	def is_max_optimal(self):
+		return False
+	# compute metric
+	def evaluate(self, approxes, target, weight):
+		# make sure theres only 1 item in approxes
+		assert len(approxes) == 1
+		# make sure there are as many actual (target) as there are predictions (approxes[0])
+		assert len(target) == len(approxes[0])
+		# set target to float and save as y_true
+		y_true = np.array(target).astype(float)
+		# get predictions, fit to logistic sigmoid function, and set as float
+		y_pred = expit(approxes[0]).astype(float)
+		# get rmse
+		flt_rmse = np.sqrt(mean_squared_error(y_true, y_pred))
+		# return
+		return error, 1
+	# get final error
+	def get_final_error(self, error, weight):
+		# Returns final value of metric
+		return error
 
 # define class for dollars gained (catboost -- just a prototype)
 class DollarsGainedPD:	
