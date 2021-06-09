@@ -60,8 +60,8 @@ class TimeParsing:
 			X_parsed['bigZestV2Id'] = [self.df_payloads['bigZestV2Id'].iloc[a] for i in range(int_n_debtors)]
 			X_parsed['dtmCreatedDate'] = [self.df_payloads['dtmCreatedDate'].iloc[a] for i in range(int_n_debtors)]
 			# place predictions
-			X_parsed['y_hat_pd'] = list(self.cls_parse_payload.pipeline_pd.y_hat_pd)
-			X_parsed['y_hat_lgd'] = list(self.cls_parse_payload.pipeline_lgd.y_hat_lgd)
+			X_parsed['y_hat_pd'] = list(self.cls_parse_payload.y_hat_pd)
+			X_parsed['y_hat_lgd'] = list(self.cls_parse_payload.y_hat_lgd)
 			# append to lists
 			# list_X_lg_grouped
 			list_X_lg_grouped.append(self.cls_parse_payload.X_lg_grouped)
