@@ -28,7 +28,7 @@ class TimeParsing:
 		list_flt_sec_create_x = [] # create x
 		list_flt_sec_preprocessing = [] # preprocess
 		list_flt_sec_counter = [] # counter offers
-		list_flt_sec_predict = [] # predict
+		#list_flt_sec_predict = [] # predict
 		list_flt_sec_adv_act = [] # adverse action
 		list_flt_sec_gen_output = [] # generate output
 		# n debtors
@@ -78,7 +78,7 @@ class TimeParsing:
 			list_flt_sec_create_x.append(self.cls_parse_payload.flt_sec_create_x) # create x
 			list_flt_sec_preprocessing.append(self.cls_parse_payload.flt_sec_preprocessing) # preprocess
 			list_flt_sec_counter.append(self.cls_parse_payload.flt_sec_counter) # counter offers
-			list_flt_sec_predict.append(self.cls_parse_payload.flt_sec_predict) # predict
+			#list_flt_sec_predict.append(self.cls_parse_payload.flt_sec_predict) # predict
 			list_flt_sec_adv_act.append(self.cls_parse_payload.flt_sec_adv_act) # adverse action
 			list_flt_sec_gen_output.append(self.cls_parse_payload.flt_sec_gen_output) # generate output
 			# n debtors
@@ -97,7 +97,7 @@ class TimeParsing:
 								  'sec_create_x': list_flt_sec_create_x,
 								  'sec_preprocessing': list_flt_sec_preprocessing,
 								  'sec_counter': list_flt_sec_counter,
-								  'sec_predict': list_flt_sec_predict,
+								  #'sec_predict': list_flt_sec_predict,
 								  'sec_adv_act': list_flt_sec_adv_act,
 								  'sec_gen_output': list_flt_sec_gen_output,
 			                      'n_debtors': list_int_n_debtors})
@@ -132,7 +132,7 @@ class TimeParsing:
 		list_str_step_name = []
 		list_flt_sec_mean = []
 		for int_n_debtors in [1,2]:
-			for str_step_name in ['sec_get_payloads','sec_parse','sec_create_x','sec_preprocessing','sec_counter','sec_predict','sec_adv_act','sec_gen_output']:
+			for str_step_name in ['sec_get_payloads','sec_parse','sec_create_x','sec_preprocessing','sec_counter','sec_adv_act','sec_gen_output']:
 				# subset
 				df_tmp = self.df_output[self.df_output['n_debtors']==int_n_debtors]
 				# get mean of step
@@ -151,7 +151,7 @@ class TimeParsing:
 						  'sec_create_x': 'Create X',
 						  'sec_preprocessing': 'Preprocessing',
 						  'sec_counter': 'Counter Offers',
-						  'sec_predict': 'Predict',
+						  #'sec_predict': 'Predict',
 						  'sec_adv_act': 'Adverse Action',
 						  'sec_gen_output': 'Generate Output'}
 		# map
