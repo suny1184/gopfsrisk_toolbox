@@ -568,18 +568,21 @@ class ParsePayload:
 
 		# calculate ecnl
 		X_lg_grouped['ecnl'] = X_lg_grouped['y_hat_pd'] * X_lg_grouped['y_hat_lgd']
+		# calculate modified ecnl
+		X_lg_grouped['ecnl_mod'] = (1.95553 * X_lg_grouped['ecnl']) - 0.03281
 
 		# get ecnl
 		self.y_hat_pd_x_lgd = list(X_lg_grouped[X_lg_grouped['sample']==0]['ecnl'])[0]
 		# get modified cnl
-		self.y_hat_pd_x_lgd_mod = (1.95553 * self.y_hat_pd_x_lgd) - 0.03281
+		self.y_hat_pd_x_lgd_mod = list(X_lg_grouped[X_lg_grouped['sample']==0]['ecnl_mod'])[0]
 		
 		# drop sample
 		X_lg_grouped.drop('sample', axis=1, inplace=True)
 
 		# sort descending
-		X_lg_grouped.sort_values(by='ecnl', ascending=False, inplace=True)
+		X_lg_grouped.sort_values(by='ecnl_mod', ascending=False, inplace=True)
 
+		"""
 		# create list of bin boundaries
 		list_bin_bounds = [0, 0.0423, 0.0823, 0.1583, 0.2014, 0.291]
 		# create list of bin names
@@ -593,51 +596,18 @@ class ParsePayload:
 		X_lg_grouped_max = X_lg_grouped.drop_duplicates(subset='tier')
 		# sort by ecnl
 		X_lg_grouped_max.sort_values(by='ecnl', ascending=True, inplace=True)
+		# save to object
+		self.X_lg_grouped_max = X_lg_grouped_max
+		"""
 
 		# save to object
 		self.X_lg_grouped = X_lg_grouped
-		self.X_lg_grouped_max = X_lg_grouped_max
 		# time
 		flt_sec_counter = time.perf_counter()-time_start
 		self.flt_sec_counter = flt_sec_counter
 		print(f'Time to generate counter-offers: {flt_sec_counter:0.5} sec.')
 		# return object
 		return self
-	"""
-	# define generate_predictions
-	def generate_predictions(self, json_str_request):
-		# counter_offers
-		self.counter_offers(json_str_request=json_str_request)
-		# make copies of X to make sure X is not over-written
-		time_start = time.perf_counter()
-		X_pd = self.X.copy()
-		X_lgd = self.X.copy()
-		# predict PD
-		y_hat_pd = self.pipeline_pd.prep_predict(X=X_pd)
-		# predict LGD
-		y_hat_lgd = self.pipeline_lgd.prep_predict(X=X_lgd)
-		# multiply the two
-		y_hat_pd_x_lgd = y_hat_pd * y_hat_lgd
-		# get amount financed
-		flt_amt_financed = self.X['fltamountfinanced__app'].iloc[0]
-		# control for amount financed
-		ecnl = y_hat_pd_x_lgd / flt_amt_financed
-		# get modified ecnl
-		ecnl_mod = -0.03007 + (1.583321 * ecnl)
-		# save to object
-		self.flt_amt_financed = flt_amt_financed
-		self.y_hat_pd = y_hat_pd
-		self.y_hat_lgd = y_hat_lgd
-		self.y_hat_pd_x_lgd = y_hat_pd_x_lgd
-		self.ecnl = ecnl
-		self.ecnl_mod = ecnl_mod
-		# time
-		flt_sec_predict = time.perf_counter()-time_start
-		self.flt_sec_predict = flt_sec_predict
-		print(f'Time to generate predictions: {flt_sec_predict:0.5} sec.')
-		# return object
-		return self
-		"""
 	# define adverse_action
 	def adverse_action(self, json_str_request):
 		# generate predictions
