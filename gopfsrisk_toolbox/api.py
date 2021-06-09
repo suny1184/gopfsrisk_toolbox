@@ -570,7 +570,9 @@ class ParsePayload:
 		X_lg_grouped['ecnl'] = X_lg_grouped['y_hat_pd'] * X_lg_grouped['y_hat_lgd']
 
 		# get ecnl
-		self.y_hat_pd_x_lgd = list(X_lg_grouped[X_lg_grouped['sample']==0]['ecnl'])
+		self.y_hat_pd_x_lgd = list(X_lg_grouped[X_lg_grouped['sample']==0]['ecnl'])[0]
+		# get modified cnl
+		self.y_hat_pd_x_lgd_mod = (1.95553 * self.y_hat_pd_x_lgd) - 0.03281
 		
 		# drop sample
 		X_lg_grouped.drop('sample', axis=1, inplace=True)
@@ -683,7 +685,7 @@ class ParsePayload:
 								  'Score_pd': self.y_hat_pd,
 								  'Score_lgd': self.y_hat_lgd,
 							      'Score_ecnl': [self.y_hat_pd_x_lgd for id_ in self.list_unique_id],
-							      #'Score_ecnl_mod': self.ecnl_mod,
+							      'Score_ecnl_mod': [self.y_hat_pd_x_lgd_mod for id_ in self.list_unique_id],
 								  'Key_factors': self.list_list_reasons,
 								  'Outlier_score': [0.0 for id_ in self.list_unique_id]})
 		# convert to json
