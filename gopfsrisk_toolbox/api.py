@@ -644,7 +644,7 @@ class ParsePayload:
 		# get list of feats in model
 		list_x_feats = self.pipeline_pd.model.feature_names_
 		# pool X for readability
-		X_pooled = cb.Pool(self.pipeline_pd.X[list_x_feats], cat_features=self.list_non_numeric_pd)
+		X_pooled = cb.Pool(self.X[list_x_feats], cat_features=self.list_non_numeric_pd)
 		# generate shap vals
 		df_shap_vals = pd.DataFrame(self.pipeline_pd.model.get_feature_importance(data=X_pooled,
 																			      type='ShapValues',
