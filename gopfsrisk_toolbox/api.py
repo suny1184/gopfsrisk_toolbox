@@ -600,6 +600,9 @@ class ParsePayload:
 		self.X_lg_grouped_max = X_lg_grouped_max
 		"""
 
+		# for testing purposes only (change for productuion)
+		self.X_lg_grouped_max = X_lg_grouped.head(5)
+
 		# save to object
 		self.X_lg_grouped = X_lg_grouped
 		# time
