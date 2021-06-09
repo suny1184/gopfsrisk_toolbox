@@ -577,7 +577,7 @@ class ParsePayload:
 		self.y_hat_pd_x_lgd_mod = list(X_lg_grouped[X_lg_grouped['sample']==0]['ecnl_mod'])[0]
 		
 		# drop sample
-		X_lg_grouped.drop('sample', axis=1, inplace=True)
+		#X_lg_grouped.drop('sample', axis=1, inplace=True)
 
 		# sort descending
 		X_lg_grouped.sort_values(by='ecnl_mod', ascending=False, inplace=True)
@@ -673,12 +673,12 @@ class ParsePayload:
 		X_lg_grouped_max_sub = self.X_lg_grouped_max[['fltapproveddowntotal__app',
 										 		 	  'fltamountfinanced__app',
 										 		   	  'fltapprovedpricewholesale__app',
-										 		 	  'tier']]
+										 		 	  'ecnl_mod']]
 		# rename columns
 		X_lg_grouped_max_sub.columns = ['Cash Down',
 										'Amount Financed',
 										'Price Wholesale',
-										'Tier']
+										'ECNL Modified']
 		# create final output
 		output_final = {"Request_id": "",
 				        "Zaml_processing_id": "",
