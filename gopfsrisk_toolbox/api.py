@@ -488,7 +488,7 @@ class ParsePayload:
 		# create large df
 		X_lg = self.X.iloc[np.tile(np.arange(len(self.X)), 100)] # 100 rows
 		# make arry for keeping samples straight
-		list_sample = list(np.repeat(list(range(100)), self.X.shape[0]))
+		list_sample = list(np.repeat(list(range(1, 101)), self.X.shape[0])) # start at 1 because we assign original to 0 below
 		# set as sample
 		X_lg['sample'] = list_sample
 
@@ -549,8 +549,14 @@ class ParsePayload:
 
 		# get lgd model
 		model_lgd = self.pipeline_lgd.model
-		# predictions pd
-		X_lg['y_hat_lgd'] = model_lgd.predict(X_lg[model_lgd.feature_names_])
+		# predictions pd and clip to make sure no values <0 or >1
+		X_lg['y_hat_lgd'] = list(np.clip(a=np.array(model_lgd.predict(X_lg[model_lgd.feature_names_])),
+										 a_min=0,
+										 a_max=1))
+		# get y_hat_pd (for all debtors)
+		self.y_hat_pd = list(X_lg[X_lg['sample']==0]['y_hat_pd'])
+		# get y_hat_lgd (for all debtors)
+		self.y_hat_lgd = list(X_lg[X_lg['sample']==0]['y_hat_lgd'])
 
 		# group by sample so we cn get mean by account
 		X_lg_grouped = X_lg[['fltapproveddowntotal__app',
@@ -560,11 +566,15 @@ class ParsePayload:
 							 'y_hat_lgd',
 							 'sample']].groupby('sample', as_index=False).mean()
 
-		# drop sample
-		#X_lg_grouped = X_lg_grouped[list(X_lg_grouped.columns)[1:]]
-
 		# calculate ecnl
 		X_lg_grouped['ecnl'] = X_lg_grouped['y_hat_pd'] * X_lg_grouped['y_hat_lgd']
+
+		# get ecnl
+		self.y_hat_pd_x_lgd = list(X_lg_grouped[X_lg_grouped['sample']==0]['ecnl'])
+		
+		# drop sample
+		X_lg_grouped.drop('sample', axis=1, inplace=True)
+
 		# sort descending
 		X_lg_grouped.sort_values(by='ecnl', ascending=False, inplace=True)
 
@@ -577,21 +587,21 @@ class ParsePayload:
 		# make tier
 		X_lg_grouped['tier'] = np.vectorize(dict_.get)(np.digitize(X_lg_grouped['ecnl'], list_bin_bounds))
 
-		"""
 		# max ecnl by tier
 		X_lg_grouped_max = X_lg_grouped.drop_duplicates(subset='tier')
 		# sort by ecnl
 		X_lg_grouped_max.sort_values(by='ecnl', ascending=True, inplace=True)
-		"""
+
 		# save to object
 		self.X_lg_grouped = X_lg_grouped
-		#self.X_lg_grouped_max = X_lg_grouped_max
+		self.X_lg_grouped_max = X_lg_grouped_max
 		# time
 		flt_sec_counter = time.perf_counter()-time_start
 		self.flt_sec_counter = flt_sec_counter
 		print(f'Time to generate counter-offers: {flt_sec_counter:0.5} sec.')
 		# return object
 		return self
+	"""
 	# define generate_predictions
 	def generate_predictions(self, json_str_request):
 		# counter_offers
@@ -625,10 +635,11 @@ class ParsePayload:
 		print(f'Time to generate predictions: {flt_sec_predict:0.5} sec.')
 		# return object
 		return self
+		"""
 	# define adverse_action
 	def adverse_action(self, json_str_request):
 		# generate predictions
-		self.generate_predictions(json_str_request=json_str_request)
+		self.counter_offers(json_str_request=json_str_request)
 		time_start = time.perf_counter()
 		# get list of feats in model
 		list_x_feats = self.pipeline_pd.model.feature_names_
@@ -672,7 +683,7 @@ class ParsePayload:
 								  'Score_pd': self.pipeline_pd.y_hat,
 								  'Score_lgd': self.pipeline_lgd.y_hat,
 							      'Score_ecnl': self.ecnl,
-							      'Score_ecnl_mod': self.ecnl_mod,
+							      #'Score_ecnl_mod': self.ecnl_mod,
 								  'Key_factors': self.list_list_reasons,
 								  'Outlier_score': [0.0 for id_ in self.list_unique_id]})
 		# convert to json
