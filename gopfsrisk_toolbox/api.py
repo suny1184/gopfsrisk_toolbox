@@ -682,7 +682,7 @@ class ParsePayload:
 		df_output = pd.DataFrame({'Row_id': self.list_unique_id,
 								  'Score_pd': self.y_hat_pd,
 								  'Score_lgd': self.y_hat_lgd,
-							      'Score_ecnl': self.y_hat_pd_x_lgd,
+							      'Score_ecnl': [self.y_hat_pd_x_lgd for id_ in self.list_unique_id],
 							      #'Score_ecnl_mod': self.ecnl_mod,
 								  'Key_factors': self.list_list_reasons,
 								  'Outlier_score': [0.0 for id_ in self.list_unique_id]})
