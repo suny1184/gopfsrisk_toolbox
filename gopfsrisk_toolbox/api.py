@@ -535,7 +535,7 @@ class ParsePayload:
 		X_lg = cls_feat_eng.transform(X_lg)
 
 		# subset to LTV bounds
-		X_lg = X_lg[(X_lg['eng_loan_to_value']>=0) & (X_lg['eng_loan_to_value']<=1.6)]
+		X_lg = X_lg[(X_lg['eng_loan_to_value']>0) & (X_lg['eng_loan_to_value']<=1.6)]
 
 		# concatenate original X
 		X_lg = pd.concat([self.X, X_lg])
@@ -579,10 +579,10 @@ class ParsePayload:
 		# drop sample
 		#X_lg_grouped.drop('sample', axis=1, inplace=True)
 
-		# sort descending
+		"""
+		# sort descending so the max of each tier can be found later
 		X_lg_grouped.sort_values(by='ecnl_mod', ascending=False, inplace=True)
 
-		"""
 		# create list of bin boundaries
 		list_bin_bounds = [0, 0.0423, 0.0823, 0.1583, 0.2014, 0.291]
 		# create list of bin names
@@ -600,9 +600,15 @@ class ParsePayload:
 		self.X_lg_grouped_max = X_lg_grouped_max
 		"""
 
-		# for testing purposes only (change for productuion)
-		self.X_lg_grouped_max = X_lg_grouped.head(5)
+		# for testing
+		X_lg_grouped_max = X_lg_grouped.copy()
+		# sort by ecnl
+		X_lg_grouped_max.sort_values(by='ecnl_mod', ascending=True, inplace=True)
+		# get preview for testing output
+		X_lg_grouped_max = X_lg_grouped_max.head(5)
 
+		# for testing purposes only (change for productuion)
+		self.X_lg_grouped_max = X_lg_grouped_max
 		# save to object
 		self.X_lg_grouped = X_lg_grouped
 		# time
