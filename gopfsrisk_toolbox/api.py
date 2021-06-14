@@ -44,12 +44,14 @@ class FinalImputer(BaseEstimator, TransformerMixin):
 		time_start = time.perf_counter()
 		# make list of keys
 		list_keys = list(self.dict_imputations.keys())
+		# make copy of dict_imputations
+		dict_imputations_copy = self.dict_imputations.copy()
 		# rm key val pairs not in X
 		for col in list_keys:
 			if col not in list(X.columns):
-				del self.dict_imputations[col]
+				del dict_imputations_copy[col]
 		# fillna
-		X.fillna(self.dict_imputations, inplace=True)
+		X.fillna(dict_imputations_copy, inplace=True)
 		print(f'Time to impute: {(time.perf_counter()-time_start):0.5} sec.')
 		# return
 		return X
