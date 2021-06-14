@@ -342,7 +342,11 @@ class SensitivityAnalysis:
 		self.str_eval_metric = str_eval_metric
 		self.logger = logger
 	# define function for sensitivity analysis
-	def sensitivity_analysis(X_train, X_valid, y_train, y_valid, 
+	def sensitivity_analysis(self,
+		                     X_train, 
+							 X_valid, 
+							 y_train, 
+							 y_valid, 
 							 list_cols, 
 							 list_class_weights=None, 
 	                         str_filename_df='./output/df_sensitivity.csv', 
@@ -424,7 +428,7 @@ class SensitivityAnalysis:
 		# return
 		return self
 	# define function for generating plot
-	def sensitivity_plot(str_filename='./output/plt_sensitivity.png'):
+	def sensitivity_plot(self, str_filename='./output/plt_sensitivity.png'):
 		# get min
 		flt_min_eval_metric = np.min(self.df_sensitivity[self.str_eval_metric])
 		# get max
@@ -461,8 +465,7 @@ class SensitivityAnalysis:
 			# log it
 			self.logger.warning(f'Sensitivity analysis plot saved to {str_filename}')
 
-
-
+"""
 # define function for sensitivity analysis
 def SENSITIVITY_ANALYSIS(X_train, X_valid, y_train, y_valid, list_cols, list_class_weights=None, 
 	                     str_filename_df='./output/df_sensitivity.csv', str_eval_metric='F1',
@@ -573,3 +576,4 @@ def SENSITIVITY_PLOT(df_feats, str_eval_metric='PR-AUC', str_filename='./output/
 	if logger:
 		# log it
 		logger.warning(f'Sensitivity analysis plot saved to {str_filename}')
+"""
