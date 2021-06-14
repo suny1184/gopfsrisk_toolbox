@@ -660,15 +660,15 @@ class ParsePayload:
 		# remove empty strings from list_errors_final
 		list_errors_final = [err for err in list_errors_final if err != '']
 		# subset to cols we want
-		X_lg_grouped_max_sub = self.X_lg_grouped_max[['fltapproveddowntotal__app',
-										 		 	  'fltamountfinanced__app',
-										 		   	  'fltapprovedpricewholesale__app',
-										 		 	  'ecnl_mod']]
+		X_lg_grouped_sub = self.X_lg_grouped[['fltapproveddowntotal__app',
+										 	  'fltamountfinanced__app',
+										 	  'fltapprovedpricewholesale__app',
+										 	  'ecnl_mod']]
 		# rename columns
-		X_lg_grouped_max_sub.columns = ['Cash Down',
-										'Amount Financed',
-										'Price Wholesale',
-										'ECNL Modified']
+		X_lg_grouped_sub.columns = ['Cash Down',
+									'Amount Financed',
+									'Price Wholesale',
+									'ECNL Modified']
 		# create final output
 		output_final = {"Request_id": "",
 				        "Zaml_processing_id": "",
@@ -676,7 +676,7 @@ class ParsePayload:
 					                  "Model_version":"v2",
 									  "Results":list_output,
 									  "Errors":list_errors_final,
-									  "Counter-Offers":X_lg_grouped_max_sub.to_dict('records')}]}
+									  "Counter-Offers":X_lg_grouped_sub.to_dict('records')}]}
 		# save to object
 		self.output_final = output_final
 		# time
