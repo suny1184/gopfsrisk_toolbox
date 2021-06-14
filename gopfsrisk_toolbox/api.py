@@ -604,7 +604,7 @@ class ParsePayload:
 	# define adverse_action
 	def adverse_action(self, json_str_request):
 		# generate predictions
-		self.counter_offers(json_str_request=json_str_request)
+		self.counter_offers(json_str_request=json_str_request, int_n_samples=100)
 		time_start = time.perf_counter()
 		# get list of feats in model
 		list_x_feats = self.pipeline_pd.model.feature_names_
