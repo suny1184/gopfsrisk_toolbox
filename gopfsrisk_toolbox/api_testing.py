@@ -64,7 +64,7 @@ class TimeParsing:
 			X_parsed['y_hat_lgd'] = list(self.cls_parse_payload.y_hat_lgd)
 			# append to lists
 			# list_X_lg_grouped
-			list_X_lg_grouped.append(self.cls_parse_payload.X_lg_grouped)
+			list_X_lg_grouped.append(self.cls_parse_payload.X_lg_grouped_pre_sub)
 			# X_parsed
 			list_x_parsed.append(X_parsed)
 			# missing, errors, reasons
