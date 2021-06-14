@@ -588,11 +588,11 @@ class ParsePayload:
 		self.X_lg_grouped_pre_sub = X_lg_grouped.copy()
 
 		# subset ecnl to < original
-		X_lg_grouped = X_lg_grouped[(X_lg_grouped['ecnl']<cls_parse_payload.y_hat_pd_x_lgd) & (X_lg_grouped['fltapproveddowntotal__app']>=flt_down_total)]
+		X_lg_grouped = X_lg_grouped[(X_lg_grouped['ecnl'] < self.y_hat_pd_x_lgd) & (X_lg_grouped['fltapproveddowntotal__app'] >= flt_down_total)]
 
 		# sort by ecnl
 		X_lg_grouped.sort_values(by='ecnl_mod', ascending=True, inplace=True)
-		
+
 		# save to object
 		self.X_lg_grouped = X_lg_grouped
 		# time
