@@ -432,11 +432,11 @@ class SensitivityAnalysis:
 		# get min
 		flt_min_eval_metric = np.min(self.df_sensitivity[self.str_eval_metric])
 		# get max
-		flt_max_eval_metric = np.max(df_feats[self.str_eval_metric])
+		flt_max_eval_metric = np.max(self.df_sensitivity[self.str_eval_metric])
 		# get median
-		flt_mdn_eval_metric = np.median(df_feats[self.str_eval_metric])
+		flt_mdn_eval_metric = np.median(self.df_sensitivity[self.str_eval_metric])
 		# create axis
-		fig, ax = plt.subplots(figsize=(df_feats.shape[0], 10))
+		fig, ax = plt.subplots(figsize=(self.df_sensitivity.shape[0], 10))
 		# title
 		if self.str_eval_metric == 'AUC':
 			ax.set_title(f'{self.str_eval_metric} (ascending) by Removed Feature')
@@ -447,13 +447,13 @@ class SensitivityAnalysis:
 		# ylabel
 		ax.set_ylabel(self.str_eval_metric)
 		# line plot of sensitivity analysis
-		ax.plot(df_feats['feature_removed'], df_feats[self.str_eval_metric], color='red', label=self.str_eval_metric)
+		ax.plot(self.df_sensitivity['feature_removed'], self.df_sensitivity[self.str_eval_metric], color='red', label=self.str_eval_metric)
 		# line of min
-		ax.plot(df_feats['feature_removed'], [flt_min_eval_metric for x in df_feats[self.str_eval_metric]], linestyle=':', color='blue', label=f'Minimum {self.str_eval_metric} ({flt_min_eval_metric:0.4})')
+		ax.plot(self.df_sensitivity['feature_removed'], [flt_min_eval_metric for x in self.df_sensitivity[self.str_eval_metric]], linestyle=':', color='blue', label=f'Minimum {self.str_eval_metric} ({flt_min_eval_metric:0.4})')
 		# line of max
-		ax.plot(df_feats['feature_removed'], [flt_max_eval_metric for x in df_feats[self.str_eval_metric]], linestyle=':', color='red', label=f'Maximum {self.str_eval_metric} ({flt_max_eval_metric:0.4})')
+		ax.plot(self.df_sensitivity['feature_removed'], [flt_max_eval_metric for x in self.df_sensitivity[self.str_eval_metric]], linestyle=':', color='red', label=f'Maximum {self.str_eval_metric} ({flt_max_eval_metric:0.4})')
 		# line of median
-		ax.plot(df_feats['feature_removed'], [flt_mdn_eval_metric for x in df_feats[self.str_eval_metric]], linestyle=':', color='green', label=f'Median {self.str_eval_metric} ({flt_mdn_eval_metric:0.4})')
+		ax.plot(self.df_sensitivity['feature_removed'], [flt_mdn_eval_metric for x in self.df_sensitivity[self.str_eval_metric]], linestyle=':', color='green', label=f'Median {self.str_eval_metric} ({flt_mdn_eval_metric:0.4})')
 		# rotate xticks 90 degrees
 		plt.xticks(rotation=90)
 		# legend
