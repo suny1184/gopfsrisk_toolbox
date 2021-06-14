@@ -490,19 +490,19 @@ class ParsePayload:
 		# return object
 		return self
 	# define counter_offers
-	def counter_offers(self, json_str_request):
+	def counter_offers(self, json_str_request, int_n_samples=100):
 		# shared preprocessing
 		self.shared_preprocessing(json_str_request=json_str_request)
 		time_start = time.perf_counter()
 		# create large df
-		X_lg = self.X.iloc[np.tile(np.arange(len(self.X)), 100)] # 100 rows
+		X_lg = self.X.iloc[np.tile(np.arange(len(self.X)), int_n_samples)] # int_n_samples rows
 		# make arry for keeping samples straight
-		list_sample = list(np.repeat(list(range(1, 101)), self.X.shape[0])) # start at 1 because we assign original to 0 below
+		list_sample = list(np.repeat(list(range(1, (int_n_samples+1))), self.X.shape[0])) # start at 1 because we assign original to 0 below
 		# set as sample
 		X_lg['sample'] = list_sample
 
 		# make array of loan to value
-		list_ltv = list(np.linspace(0, 1.6, 100))
+		list_ltv = list(np.linspace(0.78, 1.6, int_n_samples))
 		# get n debtors
 		int_n_debtors = self.X.shape[0]
 		# duplicate each value
@@ -520,8 +520,9 @@ class ParsePayload:
 
 		# calculate down pmt
 		X_lg['fltapproveddowntotal__app'] = flt_amt_financed - X_lg['fltamountfinanced__app'] + flt_down_total
-		# replace negatives with 0
-		X_lg['fltapproveddowntotal__app'] = np.where(X_lg['fltapproveddowntotal__app'] < 0, 0, X_lg['fltapproveddowntotal__app'])
+
+		# filter X_lg where fltapproveddowntotal__app > flt_down_total
+		X_lg = X_lg[X_lg['fltapproveddowntotal__app'] > flt_down_total]
 
 		# get list_transformers
 		list_transformers = self.pipeline_shared.list_transformers
@@ -531,12 +532,10 @@ class ParsePayload:
 		# bin
 		X_lg = cls_binner.transform(X_lg)
 
-		"""
 		# get val replacer
 		cls_val_replacer = list_transformers[6]
 		# replace in case things are binned to 0
 		X_lg = cls_val_replacer.transform(X_lg)
-		"""
 
 		# get feature engineering class
 		cls_feat_eng = list_transformers[7]
@@ -562,9 +561,9 @@ class ParsePayload:
 		X_lg['y_hat_lgd'] = list(np.clip(a=np.array(model_lgd.predict(X_lg[model_lgd.feature_names_])),
 										 a_min=0,
 										 a_max=1))
-		# get y_hat_pd (for all debtors)
+		# get original y_hat_pd (for all debtors)
 		self.y_hat_pd = list(X_lg[X_lg['sample']==0]['y_hat_pd'])
-		# get y_hat_lgd (for all debtors)
+		# get original y_hat_lgd (for all debtors)
 		self.y_hat_lgd = list(X_lg[X_lg['sample']==0]['y_hat_lgd'])
 
 		# group by sample so we cn get mean by account
@@ -584,40 +583,16 @@ class ParsePayload:
 		self.y_hat_pd_x_lgd = list(X_lg_grouped[X_lg_grouped['sample']==0]['ecnl'])[0]
 		# get modified cnl
 		self.y_hat_pd_x_lgd_mod = list(X_lg_grouped[X_lg_grouped['sample']==0]['ecnl_mod'])[0]
+
+		# save to object at this point for testing
+		self.X_lg_grouped_pre_sub = X_lg_grouped.copy()
+
+		# subset ecnl to < original
+		X_lg_grouped = X_lg_grouped[(X_lg_grouped['ecnl']<cls_parse_payload.y_hat_pd_x_lgd) & (X_lg_grouped['fltapproveddowntotal__app']>=flt_down_total)]
+
+		# sort by ecnl
+		X_lg_grouped.sort_values(by='ecnl_mod', ascending=True, inplace=True)
 		
-		# drop sample
-		#X_lg_grouped.drop('sample', axis=1, inplace=True)
-
-		"""
-		# sort descending so the max of each tier can be found later
-		X_lg_grouped.sort_values(by='ecnl_mod', ascending=False, inplace=True)
-
-		# create list of bin boundaries
-		list_bin_bounds = [0, 0.0423, 0.0823, 0.1583, 0.2014, 0.291]
-		# create list of bin names
-		list_bin_names = ['A1', 'A', 'B', 'C', 'D', 'Decline']
-		# create dictionary with names
-		dict_ = dict(enumerate(list_bin_names, 1))
-		# make tier
-		X_lg_grouped['tier'] = np.vectorize(dict_.get)(np.digitize(X_lg_grouped['ecnl'], list_bin_bounds))
-
-		# max ecnl by tier
-		X_lg_grouped_max = X_lg_grouped.drop_duplicates(subset='tier')
-		# sort by ecnl
-		X_lg_grouped_max.sort_values(by='ecnl', ascending=True, inplace=True)
-		# save to object
-		self.X_lg_grouped_max = X_lg_grouped_max
-		"""
-
-		# for testing
-		X_lg_grouped_max = X_lg_grouped.copy()
-		# sort by ecnl
-		X_lg_grouped_max.sort_values(by='ecnl_mod', ascending=True, inplace=True)
-		# get preview for testing output
-		X_lg_grouped_max = X_lg_grouped_max.head(5)
-
-		# for testing purposes only (change for productuion)
-		self.X_lg_grouped_max = X_lg_grouped_max
 		# save to object
 		self.X_lg_grouped = X_lg_grouped
 		# time
