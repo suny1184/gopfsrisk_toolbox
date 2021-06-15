@@ -502,7 +502,7 @@ class ParsePayload:
 		X_lg['sample'] = list_sample
 
 		# make array of loan to value
-		list_ltv = list(np.linspace(0.78, 1.6, int_n_samples))
+		list_ltv = list(np.linspace(0.5, 1.6, int_n_samples))
 		# get n debtors
 		int_n_debtors = self.X.shape[0]
 		# duplicate each value
