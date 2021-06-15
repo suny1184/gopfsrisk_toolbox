@@ -80,11 +80,13 @@ class FeatureEngineeringAaronPD:
 			X['ENG_down_to_financed'] = X['fltApprovedDownTotal__app'] / X['fltAmountFinanced__app']
 		except:
 			pass
+		"""
 		# down payment over gross monthly
 		try:
 			X['ENG_down_to_income'] = X['fltApprovedDownTotal__app'] / X['fltGrossMonthly__income_sum']
 		except:
 			pass
+		"""
 		# down payment to price wholesale
 		try:
 			X['ENG_down_to_wholesale'] = X['fltApprovedDownTotal__app'] / X['fltApprovedPriceWholesale__app']
@@ -147,11 +149,13 @@ class FeatureEngineeringAaronLGD:
 			X['ENG_down_to_financed'] = X['fltApprovedDownTotal__app'] / X['fltAmountFinanced__app']
 		except:
 			pass
+		"""
 		# down payment over gross monthly
 		try:
 			X['ENG_down_to_income'] = X['fltApprovedDownTotal__app'] / X['fltGrossMonthly__income_sum']
 		except:
 			pass
+		"""
 		# down payment to price wholesale
 		try:
 			X['ENG_down_to_wholesale'] = X['fltApprovedDownTotal__app'] / X['fltApprovedPriceWholesale__app']
