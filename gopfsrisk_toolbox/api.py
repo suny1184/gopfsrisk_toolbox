@@ -122,6 +122,7 @@ class ParsePayload:
 					   pipeline_pd,
 					   pipeline_lgd,
 					   list_non_numeric_pd,
+					   list_string_cols,
 					   dict_aa_pd,
 					   bool_debt=False,
 					   list_feats_raw_debt=None,
@@ -142,6 +143,7 @@ class ParsePayload:
 		self.pipeline_shared = pipeline_shared
 		self.pipeline_pd = pipeline_pd
 		self.pipeline_lgd = pipeline_lgd
+		self.list_string_cols = list_string_cols
 		self.list_non_numeric_pd = list_non_numeric_pd
 		self.dict_aa_pd = dict_aa_pd
 		self.bool_debt = bool_debt
@@ -481,6 +483,10 @@ class ParsePayload:
 		X = self.pipeline_shared.transform(X=self.X)
 		# lowercase cols names
 		X.columns = [col.lower() for col in X.columns]
+
+		# set string cols
+		X[self.list_string_cols] = X[self.list_string_cols].astype(str)
+
 		# save to object
 		self.X = X
 		# time
