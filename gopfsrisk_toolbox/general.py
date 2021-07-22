@@ -8,6 +8,8 @@ from pandas.api.types import is_numeric_dtype
 import json
 from sklearn.utils.class_weight import compute_class_weight
 import numpy as np
+import datetime as dt
+import git
 
 # define function for logging
 def LOG_EVENTS(str_filename='./logs/db_pull.log'):
@@ -145,3 +147,35 @@ def GET_LIST_CLASS_WEIGHTS(y_train, logger=None):
 		logger.warning(f'List of class weights {list_class_weights} computed')
 	# return
 	return list_class_weights
+
+# define function for pushing code to github
+def PUSH_TO_REPO(str_path_of_git_repo=f'{os.getcwd()}\.git', 
+				 str_commit_message=f'ran on {dt.datetime.now()}',
+				 str_add='.',
+				 logger=None):
+	# create repo object
+	repo = git.Repo(str_path_of_git_repo)
+	# pull
+	print('git pull')
+	repo.git.pull()
+	# add
+	print(f'git add {str_add}')
+	if str_add == '.':
+		repo.git.add(all=True)
+	else:
+		repo.git.add(str_add)
+	# commit
+	print(f'git commit -m "{str_commit_message}"')
+	repo.index.commit(str_commit_message)
+	# get origin
+	origin = repo.remote(name='origin')
+	# push to origin
+	print('git push origin main')
+	origin.push()
+	# get url of origin
+	str_url_origin = git.cmd.Git(str_path_of_git_repo).execute('git remote get-url origin')
+	# print message
+	print(f'Push to {str_url_origin} complete')
+	# if using logger
+	if logger:
+		logger.warning(f'Pushed all files to {str_url_origin}')
