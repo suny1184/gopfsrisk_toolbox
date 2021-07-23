@@ -338,7 +338,7 @@ class ProportionRTIConverter(BaseEstimator, TransformerMixin):
 			# iterate through R, T, I
 			for rti in ['R','T','I']:
 				# create new col
-				X[f'{col}__prop_{rti}'] = series_.apply(lambda x: HELPER_PROP_RTI(str_=x, rti=rti))
+				X[f'{col}__prop_{rti.lower()}'] = series_.apply(lambda x: HELPER_PROP_RTI(str_=x, rti=rti))
 			# drop col
 			X.drop(col, axis=1, inplace=True)
 		# return df
