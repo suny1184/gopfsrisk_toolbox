@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from .algorithms import FIT_CATBOOST_MODEL
 import pickle
-from sklearn.metrics import precision_score, roc_auc_score, mean_squared_error, confusion_matrix
+from sklearn.metrics import precision_score, roc_auc_score, mean_squared_error, confusion_matrix, accuracy_score
 import numpy as np
 
 # define function to tune lr
@@ -59,11 +59,26 @@ def TUNE_LEARNING_RATE(X_train, y_train, X_valid, y_valid, list_non_numeric,
 		# append to list
 		list_model.append(model)
 		# if Precision
-		if str_eval_metric == 'Precision':
+		if str_eval_metric in ['Precision', 'Accuracy', 'RMSE']:
 			# get predictions
 			y_hat = model.predict(X_valid)
-			# get precision
-			flt_metric = precision_score(y_true=y_valid, y_pred=y_hat)
+			# logic
+			if str_eval_metric == 'Precision':
+				# get precision
+				flt_metric = precision_score(y_true=y_valid, y_pred=y_hat)
+			elif str_eval_metric == 'Accuracy':
+				# get accuracy
+				flt_metric = accuracy_score(y_true=y_valid, y_pred=y_hat)
+			elif str_eval_metric == 'RMSE':
+				# get MSE
+				flt_metric = mean_squared_error(y_true=y_valid, y_pred=y_hat)
+				# get RMSE
+				flt_metric = np.sqrt(flt_metric)
+				# log the metric
+				if logger:
+					logger.warning(f'Model: {a}; LR: {flt_learning_rate}; RMSE: {flt_metric}')
+				# make negative so less negative is better (i.e., so our logic works)
+				flt_metric = -flt_metric
 		# if AUC
 		elif str_eval_metric == 'AUC':
 			# get predictions
@@ -71,7 +86,7 @@ def TUNE_LEARNING_RATE(X_train, y_train, X_valid, y_valid, list_non_numeric,
 			# get roc auc
 			flt_metric = roc_auc_score(y_true=y_valid, y_score=y_hat)
 		# if RMSE
-		elif (str_eval_metric == 'RMSE') or (str_eval_metric.__class__.__name__ == 'LogitContinuous'):
+		elif str_eval_metric.__class__.__name__ == 'LogitContinuous':
 			# get predictions
 			y_hat = model.predict(X_valid)
 			# get MSE
