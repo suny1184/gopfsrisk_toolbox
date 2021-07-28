@@ -5,7 +5,7 @@ from .algorithms import FIT_CATBOOST_MODEL
 from .general import GET_NUMERIC_AND_NONNUMERIC
 import ast
 import pickle
-from sklearn.metrics import f1_score, roc_auc_score, mean_squared_error
+from sklearn.metrics import f1_score, roc_auc_score, mean_squared_error, accuracy_score
 from scipy.special import expit
 import matplotlib.pyplot as plt
 
@@ -57,10 +57,14 @@ def ITER_IMP_THRESH_FEAT_SELECT(X_train, y_train, X_valid, y_valid, list_non_num
 					               dict_monotone_constraints=dict_monotone_constraints,
 					               flt_rsm=flt_rsm)
 		# get metric
-		if (str_eval_metric == 'RMSE') or (str_eval_metric.__class__.__name__ == 'LogitContinuous'):
+		if (str_eval_metric == 'RMSE') or (str_eval_metric == 'Accuracy'):
 			# predict
 			y_hat = model.predict(X_valid[list_features])
-			flt_metric = np.sqrt(mean_squared_error(y_true=y_valid, y_pred=y_hat))
+			# logic
+			if str_eval_metric == 'RMSE':
+				flt_metric = np.sqrt(mean_squared_error(y_true=y_valid, y_pred=y_hat))
+			elif str_eval_metric == 'Accuracy':
+				flt_metric = accuracy_score(y_true=y_valid, y_pred=y_hat)
 		elif str_eval_metric == 'AUC':
 			# predict
 			y_hat = model.predict_proba(X_valid[list_features])[:,1]
