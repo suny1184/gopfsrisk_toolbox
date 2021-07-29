@@ -399,24 +399,31 @@ class SensitivityAnalysis:
 		                       		   int_random_state=int_random_state,
 		                       		   dict_monotone_constraints=dict_monotone_constraints_for_model)
 			# get eval metric
-			if self.str_eval_metric == 'RMSE':
+			if self.str_eval_metric in ['RMSE', 'Accuracy']:
 				# predictions
 				y_hat = model.predict(X_valid[list_columns])
-				# metric
-				metric_ = np.sqrt(mean_squared_error(y_true=y_valid, y_pred=y_hat))
-			elif self.str_eval_metric == 'AUC':
+				# logic
+				if self.str_eval_metric == 'RMSE':
+					# metric
+					metric_ = np.sqrt(mean_squared_error(y_true=y_valid, y_pred=y_hat))
+				elif self.str_eval_metric == 'Accuracy':
+					# metric
+					metric_ = accuracy_score(y_true=y_valid, y_pred=y_hat)
+			elif self.str_eval_metric in ['AUC']:
 				# predictions
 				y_hat = model.predict_proba(X_valid[list_columns])[:,1]
-				# metric
-				metric_ = roc_auc_score(y_true=y_valid, y_score=y_hat)
+				# logic
+				if self.str_eval_metric == 'AUC':
+					# metric
+					metric_ = roc_auc_score(y_true=y_valid, y_score=y_hat)
 			# create dictionary
 			dict_ = {'feature_removed':col, self.str_eval_metric:metric_}
 			# append dict_ to df_sensitivity
 			df_sensitivity = df_sensitivity.append(dict_, ignore_index=True)
 			# sort it
-			if self.str_eval_metric == 'RMSE':
+			if self.str_eval_metric in ['RMSE']: # lower is better
 				df_sensitivity.sort_values(by=self.str_eval_metric, ascending=False, inplace=True)
-			elif self.str_eval_metric == 'AUC':
+			elif self.str_eval_metric in ['AUC', 'Accuracy']: # higher is better
 				df_sensitivity.sort_values(by=self.str_eval_metric, ascending=True, inplace=True)
 			# write to csv
 			df_sensitivity.to_csv(str_filename_df, index=False)
@@ -438,9 +445,9 @@ class SensitivityAnalysis:
 		# create axis
 		fig, ax = plt.subplots(figsize=(self.df_sensitivity.shape[0], 10))
 		# title
-		if self.str_eval_metric == 'AUC':
+		if self.str_eval_metric in ['AUC', 'Accuracy']:
 			ax.set_title(f'{self.str_eval_metric} (ascending) by Removed Feature')
-		elif self.str_eval_metric == 'RMSE':
+		elif self.str_eval_metric in ['RMSE']:
 			ax.set_title(f'{self.str_eval_metric} (descending) by Removed Feature')
 		# xlabel
 		ax.set_xlabel('Removed Feature')
@@ -464,116 +471,3 @@ class SensitivityAnalysis:
 		if self.logger:
 			# log it
 			self.logger.warning(f'Sensitivity analysis plot saved to {str_filename}')
-
-"""
-# define function for sensitivity analysis
-def SENSITIVITY_ANALYSIS(X_train, X_valid, y_train, y_valid, list_cols, list_class_weights=None, 
-	                     str_filename_df='./output/df_sensitivity.csv', str_eval_metric='F1',
-	                     logger=None, int_iterations=1000, int_early_stopping_rounds=100,
-	                     str_task_type='GPU', bool_classifier=True, int_random_state=42,
-	                     flt_learning_rate=None, dict_monotone_constraints=None): 
-	# create empty df
-	df_sensitivity = pd.DataFrame(columns=['feature_removed', str_eval_metric]) 
-	# iterate through columns in X_train
-	for a, col in enumerate(list_cols):
-		# print message
-		print(f'Feature {a+1}/{len(list_cols)}')
-		# create list of columns
-		list_columns = [x for x in list_cols if x != col]
-		# get non-numeric feats
-		list_non_numeric = GET_NUMERIC_AND_NONNUMERIC(df=X_train, 
-			                                          list_columns=list_columns, 
-			                                          logger=None)[1]
-		# if using monotone constraints
-		if dict_monotone_constraints:
-			# make copy of dict_monotone constraints
-			dict_monotone_constraints_copy = dict_monotone_constraints.copy()
-			# list keys
-			list_keys = list(dict_monotone_constraints_copy.keys())
-			# rm keys not in list_columns
-			for key in list_keys:
-				if key not in list_columns:
-					del dict_monotone_constraints_copy[key]
-			# save to alias
-			dict_monotone_constraints_for_model = dict_monotone_constraints_copy.copy()
-		else:
-			# save to alias
-			dict_monotone_constraints_for_model = None
-		# fit cb model
-		model = FIT_CATBOOST_MODEL(X_train=X_train[list_columns],
-	                       		   y_train=y_train,
-	                       		   X_valid=X_valid[list_columns],
-	                       		   y_valid=y_valid,
-	                       		   list_non_numeric=list_non_numeric,
-	                       		   int_iterations=int_iterations,
-	                       		   str_eval_metric=str_eval_metric,
-	                       		   int_early_stopping_rounds=int_early_stopping_rounds,
-	                       		   str_task_type=str_task_type,
-	                       		   bool_classifier=bool_classifier,
-	                       		   list_class_weights=list_class_weights,
-	                       		   int_random_state=int_random_state,
-	                       		   dict_monotone_constraints=dict_monotone_constraints_for_model)
-		# get eval metric
-		if str_eval_metric == 'RMSE':
-			# predictions
-			y_hat = model.predict(X_valid[list_columns])
-			# metric
-			metric_ = np.sqrt(mean_squared_error(y_true=y_valid, y_pred=y_hat))
-		elif str_eval_metric == 'AUC':
-			# predictions
-			y_hat = model.predict_proba(X_valid[list_columns])[:,1]
-			# metric
-			metric_ = roc_auc_score(y_true=y_valid, y_score=y_hat)
-		# create dictionary
-		dict_ = {'feature_removed':col, str_eval_metric:metric_}
-		# append dict_ to df_sensitivity
-		df_sensitivity = df_sensitivity.append(dict_, ignore_index=True)
-		# sort it
-		if str_eval_metric == 'RMSE':
-			df_sensitivity.sort_values(by=str_eval_metric, ascending=False, inplace=True)
-		elif str_eval_metric == 'AUC':
-			df_sensitivity.sort_values(by=str_eval_metric, ascending=True, inplace=True)
-		# write to csv
-		df_sensitivity.to_csv(str_filename_df, index=False)
-	# if using logger
-	if logger:
-		logger.warning(f'Sensitivity analysis complete, output saved to {str_filename_df}')
-
-# define function for sensitivity plot
-def SENSITIVITY_PLOT(df_feats, str_eval_metric='PR-AUC', str_filename='./output/plt_sensitivity.png', logger=None):
-	# get min
-	flt_min_eval_metric = np.min(df_feats[str_eval_metric])
-	# get max
-	flt_max_eval_metric = np.max(df_feats[str_eval_metric])
-	# get median
-	flt_mdn_eval_metric = np.median(df_feats[str_eval_metric])
-	# create axis
-	fig, ax = plt.subplots(figsize=(df_feats.shape[0], 10))
-	# title
-	if str_eval_metric == 'AUC':
-		ax.set_title(f'{str_eval_metric} (ascending) by Removed Feature')
-	elif str_eval_metric == 'RMSE':
-		ax.set_title(f'{str_eval_metric} (descending) by Removed Feature')
-	# xlabel
-	ax.set_xlabel('Removed Feature')
-	# ylabel
-	ax.set_ylabel(str_eval_metric)
-	# line plot of sensitivity analysis
-	ax.plot(df_feats['feature_removed'], df_feats[str_eval_metric], color='red', label=str_eval_metric)
-	# line of min
-	ax.plot(df_feats['feature_removed'], [flt_min_eval_metric for x in df_feats[str_eval_metric]], linestyle=':', color='blue', label=f'Minimum {str_eval_metric} ({flt_min_eval_metric:0.4})')
-	# line of max
-	ax.plot(df_feats['feature_removed'], [flt_max_eval_metric for x in df_feats[str_eval_metric]], linestyle=':', color='red', label=f'Maximum {str_eval_metric} ({flt_max_eval_metric:0.4})')
-	# line of median
-	ax.plot(df_feats['feature_removed'], [flt_mdn_eval_metric for x in df_feats[str_eval_metric]], linestyle=':', color='green', label=f'Median {str_eval_metric} ({flt_mdn_eval_metric:0.4})')
-	# rotate xticks 90 degrees
-	plt.xticks(rotation=90)
-	# legend
-	plt.legend()
-	# save figure
-	plt.savefig(str_filename, bbox_inches='tight')
-	# if using logger
-	if logger:
-		# log it
-		logger.warning(f'Sensitivity analysis plot saved to {str_filename}')
-"""
