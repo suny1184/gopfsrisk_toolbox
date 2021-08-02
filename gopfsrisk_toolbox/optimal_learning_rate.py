@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from .algorithms import FIT_CATBOOST_MODEL
 import pickle
-from sklearn.metrics import precision_score, roc_auc_score, mean_squared_error, confusion_matrix, accuracy_score
+from sklearn.metrics import precision_score, roc_auc_score, mean_squared_error, confusion_matrix, accuracy_score, recall_score, balanced_accuracy_score, log_loss
 import numpy as np
 
 # define function to tune lr
@@ -59,58 +59,34 @@ def TUNE_LEARNING_RATE(X_train, y_train, X_valid, y_valid, list_non_numeric,
 		# append to list
 		list_model.append(model)
 		# if Precision
-		if str_eval_metric in ['Precision', 'Accuracy', 'RMSE']:
+		if str_eval_metric in ['RMSE', 'Accuracy', 'Recall', 'Precision', 'BalancedAccuracy']:
 			# get predictions
 			y_hat = model.predict(X_valid)
 			# logic
-			if str_eval_metric == 'Precision':
-				# get precision
-				flt_metric = precision_score(y_true=y_valid, y_pred=y_hat)
+			if str_eval_metric == 'RMSE':
+				flt_metric = np.sqrt(mean_squared_error(y_true=y_valid, y_pred=y_hat))
+				# make negative so less negative is better (i.e., so our logic works)
+				flt_metric = -flt_metric
 			elif str_eval_metric == 'Accuracy':
 				# get accuracy
 				flt_metric = accuracy_score(y_true=y_valid, y_pred=y_hat)
-			elif str_eval_metric == 'RMSE':
-				# get MSE
-				flt_metric = mean_squared_error(y_true=y_valid, y_pred=y_hat)
-				# get RMSE
-				flt_metric = np.sqrt(flt_metric)
-				# log the metric
-				if logger:
-					logger.warning(f'Model: {a}; LR: {flt_learning_rate}; RMSE: {flt_metric}')
-				# make negative so less negative is better (i.e., so our logic works)
-				flt_metric = -flt_metric
+			elif str_eval_metric == 'Recall':
+				flt_metric = recall_score(y_true=y_valid, y_pred=y_hat)
+			elif str_eval_metric == 'Precision':
+				flt_metric = precision_score(y_true=y_valid, y_pred=y_hat)
+			elif str_eval_metric == 'BalancedAccuracy':
+				flt_metric = balanced_accuracy_score(y_true=y_valid, y_pred=y_hat)
 		# if AUC
-		elif str_eval_metric == 'AUC':
+		elif str_eval_metric in ['AUC', 'LogLoss']:
 			# get predictions
 			y_hat = model.predict_proba(X_valid)[:,1]
-			# get roc auc
-			flt_metric = roc_auc_score(y_true=y_valid, y_score=y_hat)
-		# if RMSE
-		elif str_eval_metric.__class__.__name__ == 'LogitContinuous':
-			# get predictions
-			y_hat = model.predict(X_valid)
-			# get MSE
-			flt_metric = mean_squared_error(y_true=y_valid, y_pred=y_hat)
-			# get RMSE
-			flt_metric = np.sqrt(flt_metric)
-			# log the metric
-			if logger:
-				logger.warning(f'Model: {a}; LR: {flt_learning_rate}; RMSE: {flt_metric}')
-			# make negative so less negative is better (i.e., so our logic works)
-			flt_metric = -flt_metric
-		# if money
-		elif str_eval_metric.__class__.__name__ == 'DollarsGainedPD':
-			# get predictions
-			y_hat = model.predict(X_valid)
-			# get true negative, false positives, etc
-			tn, fp, fn, tp = confusion_matrix(y_true=y_valid, y_pred=y_hat).ravel()
-			# multiply by weights
-			sum_tp = tp * 0
-			sum_fp = fp * -5000
-			sum_tn = tn * 5000
-			sum_fn = fn * -5000
-			# calculate sum
-			flt_metric = np.sum([sum_tp, sum_fp, sum_tn, sum_fn])
+			# logic
+			if str_eval_metric == 'AUC':
+				flt_metric = roc_auc_score(y_true=y_valid, y_score=y_hat)
+			elif str_eval_metric == 'LogLoss':
+				flt_metric = log_loss(y_true=y_valid, y_pred=y_hat)
+				# make negative so lower is better
+				flt_metric = -flt_metric
 
 		# append to list
 		list_flt_metric.append(flt_metric)
