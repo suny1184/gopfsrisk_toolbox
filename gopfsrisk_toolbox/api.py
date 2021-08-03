@@ -186,8 +186,6 @@ class ParsePayload:
 			self.error_app = 'No application data'
 		# reset index
 		df_app.reset_index(drop=True, inplace=True)
-		# save dtmstampcreation__app
-		self.dtmstampcreation = df_app['dtmstampcreation__app'].iloc[0]
 		# save df_app to self
 		self.df_app = df_app
 		# return object
@@ -470,6 +468,7 @@ class ParsePayload:
 		# zip into dictionary
 		dict_n_miss = dict(zip(ser_na.index, ser_na.values))
 		# save to object
+		self.dtmstampcreation = X['dtmstampcreation__app'].iloc[0]
 		self.X = X
 		self.dict_n_miss = dict_n_miss
 		# time
