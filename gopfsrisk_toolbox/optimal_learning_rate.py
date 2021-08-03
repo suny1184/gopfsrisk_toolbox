@@ -4,7 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from .algorithms import FIT_CATBOOST_MODEL
 import pickle
-from sklearn.metrics import precision_score, roc_auc_score, mean_squared_error, confusion_matrix, accuracy_score, recall_score, balanced_accuracy_score, log_loss
+from sklearn.metrics import (precision_score, roc_auc_score, mean_squared_error, confusion_matrix, accuracy_score, recall_score, 
+	balanced_accuracy_score, log_loss, f1_score)
 import numpy as np
 
 # define function to tune lr
@@ -59,7 +60,7 @@ def TUNE_LEARNING_RATE(X_train, y_train, X_valid, y_valid, list_non_numeric,
 		# append to list
 		list_model.append(model)
 		# if Precision
-		if str_eval_metric in ['RMSE', 'Accuracy', 'Recall', 'Precision', 'BalancedAccuracy']:
+		if str_eval_metric in ['RMSE', 'Accuracy', 'Recall', 'Precision', 'BalancedAccuracy', 'F1']:
 			# get predictions
 			y_hat = model.predict(X_valid)
 			# logic
@@ -76,6 +77,8 @@ def TUNE_LEARNING_RATE(X_train, y_train, X_valid, y_valid, list_non_numeric,
 				flt_metric = precision_score(y_true=y_valid, y_pred=y_hat)
 			elif str_eval_metric == 'BalancedAccuracy':
 				flt_metric = balanced_accuracy_score(y_true=y_valid, y_pred=y_hat)
+			elif str_eval_metric == 'F1':
+				flt_metric = f1_score(y_true=y_valid, y_pred=y_hat)
 		# if AUC
 		elif str_eval_metric in ['AUC', 'LogLoss']:
 			# get predictions
