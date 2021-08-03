@@ -399,29 +399,34 @@ class SensitivityAnalysis:
 		                       		   int_random_state=int_random_state,
 		                       		   dict_monotone_constraints=dict_monotone_constraints_for_model)
 			# get eval metric
-			if self.str_eval_metric in ['RMSE', 'Accuracy']:
+			if self.str_eval_metric in ['RMSE', 'Accuracy', 'Recall', 'Precision', 'F1']:
 				# predictions
 				y_hat = model.predict(X_valid[list_columns])
 				# logic
 				if self.str_eval_metric == 'RMSE':
-					# metric
 					metric_ = np.sqrt(mean_squared_error(y_true=y_valid, y_pred=y_hat))
 				elif self.str_eval_metric == 'Accuracy':
-					# metric
 					metric_ = accuracy_score(y_true=y_valid, y_pred=y_hat)
-			elif self.str_eval_metric in ['AUC']:
+				elif self.str_eval_metric == 'Recall':
+					metric_ = recall_score(y_true=y_valid, y_pred=y_hat)
+				elif self.str_eval_metric == 'Precision':
+					metric_ = precision_score(y_true=y_valid, y_pred=y_hat)
+				elif self.str_eval_metric == 'F1':
+					metric_ = f1_score(y_true=y_valid, y_pred=y_hat)
+			elif self.str_eval_metric in ['AUC', 'LogLoss']:
 				# predictions
 				y_hat = model.predict_proba(X_valid[list_columns])[:,1]
 				# logic
 				if self.str_eval_metric == 'AUC':
-					# metric
 					metric_ = roc_auc_score(y_true=y_valid, y_score=y_hat)
+				elif self.str_eval_metric == 'LogLoss':
+					metric_ = log_loss(y_true=y_valid, y_pred=y_hat)
 			# create dictionary
 			dict_ = {'feature_removed':col, self.str_eval_metric:metric_}
 			# append dict_ to df_sensitivity
 			df_sensitivity = df_sensitivity.append(dict_, ignore_index=True)
 			# sort it
-			if self.str_eval_metric in ['RMSE']: # lower is better
+			if self.str_eval_metric in ['RMSE', 'LogLoss']: # lower is better
 				df_sensitivity.sort_values(by=self.str_eval_metric, ascending=False, inplace=True)
 			elif self.str_eval_metric in ['AUC', 'Accuracy']: # higher is better
 				df_sensitivity.sort_values(by=self.str_eval_metric, ascending=True, inplace=True)
