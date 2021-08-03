@@ -57,7 +57,7 @@ def ITER_IMP_THRESH_FEAT_SELECT(X_train, y_train, X_valid, y_valid, list_non_num
 					               dict_monotone_constraints=dict_monotone_constraints,
 					               flt_rsm=flt_rsm)
 		# get metric
-		if str_eval_metric in ['RMSE', 'Accuracy', 'Recall', 'Precision', 'BalancedAccuracy']:
+		if str_eval_metric in ['RMSE', 'Accuracy', 'Recall', 'Precision', 'BalancedAccuracy', 'F1']:
 			# predict
 			y_hat = model.predict(X_valid[list_features])
 			# logic
@@ -71,6 +71,8 @@ def ITER_IMP_THRESH_FEAT_SELECT(X_train, y_train, X_valid, y_valid, list_non_num
 				flt_metric = precision_score(y_true=y_valid, y_pred=y_hat)
 			elif str_eval_metric == 'BalancedAccuracy':
 				flt_metric = balanced_accuracy_score(y_true=y_valid, y_pred=y_hat)
+			elif str_eval_metric == 'F1':
+				flt_metric = f1_score(y_true=y_valid, y_pred=y_hat)
 		elif str_eval_metric in ['AUC', 'Logloss']:
 			# predict
 			y_hat = model.predict_proba(X_valid[list_features])[:,1]
