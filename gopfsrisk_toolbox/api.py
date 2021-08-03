@@ -173,6 +173,8 @@ class ParsePayload:
 	def parse_application(self, str_values):
 		# create error
 		self.error_app = ''
+		# add dtmStampCreation
+		self.list_feats_raw_app.append('dtmStampCreation')
 		# put into df
 		df_app = pd.read_csv(StringIO(str_values), delimiter=',', usecols=lambda col: col.lower() in self.list_feats_raw_app)
 		# convert to lower
@@ -184,6 +186,8 @@ class ParsePayload:
 			self.error_app = 'No application data'
 		# reset index
 		df_app.reset_index(drop=True, inplace=True)
+		# save dtmstampcreation__app
+		self.dtmstampcreation = df_app['dtmstampcreation__app'].iloc[0]
 		# save df_app to self
 		self.df_app = df_app
 		# return object
