@@ -9,7 +9,7 @@ from itertools import chain
 from sklearn.metrics import (accuracy_score, fowlkes_mallows_score, precision_score,
                              recall_score, f1_score, roc_auc_score, average_precision_score,
                              log_loss, brier_score_loss, precision_recall_curve, auc,
-	                         roc_curve)
+	                         roc_curve, confusion_matrix)
 from sklearn.metrics import (explained_variance_score, mean_absolute_error, mean_squared_error)
 from scipy.stats import zscore
 from .general import GET_NUMERIC_AND_NONNUMERIC
@@ -84,6 +84,16 @@ def BIN_CLASS_EVAL_METRICS(model_classifier, X, y, logger=None):
 	log_loss_ = log_loss(y_true=y, y_pred=y_hat_proba)
 	# brier 
 	brier = brier_score_loss(y_true=y, y_prob=y_hat_proba)
+	# get confusion matrix
+	tn, fp, fn, tp = confusion_matrix(y_true=y, y_pred=y_hat_class).ravel()
+	# true positive rate
+	tpr = tp / (tp + fn)
+	# true negative rate
+	tnr = tn / tn + fp
+	# diagnostic odds ratio
+	dor = (tp / fn) / (fp / tn)
+	# discriminatory power
+	disc_pwr = (np.sqrt(3) / np.pi) * (np.log(tpr / (1 - tnr)) + np.log(tnr / (1 - tpr)))
 	# put into dictionary
 	dict_ = {'accuracy': accuracy,
 	         'geometric_mean': geometric_mean,
@@ -93,7 +103,11 @@ def BIN_CLASS_EVAL_METRICS(model_classifier, X, y, logger=None):
 	         'roc_auc': roc_auc,
 	         'pr_auc': pr_auc,
 	         'log_loss': log_loss_,
-	         'brier': brier}
+	         'brier': brier,
+	         'tpr': tpr,
+	         'tnr': tnr,
+	         'dor': dor,
+	         'disc_pwr': disc_pwr}
 	# if using logger
 	if logger:
 		logger.warning('Dictionary of binary eval metrics generated')
