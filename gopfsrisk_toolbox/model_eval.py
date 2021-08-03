@@ -89,7 +89,7 @@ def BIN_CLASS_EVAL_METRICS(model_classifier, X, y, logger=None):
 	# true positive rate
 	tpr = tp / (tp + fn)
 	# true negative rate
-	tnr = tn / tn + fp
+	tnr = tn / (tn + fp)
 	# diagnostic odds ratio
 	dor = (tp / fn) / (fp / tn)
 	# discriminatory power
