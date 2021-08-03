@@ -94,6 +94,11 @@ def BIN_CLASS_EVAL_METRICS(model_classifier, X, y, logger=None):
 	dor = (tp / fn) / (fp / tn)
 	# discriminatory power
 	disc_pwr = (np.sqrt(3) / np.pi) * (np.log(tpr / (1 - tnr)) + np.log(tnr / (1 - tpr)))
+	# gilberts skill score
+	# get c
+	c = ((tp + fp) * (tp + fn)) / len(y)
+	# get gs
+	gilb_score = (tp - c) / (tp - c + fn + fp)
 	# put into dictionary
 	dict_ = {'accuracy': accuracy,
 	         'geometric_mean': geometric_mean,
@@ -107,7 +112,8 @@ def BIN_CLASS_EVAL_METRICS(model_classifier, X, y, logger=None):
 	         'tpr': tpr,
 	         'tnr': tnr,
 	         'dor': dor,
-	         'disc_pwr': disc_pwr}
+	         'disc_pwr': disc_pwr,
+	         'gilb_score': gilb_score}
 	# if using logger
 	if logger:
 		logger.warning('Dictionary of binary eval metrics generated')
