@@ -173,8 +173,6 @@ class ParsePayload:
 	def parse_application(self, str_values):
 		# create error
 		self.error_app = ''
-		# add dtmStampCreation
-		self.list_feats_raw_app.append('dtmStampCreation')
 		# put into df
 		df_app = pd.read_csv(StringIO(str_values), delimiter=',', usecols=lambda col: col.lower() in self.list_feats_raw_app)
 		# convert to lower
@@ -385,6 +383,8 @@ class ParsePayload:
 	def parse_all(self, json_str_request):
 		# get payload df
 		self.get_payload_df(json_str_request=json_str_request)
+		# append dtmStampCreation to self.list_
+		self.list_feats_raw_app.append('dtmStampCreation')
 		# empty lists of lists
 		time_start = time.perf_counter()
 		list_list_errors = []
