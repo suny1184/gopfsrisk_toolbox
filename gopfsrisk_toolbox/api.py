@@ -384,7 +384,7 @@ class ParsePayload:
 		# get payload df
 		self.get_payload_df(json_str_request=json_str_request)
 		# append dtmStampCreation to self.list_
-		self.list_feats_raw_app.append('dtmStampCreation')
+		self.list_feats_raw_app.append('dtmstampcreation')
 		# empty lists of lists
 		time_start = time.perf_counter()
 		list_list_errors = []
