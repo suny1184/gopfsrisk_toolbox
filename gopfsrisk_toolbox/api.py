@@ -599,7 +599,7 @@ class ParsePayload:
 		X_lg_grouped = X_lg_grouped[(X_lg_grouped['ecnl'] < self.y_hat_pd_x_lgd) & (X_lg_grouped['fltapproveddowntotal__app'] >= flt_down_total)]
 
 		# get date from row_id
-		int_date = int(swelf.list_unique_id[0].split('_')[4])
+		int_date = int(self.list_unique_id[0].split('_')[4])
 
 		# define function to map ecnl to tier
 		def ecnl_to_tier(dict_tiers, flt_ecnl):
