@@ -620,16 +620,16 @@ class ParsePayload:
 						return idx
 
 		# apply function
-		X_lg_grouped['Tier'] = X_lg_grouped['ecnl'].apply(lambda x: ecnl_to_tier(dict_tiers=self.dict_tiers, 
+		X_lg_grouped['Tier'] = X_lg_grouped['ecnl_mod'].apply(lambda x: ecnl_to_tier(dict_tiers=self.dict_tiers, 
 																		 		 flt_ecnl=x))
 
-		# get indices of max ecnl by tier
-		ser_idx_max = X_lg_grouped.groupby('Tier')['ecnl'].idxmax()
+		# get indices of max ecnl_mod by tier
+		ser_idx_max = X_lg_grouped.groupby('Tier')['ecnl_mod'].idxmax()
 		# subset X_lg_grouped
 		X_lg_grouped = X_lg_grouped.loc[ser_idx_max]
 
-		# sort by ecnl
-		X_lg_grouped.sort_values(by='ecnl', ascending=True, inplace=True)
+		# sort by ecnl_mod
+		X_lg_grouped.sort_values(by='ecnl_mod', ascending=True, inplace=True)
 
 		# save to object
 		self.X_lg_grouped = X_lg_grouped
