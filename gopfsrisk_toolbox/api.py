@@ -124,6 +124,7 @@ class ParsePayload:
 					   list_non_numeric_pd,
 					   list_string_cols,
 					   dict_aa_pd,
+					   dict_tiers,
 					   bool_debt=False,
 					   list_feats_raw_debt=None,
 					   list_feats_agg_debt=None,
@@ -146,6 +147,7 @@ class ParsePayload:
 		self.list_string_cols = list_string_cols
 		self.list_non_numeric_pd = list_non_numeric_pd
 		self.dict_aa_pd = dict_aa_pd
+		self.dict_tiers = dict_tiers
 		self.bool_debt = bool_debt
 	# payload for each applicant
 	def get_payload_df(self, json_str_request):
@@ -383,8 +385,6 @@ class ParsePayload:
 	def parse_all(self, json_str_request):
 		# get payload df
 		self.get_payload_df(json_str_request=json_str_request)
-		# append dtmStampCreation to self.list_
-		self.list_feats_raw_app.append('dtmstampcreation')
 		# empty lists of lists
 		time_start = time.perf_counter()
 		list_list_errors = []
@@ -468,7 +468,6 @@ class ParsePayload:
 		# zip into dictionary
 		dict_n_miss = dict(zip(ser_na.index, ser_na.values))
 		# save to object
-		self.dtmstampcreation = X['dtmstampcreation__app'].iloc[0]
 		self.X = X
 		self.dict_n_miss = dict_n_miss
 		# time
@@ -599,8 +598,38 @@ class ParsePayload:
 		# subset ecnl to < original
 		X_lg_grouped = X_lg_grouped[(X_lg_grouped['ecnl'] < self.y_hat_pd_x_lgd) & (X_lg_grouped['fltapproveddowntotal__app'] >= flt_down_total)]
 
+		# get date from row_id
+		int_date = int(swelf.list_unique_id[0].split('_')[4])
+
+		# define function to map ecnl to tier
+		def ecnl_to_tier(dict_tiers, flt_ecnl):
+			# get the maximum key in dict_tiers
+			int_max_date = np.max(list(dict_tiers.keys()))
+			# get the dictionary of tiers from that key
+			dict_tiers_max = dict_tiers[int_max_date]
+			# convert dict_tiers_max to series and then sort by value ascending
+			ser_tiers_max = pd.Series(dict_tiers_max).sort_values(ascending=True, inplace=False)
+			# return declines right away
+			if flt_ecnl > np.max(ser_tiers_max):
+				return 'Decline'
+			else:
+				# iterate through values
+				for idx, val in ser_tiers_max.items():
+					# logic
+					if flt_ecnl <= val:
+						return idx
+
+		# apply function
+		X_lg_grouped['Tier'] = X_lg_grouped['ecnl'].apply(lambda x: ecnl_to_tier(dict_tiers=self.dict_tiers, 
+																		 		 flt_ecnl=x))
+
+		# get indices of max ecnl by tier
+		ser_idx_max = X_lg_grouped.groupby('Tier')['ecnl'].idxmax()
+		# subset X_lg_grouped
+		X_lg_grouped = X_lg_grouped.loc[ser_idx_max]
+
 		# sort by ecnl
-		X_lg_grouped.sort_values(by='ecnl_mod', ascending=True, inplace=True)
+		X_lg_grouped.sort_values(by='ecnl', ascending=True, inplace=True)
 
 		# save to object
 		self.X_lg_grouped = X_lg_grouped
