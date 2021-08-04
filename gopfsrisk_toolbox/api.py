@@ -701,12 +701,14 @@ class ParsePayload:
 		X_lg_grouped_sub = self.X_lg_grouped[['fltapproveddowntotal__app',
 										 	  'fltamountfinanced__app',
 										 	  'fltapprovedpricewholesale__app',
-										 	  'ecnl_mod']]
+										 	  'ecnl_mod',
+										 	  'Tier']]
 		# rename columns
 		X_lg_grouped_sub.columns = ['Cash Down',
 									'Amount Financed',
 									'Price Wholesale',
-									'ECNL Modified']
+									'ECNL Modified',
+									'Tier']
 		# create final output
 		output_final = {"Request_id": "",
 				        "Zaml_processing_id": "",
