@@ -79,7 +79,7 @@ def ITER_IMP_THRESH_FEAT_SELECT(X_train, y_train, X_valid, y_valid, list_non_num
 			# logic
 			if str_eval_metric == 'AUC':
 				flt_metric = roc_auc_score(y_true=y_valid, y_score=y_hat)
-			elif str_eval_metric == 'LogLoss':
+			elif str_eval_metric == 'Logloss':
 				flt_metric = log_loss(y_true=y_valid, y_pred=y_hat)
 
 		# append to list
