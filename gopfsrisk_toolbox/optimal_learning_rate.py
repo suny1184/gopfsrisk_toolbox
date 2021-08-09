@@ -80,13 +80,13 @@ def TUNE_LEARNING_RATE(X_train, y_train, X_valid, y_valid, list_non_numeric,
 			elif str_eval_metric == 'F1':
 				flt_metric = f1_score(y_true=y_valid, y_pred=y_hat)
 		# if AUC
-		elif str_eval_metric in ['AUC', 'LogLoss']:
+		elif str_eval_metric in ['AUC', 'Logloss']:
 			# get predictions
 			y_hat = model.predict_proba(X_valid)[:,1]
 			# logic
 			if str_eval_metric == 'AUC':
 				flt_metric = roc_auc_score(y_true=y_valid, y_score=y_hat)
-			elif str_eval_metric == 'LogLoss':
+			elif str_eval_metric == 'Logloss':
 				flt_metric = log_loss(y_true=y_valid, y_pred=y_hat)
 				# make negative so lower is better
 				flt_metric = -flt_metric
