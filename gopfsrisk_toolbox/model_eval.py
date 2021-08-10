@@ -433,13 +433,13 @@ class SensitivityAnalysis:
 					metric_ = precision_score(y_true=y_valid, y_pred=y_hat)
 				elif self.str_eval_metric == 'F1':
 					metric_ = f1_score(y_true=y_valid, y_pred=y_hat)
-			elif self.str_eval_metric in ['AUC', 'LogLoss', 'MAP']:
+			elif self.str_eval_metric in ['AUC', 'Logloss', 'MAP']:
 				# predictions
 				y_hat = model.predict_proba(X_valid[list_columns])[:,1]
 				# logic
 				if self.str_eval_metric == 'AUC':
 					metric_ = roc_auc_score(y_true=y_valid, y_score=y_hat)
-				elif self.str_eval_metric == 'LogLoss':
+				elif self.str_eval_metric == 'Logloss':
 					metric_ = log_loss(y_true=y_valid, y_pred=y_hat)
 				elif self.str_eval_metric == 'MAP':
 					metric_ = average_precision_score(y_true=y_valid, y_score=y_hat)
@@ -448,9 +448,9 @@ class SensitivityAnalysis:
 			# append dict_ to df_sensitivity
 			df_sensitivity = df_sensitivity.append(dict_, ignore_index=True)
 			# sort it
-			if self.str_eval_metric in ['RMSE', 'LogLoss']: # lower is better
+			if self.str_eval_metric in ['RMSE', 'Logloss']: # lower is better
 				df_sensitivity.sort_values(by=self.str_eval_metric, ascending=False, inplace=True)
-			elif self.str_eval_metric in ['AUC', 'Accuracy']: # higher is better
+			elif self.str_eval_metric in ['AUC', 'Accuracy', 'Recall', 'Precision', 'F1', 'MAP']: # higher is better
 				df_sensitivity.sort_values(by=self.str_eval_metric, ascending=True, inplace=True)
 			# write to csv
 			df_sensitivity.to_csv(str_filename_df, index=False)
