@@ -433,7 +433,7 @@ class SensitivityAnalysis:
 					metric_ = precision_score(y_true=y_valid, y_pred=y_hat)
 				elif self.str_eval_metric == 'F1':
 					metric_ = f1_score(y_true=y_valid, y_pred=y_hat)
-			elif self.str_eval_metric in ['AUC', 'LogLoss']:
+			elif self.str_eval_metric in ['AUC', 'LogLoss', 'MAP']:
 				# predictions
 				y_hat = model.predict_proba(X_valid[list_columns])[:,1]
 				# logic
@@ -441,6 +441,8 @@ class SensitivityAnalysis:
 					metric_ = roc_auc_score(y_true=y_valid, y_score=y_hat)
 				elif self.str_eval_metric == 'LogLoss':
 					metric_ = log_loss(y_true=y_valid, y_pred=y_hat)
+				elif self.str_eval_metric == 'MAP':
+					metric_ = average_precision_score(y_true=y_valid, y_score=y_hat)
 			# create dictionary
 			dict_ = {'feature_removed':col, self.str_eval_metric:metric_}
 			# append dict_ to df_sensitivity
