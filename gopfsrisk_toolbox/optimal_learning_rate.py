@@ -80,7 +80,7 @@ def TUNE_LEARNING_RATE(X_train, y_train, X_valid, y_valid, list_non_numeric,
 			elif str_eval_metric == 'F1':
 				flt_metric = f1_score(y_true=y_valid, y_pred=y_hat)
 		# if we need predicted probabilities
-		elif str_eval_metric in ['AUC', 'Logloss', 'MAP']:
+		elif (str_eval_metric in ['AUC', 'Logloss']) or (str_eval_metric.__name__ in ['PrecisionRecallAUC']):
 			# get predictions
 			y_hat = model.predict_proba(X_valid)[:,1]
 			# logic
@@ -90,7 +90,7 @@ def TUNE_LEARNING_RATE(X_train, y_train, X_valid, y_valid, list_non_numeric,
 				flt_metric = log_loss(y_true=y_valid, y_pred=y_hat)
 				# make negative so lower is better
 				flt_metric = -flt_metric
-			elif str_eval_metric == 'MAP':
+			elif str_eval_metric.__name__ == 'PrecisionRecallAUC':
 				flt_metric = average_precision_score(y_true=y_valid, y_score=y_hat)
 
 		# append to list

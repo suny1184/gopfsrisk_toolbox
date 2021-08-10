@@ -10,6 +10,7 @@ from sklearn.metrics import (f1_score, roc_auc_score, mean_squared_error, accura
 from scipy.special import expit
 import matplotlib.pyplot as plt
 
+
 # define function for importance threshold feat select
 def ITER_IMP_THRESH_FEAT_SELECT(X_train, y_train, X_valid, y_valid, list_non_numeric,
 								list_class_weights, flt_thresh_imp=0.0,
@@ -74,7 +75,7 @@ def ITER_IMP_THRESH_FEAT_SELECT(X_train, y_train, X_valid, y_valid, list_non_num
 				flt_metric = balanced_accuracy_score(y_true=y_valid, y_pred=y_hat)
 			elif str_eval_metric == 'F1':
 				flt_metric = f1_score(y_true=y_valid, y_pred=y_hat)
-		elif str_eval_metric in ['AUC', 'Logloss', 'MAP']:
+		elif (str_eval_metric in ['AUC', 'Logloss']) or (str_eval_metric.__name__ in ['PrecisionRecallAUC']):
 			# predict
 			y_hat = model.predict_proba(X_valid[list_features])[:,1]
 			# logic
@@ -82,7 +83,7 @@ def ITER_IMP_THRESH_FEAT_SELECT(X_train, y_train, X_valid, y_valid, list_non_num
 				flt_metric = roc_auc_score(y_true=y_valid, y_score=y_hat)
 			elif str_eval_metric == 'Logloss':
 				flt_metric = log_loss(y_true=y_valid, y_pred=y_hat)
-			elif str_eval_metric == 'MAP':
+			elif str_eval_metric.__name__ == 'PrecisionRecallAUC':
 				flt_metric = average_precision_score(y_true=y_valid, y_score=y_hat)
 
 		# append to list
