@@ -601,27 +601,36 @@ class ParsePayload:
 		# get date from row_id
 		int_date = int(self.list_unique_id[0].split('_')[4])
 
-		# define function to map ecnl to tier
-		def ecnl_to_tier(dict_tiers, flt_ecnl):
-			# get the maximum key in dict_tiers
-			int_max_date = np.max(list(dict_tiers.keys()))
-			# get the dictionary of tiers from that key
-			dict_tiers_max = dict_tiers[int_max_date]
-			# convert dict_tiers_max to series and then sort by value ascending
-			ser_tiers_max = pd.Series(dict_tiers_max).sort_values(ascending=True, inplace=False)
+		# get the keys in dict_tiers
+		list_keys = list(self.dict_tiers.keys())
+
+		# get keys <= int_date
+		list_keys = [key for key in list_keys if key <= int_date]
+
+		# get max of list_keys
+		int_max_list_keys = np.max(list_keys)
+
+		# get dict_tiers_subset from dict_tiers with key = int_max_list_keys
+		dict_tiers_subset = self.dict_tiers[int_max_list_keys]
+
+		# convert dict_tiers_subset to series and then sort by value ascending for iterating in the upcoming function
+		ser_tiers = pd.Series(dict_tiers_subset).sort_values(ascending=True, inplace=False)
+
+		# define function to map ecnl modified to tier
+		def ecnl_to_tier(ser_tiers, flt_ecnl):
 			# return declines right away
-			if flt_ecnl > np.max(ser_tiers_max):
+			if flt_ecnl > np.max(ser_tiers):
 				return 'Decline'
 			else:
 				# iterate through values
-				for idx, val in ser_tiers_max.items():
+				for idx, val in ser_tiers.items():
 					# logic
 					if flt_ecnl <= val:
 						return idx
 
 		# apply function
-		X_lg_grouped['Tier'] = X_lg_grouped['ecnl_mod'].apply(lambda x: ecnl_to_tier(dict_tiers=self.dict_tiers, 
-																		 		 flt_ecnl=x))
+		X_lg_grouped['Tier'] = X_lg_grouped['ecnl_mod'].apply(lambda x: ecnl_to_tier(ser_tiers=ser_tiers, 
+																		     		 flt_ecnl=x))
 
 		# get indices of max ecnl_mod by tier
 		ser_idx_max = X_lg_grouped.groupby('Tier')['ecnl_mod'].idxmax()
@@ -633,6 +642,10 @@ class ParsePayload:
 
 		# save to object
 		self.X_lg_grouped = X_lg_grouped
+		# application date
+		self.int_date = int_date
+		# tiers used
+		self.dict_tiers_subset = dict_tiers_subset
 		# time
 		flt_sec_counter = time.perf_counter()-time_start
 		self.flt_sec_counter = flt_sec_counter
