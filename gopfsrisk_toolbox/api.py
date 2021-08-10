@@ -604,11 +604,17 @@ class ParsePayload:
 		# get the keys in dict_tiers
 		list_keys = list(self.dict_tiers.keys())
 
-		# get keys <= int_date
-		list_keys = [key for key in list_keys if key <= int_date]
-
-		# get max of list_keys
-		int_max_list_keys = np.max(list_keys)
+		# if theres only 1 key
+		if len(list_keys) == 1:
+			# get max of list_keys
+			int_max_list_keys = np.max(list_keys)
+		elif len(list_keys) > 1:
+			# get keys <= int_date
+			list_keys = [key for key in list_keys if key <= int_date]
+			# get max of list_keys
+			int_max_list_keys = np.max(list_keys)
+		else:
+			raise ValueError('Tier dictionary is empty')
 
 		# get dict_tiers_subset from dict_tiers with key = int_max_list_keys
 		dict_tiers_subset = self.dict_tiers[int_max_list_keys]
