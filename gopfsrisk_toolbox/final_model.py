@@ -2,7 +2,7 @@
 import pandas as pd
 from .algorithms import FIT_CATBOOST_MODEL
 import pickle
-from sklearn.metrics import f1_score, average_precision_score, precision_score, recall_score, roc_auc_score
+from sklearn.metrics import f1_score, average_precision_score, precision_score, recall_score, roc_auc_score, precision_score, balanced_accuracy_score, log_loss
 import matplotlib.pyplot as plt
 import numpy as np
 

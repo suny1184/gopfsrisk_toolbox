@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from .algorithms import FIT_CATBOOST_MODEL
 import pickle
 from sklearn.metrics import (precision_score, roc_auc_score, mean_squared_error, confusion_matrix, accuracy_score, recall_score, 
-	balanced_accuracy_score, log_loss, f1_score)
+							 balanced_accuracy_score, log_loss, f1_score, average_precision_score)
 import numpy as np
 
 # define function to tune lr
@@ -59,7 +59,7 @@ def TUNE_LEARNING_RATE(X_train, y_train, X_valid, y_valid, list_non_numeric,
 		                           flt_rsm=flt_rsm)
 		# append to list
 		list_model.append(model)
-		# if Precision
+		# if we need predicted classes
 		if str_eval_metric in ['RMSE', 'Accuracy', 'Recall', 'Precision', 'BalancedAccuracy', 'F1']:
 			# get predictions
 			y_hat = model.predict(X_valid)
@@ -79,8 +79,8 @@ def TUNE_LEARNING_RATE(X_train, y_train, X_valid, y_valid, list_non_numeric,
 				flt_metric = balanced_accuracy_score(y_true=y_valid, y_pred=y_hat)
 			elif str_eval_metric == 'F1':
 				flt_metric = f1_score(y_true=y_valid, y_pred=y_hat)
-		# if AUC
-		elif str_eval_metric in ['AUC', 'Logloss']:
+		# if we need predicted probabilities
+		elif str_eval_metric in ['AUC', 'Logloss', 'MAP']:
 			# get predictions
 			y_hat = model.predict_proba(X_valid)[:,1]
 			# logic
@@ -90,6 +90,8 @@ def TUNE_LEARNING_RATE(X_train, y_train, X_valid, y_valid, list_non_numeric,
 				flt_metric = log_loss(y_true=y_valid, y_pred=y_hat)
 				# make negative so lower is better
 				flt_metric = -flt_metric
+			elif str_eval_metric == 'MAP':
+				flt_metric = average_precision_score(y_true=y_valid, y_score=y_hat)
 
 		# append to list
 		list_flt_metric.append(flt_metric)
