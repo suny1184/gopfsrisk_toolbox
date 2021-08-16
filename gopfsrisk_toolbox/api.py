@@ -107,6 +107,50 @@ class PipelineDataPrep:
 		# return
 		return y_hat_mean
 
+# define pipeline class
+class PipelineDataPrepEnsemble:
+	# initialize
+	def __init__(self, list_transformers, model_a, model_b, bool_classifier=True):
+		self.list_transformers = list_transformers
+		self.model = model
+		self.bool_classifier = bool_classifier
+	# prep predict
+	def prep_predict(self, X, bool_lower=True):
+		# loop through transformers
+		time_start = time.perf_counter()
+		for transformer in self.list_transformers:
+			# transform
+			X = transformer.transform(X)
+		print(f'Time to transform: {(time.perf_counter()-time_start):0.5} sec.')
+		# logic
+		if bool_lower:
+			# make all cols lower
+			X.columns = X.columns.str.lower()
+		# save to object
+		self.X = X
+		# logic
+		time_start = time.perf_counter()
+		# if using a classifier
+		if self.bool_classifier:
+			# model_a predictions
+			predictions_a = model_a.predict_proba(X[self.model_a.feature_names_])[:,1]
+			# model_b predictions
+			predictions_b = model_b.predict_proba(X[self.model_b.feature_names_])[:,1]
+		else:
+			# model_a predictions
+			predictions_a = model_a.predict(X[self.model_a.feature_names_])
+			# model_b predictions
+			predictions_b = model_b.predict(X[self.model_b.feature_names_])
+		# ensemble
+		y_hat = (predictions_a + predictions_b) / 2
+		# save to object
+		self.y_hat = y_hat
+		# get mean
+		y_hat_mean = np.mean(y_hat)
+		print(f'Time to predict: {(time.perf_counter()-time_start):0.5} sec.')
+		# return
+		return y_hat_mean
+
 # define function for payload parsing and generating output
 class ParsePayload:
 	# initialize
