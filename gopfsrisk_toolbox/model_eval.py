@@ -60,7 +60,7 @@ def CONTINUOUS_EVAL_METRICS(model_regressor, X, y, logger=None):
 	return dict_
 
 # define function to get binary eval metrics
-def BIN_CLASS_EVAL_METRICS(X, y, model_classifier=None, y_hat_class=None, y_hat_proba=None, logger=None):
+def BIN_CLASS_EVAL_METRICS(y, X=None, model_classifier=None, y_hat_class=None, y_hat_proba=None, logger=None):
 	# if starting with model
 	if model_classifier:
 		# generate predicted class
