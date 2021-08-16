@@ -60,12 +60,13 @@ def CONTINUOUS_EVAL_METRICS(model_regressor, X, y, logger=None):
 	return dict_
 
 # define function to get binary eval metrics
-def BIN_CLASS_EVAL_METRICS(model_classifier, X, y, logger=None):
-	# generate predicted class
-	y_hat_class = model_classifier.predict(X[model_classifier.feature_names_])
-	# generate predicted probabilities
-	y_hat_proba = model_classifier.predict_proba(X[model_classifier.feature_names_])[:,1]
-	# metrics
+def BIN_CLASS_EVAL_METRICS(X, y, model_classifier=None, y_hat_class=None, y_hat_proba=None, logger=None):
+	# if starting with model
+	if model_classifier:
+		# generate predicted class
+		y_hat_class = model_classifier.predict(X[model_classifier.feature_names_])
+		# generate predicted probabilities
+		y_hat_proba = model_classifier.predict_proba(X[model_classifier.feature_names_])[:,1]
 	# accuracy
 	accuracy = accuracy_score(y_true=y, y_pred=y_hat_class)
 	# geometric mean
