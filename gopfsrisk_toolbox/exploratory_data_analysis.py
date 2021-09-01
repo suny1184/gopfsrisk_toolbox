@@ -11,6 +11,21 @@ from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
 import os
 
+# define function for histogram
+def MAKE_AND_SAVE_HISTOGRAM(list_data, str_filename='./output/plt_histogram.png', str_name='lgdtarget', tpl_figsize=(10,10), logger=None):
+	# fig
+	fig, ax = plt.subplots(figsize=tpl_figsize)
+	# title
+	ax.set_title(f'Distribution of {str_name}')
+	# plot
+	sns.histplot(list_data, ax=ax, kde=True)
+	# fix overlap
+	fig.tight_layout()
+	# save
+	fig.savefig(str_filename, bbox_inches='tight')
+	# return
+	return fig
+
 # define class to make plot comparisons
 class ContinuousTargetComparison:
 	# get y
