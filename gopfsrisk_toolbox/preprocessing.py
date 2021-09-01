@@ -187,10 +187,8 @@ class StringConverter(BaseEstimator, TransformerMixin):
 	def transform(self, X):
 		# make sure all cols are in X
 		list_cols = [col for col in self.list_cols if col in list(X.columns)]
-		# get the null cells
-		df_null_cells = X[list_cols].isnull()
 		# convert to string
-		X[list_cols] = X[list_cols].astype(str).mask(df_null_cells, np.nan)
+		X[list_cols] = X[list_cols].applymap(str)
 		# return
 		return X
 
