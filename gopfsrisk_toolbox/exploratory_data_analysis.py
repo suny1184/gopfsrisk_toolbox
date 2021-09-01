@@ -23,6 +23,9 @@ def MAKE_AND_SAVE_HISTOGRAM(list_data, str_filename='./output/plt_histogram.png'
 	fig.tight_layout()
 	# save
 	fig.savefig(str_filename, bbox_inches='tight')
+	# log
+	if logger:
+		logger.warning(f'Saved plot to {str_filename}')
 	# return
 	return fig
 
