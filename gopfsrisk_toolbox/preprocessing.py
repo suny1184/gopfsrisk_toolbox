@@ -17,7 +17,7 @@ from sklearn.linear_model import BayesianRidge
 # class for one-hot encoding
 class MyDummyCreator(BaseEstimator, TransformerMixin):
 	# initialize class
-	def __init__(self, list_cols):
+	def __init__(self):
 		pass
 	# def fit
 	def fit(self, X, y=None):
