@@ -27,7 +27,7 @@ class MyDummyCreator(BaseEstimator, TransformerMixin):
 		# start timer
 		time_start = time.perf_counter()
 		# transform
-		X = X.get_dummies(X)
+		X = pd.get_dummies(X)
 		# get time
 		flt_time = time.perf_counter()-time_start
 		# print time
