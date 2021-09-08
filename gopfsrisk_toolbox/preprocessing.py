@@ -14,6 +14,29 @@ from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer
 from sklearn.linear_model import BayesianRidge
 
+# replace negatives, inf, and -inf with 0
+class ReplaceNegativesAndInf(BaseEstimator, TransformerMixin):
+	# initialize
+	def __init__(self):
+		pass
+	# fit
+	def fit(self, X):
+		return self
+	# transform
+	def transform(self, X):
+		# start timer
+		time_start = time.perf_counter()
+		# no need to future proof
+		X = X.mask(X < 0).replace(np.inf, np.nan).fillna(0)
+		# get time
+		flt_time = time.perf_counter()-time_start
+		# print time
+		print(f'Time to replace negatives and inf: {flt_time:0.5} sec.')
+		# save to object
+		self.flt_time = flt_time
+		# return
+		return X
+
 # rounding binner
 class RoundBinning(BaseEstimator, TransformerMixin):
 	# initialize
