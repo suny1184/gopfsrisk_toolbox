@@ -17,8 +17,8 @@ from sklearn.linear_model import BayesianRidge
 # replace negatives, inf, and -inf with 0
 class ReplaceNegativesAndInf(BaseEstimator, TransformerMixin):
 	# initialize
-	def __init__(self):
-		pass
+	def __init__(self, list_cols):
+		self.list_cols = list_cols
 	# fit
 	def fit(self, X):
 		return self
@@ -26,8 +26,10 @@ class ReplaceNegativesAndInf(BaseEstimator, TransformerMixin):
 	def transform(self, X):
 		# start timer
 		time_start = time.perf_counter()
+		# future proof
+		list_cols = [col for col in self.list_cols if col in list(X.columns)]
 		# no need to future proof
-		X = X.mask(X < 0).replace(np.inf, np.nan).fillna(0)
+		X[list_cols] = X[list_cols].mask(X < 0).replace(np.inf, np.nan).fillna(0)
 		# get time
 		flt_time = time.perf_counter()-time_start
 		# print time
