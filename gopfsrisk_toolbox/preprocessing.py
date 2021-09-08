@@ -14,6 +14,40 @@ from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer
 from sklearn.linear_model import BayesianRidge
 
+# class for min max scaling
+class MyMinMaxScaler(BaseEstimator, TransformerMixin):
+	# initialize class
+	def __init__(self, list_cols):
+		self.list_cols = list_cols
+	# define fit
+	def fit(self, X, y=None):
+		# initialize class
+		cls_minmaxscaler = MinMaxScaler()
+		# fit
+		cls_minmaxscaler.fit(X[list_cols])
+		# save to self
+		self.cls_minmaxscaler = cls_minmaxscaler
+		# return
+		return self
+	# define transform
+	def transform(self, X):
+		# start timer
+		time_start = time.perf_counter()
+		# future proof
+		list_cols = [col for col in self.list_cols if col in list(X.columns)]
+		# transform
+		X_scaled = pd.DataFrame(self.cls_minmaxscaler.transform(X[list_cols]), columns=list_cols)
+		# recreate X
+		X[list_cols] = X_scaled[list_cols]
+		# get time
+		flt_time = time.perf_counter()-time_start
+		# print time
+		print(f'Time to scale: {flt_time:0.5} sec.')
+		# save to object
+		self.flt_time = flt_time
+		# return X
+		return X
+
 # replace negatives, inf, and -inf with 0
 class ReplaceNegativesAndInf(BaseEstimator, TransformerMixin):
 	# initialize
@@ -495,26 +529,4 @@ class MyOneHotEncoder(BaseEstimator, TransformerMixin):
 		# drop list_cols
 		X.drop(self.list_cols, axis=1, inplace=True)
 		# return
-		return X
-
-# class for min max scaling
-class MyMinMaxScaler(BaseEstimator, TransformerMixin):
-	# initialize class
-	def __init__(self):
-		self.cls_minmaxscaler = MinMaxScaler()
-	# define fit
-	def fit(self, X, y=None):
-		# instantiate class
-		cls_minmaxscaler = self.cls_minmaxscaler
-		# fit
-		cls_minmaxscaler.fit(X)
-		# save to self
-		self.cls_minmaxscaler = cls_minmaxscaler
-		# return
-		return self
-	# define transform
-	def transform(self, X):
-		# transform
-		X = pd.DataFrame(self.cls_minmaxscaler.transform(X), columns=X.columns)
-		# return X
 		return X
