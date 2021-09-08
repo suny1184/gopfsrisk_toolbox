@@ -24,7 +24,7 @@ class MyMinMaxScaler(BaseEstimator, TransformerMixin):
 		# initialize class
 		cls_minmaxscaler = MinMaxScaler()
 		# fit
-		cls_minmaxscaler.fit(X[list_cols])
+		cls_minmaxscaler.fit(X[self.list_cols])
 		# save to self
 		self.cls_minmaxscaler = cls_minmaxscaler
 		# return
@@ -33,12 +33,10 @@ class MyMinMaxScaler(BaseEstimator, TransformerMixin):
 	def transform(self, X):
 		# start timer
 		time_start = time.perf_counter()
-		# future proof
-		list_cols = [col for col in self.list_cols if col in list(X.columns)]
 		# transform
-		X_scaled = pd.DataFrame(self.cls_minmaxscaler.transform(X[list_cols]), columns=list_cols)
+		X_scaled = pd.DataFrame(self.cls_minmaxscaler.transform(X[self.list_cols]), columns=self.list_cols)
 		# recreate X
-		X[list_cols] = X_scaled[list_cols]
+		X[self.list_cols] = X_scaled[self.list_cols]
 		# get time
 		flt_time = time.perf_counter()-time_start
 		# print time
