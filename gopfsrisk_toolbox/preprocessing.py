@@ -29,7 +29,7 @@ class ReplaceNegativesAndInf(BaseEstimator, TransformerMixin):
 		# future proof
 		list_cols = [col for col in self.list_cols if col in list(X.columns)]
 		# no need to future proof
-		X[list_cols] = X[list_cols].mask(X < 0).replace(np.inf, np.nan).fillna(0)
+		X[list_cols] = X[list_cols].mask(X[list_cols] < 0).replace(np.inf, np.nan).fillna(0)
 		# get time
 		flt_time = time.perf_counter()-time_start
 		# print time
