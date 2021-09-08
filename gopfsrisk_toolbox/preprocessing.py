@@ -14,6 +14,29 @@ from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer
 from sklearn.linear_model import BayesianRidge
 
+# class for one-hot encoding
+class MyDummyCreator(BaseEstimator, TransformerMixin):
+	# initialize class
+	def __init__(self, list_cols):
+		pass
+	# def fit
+	def fit(self, X, y=None):
+		pass
+	# define transform
+	def transform(self, X):
+		# start timer
+		time_start = time.perf_counter()
+		# transform
+		X = X.get_dummies(X)
+		# get time
+		flt_time = time.perf_counter()-time_start
+		# print time
+		print(f'Time to create dummies: {flt_time:0.5} sec.')
+		# save to object
+		self.flt_time = flt_time
+		# return X
+		return X
+
 # class for min max scaling
 class MyMinMaxScaler(BaseEstimator, TransformerMixin):
 	# initialize class
@@ -499,32 +522,4 @@ class ImputerMode(BaseEstimator, TransformerMixin):
 	def transform(self, X):
 		# fill the nas with dict_mode
 		X.fillna(value=self.dict_mode, inplace=True)
-		return X
-
-# class for one-hot encoding
-class MyOneHotEncoder(BaseEstimator, TransformerMixin):
-	# initialize class
-	def __init__(self, list_cols):
-		self.list_cols = list_cols
-		self.cls_onehotencoder = OneHotEncoder(drop=None)
-	# def fit
-	def fit(self, X, y=None):
-		# instantiate class
-		cls_onehotencoder = self.cls_onehotencoder
-		# fit
-		cls_onehotencoder.fit(X[self.list_cols])
-		# save to self
-		self.cls_onehotencoder = cls_onehotencoder
-		# return
-		return self
-	# define transform
-	def transform(self, X):
-		X_hot = pd.DataFrame(self.cls_onehotencoder.transform(X[self.list_cols]).toarray())
-		# make sure the indices match
-		X_hot.index = X.index
-		# concatenate the X and X hot dfs
-		X = pd.concat([X, X_hot], axis=1, ignore_index=False)
-		# drop list_cols
-		X.drop(self.list_cols, axis=1, inplace=True)
-		# return
 		return X
