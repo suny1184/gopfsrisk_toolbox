@@ -1,4 +1,4 @@
-<h1>gopfsrisk_toolbox (version = 1.0.0)</h1>
+<h2>gopfsrisk_toolbox (version = 1.0.0)</h2>
 
 Install from Github via pip:
 - (Windows)
