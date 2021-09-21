@@ -458,11 +458,11 @@ class ParsePayload:
 									  a_min=0,
 									  a_max=1))
 
-		# calculate ecnl by multiplying lists
-		self.y_hat_pd_x_lgd = list(np.array(self.y_hat_pd) * np.array(self.y_hat_lgd))
+		# calculate ecnl by multiplying means of lists
+		self.y_hat_pd_x_lgd = np.mean(self.y_hat_pd) * np.mean(self.y_hat_lgd)
 
 		# get modified ecnl
-		self.y_hat_pd_x_lgd_mod = list((1.95553 * np.array(self.y_hat_pd_x_lgd)) - 0.03281)
+		self.y_hat_pd_x_lgd_mod = (1.95553 * self.y_hat_pd_x_lgd) - 0.03281
 
 		# time
 		flt_sec_counter = time.perf_counter()-time_start
