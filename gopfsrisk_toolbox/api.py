@@ -552,7 +552,8 @@ class ParsePayload:
 						"Response": [{"Model_name":"prestige-GenXI",
 					                  "Model_version":"v2",
 									  "Results":list_output,
-									  "Errors":list_errors_final}]}
+									  "Errors":list_errors_final,
+									  "Counter-Offers":[]}]}
 
 		# save to object
 		self.output_final = output_final
