@@ -124,7 +124,6 @@ class ParsePayload:
 					   list_non_numeric_pd,
 					   list_string_cols,
 					   dict_aa_pd,
-					   dict_tiers,
 					   bool_aa):
 		# args
 		self.list_feats_raw_app = list_feats_raw_app
@@ -141,7 +140,6 @@ class ParsePayload:
 		self.list_string_cols = list_string_cols
 		self.list_non_numeric_pd = list_non_numeric_pd
 		self.dict_aa_pd = dict_aa_pd
-		self.dict_tiers = dict_tiers
 		self.bool_aa = bool_aa
 	# payload for each applicant
 	def get_payload_df(self, json_str_request):
