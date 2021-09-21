@@ -442,161 +442,30 @@ class ParsePayload:
 		print(f'Time to complete shared preprocessing: {flt_sec_preprocessing:0.5} sec.')
 		# return object
 		return self
-	# define counter_offers
-	def counter_offers(self, json_str_request, int_n_samples=100):
+	# define generate_predictions
+	def generate_predictions(self, json_str_request):
 		# shared preprocessing
 		self.shared_preprocessing(json_str_request=json_str_request)
 		time_start = time.perf_counter()
-		# create large df
-		X_lg = self.X.iloc[np.tile(np.arange(len(self.X)), int_n_samples)] # int_n_samples rows
-		# make arry for keeping samples straight
-		list_sample = list(np.repeat(list(range(1, (int_n_samples+1))), self.X.shape[0])) # start at 1 because we assign original to 0 below
-		# set as sample
-		X_lg['sample'] = list_sample
-
-		# make array of loan to value
-		list_ltv = list(np.linspace(0.5, 1.6, int_n_samples))
-		# get n debtors
-		int_n_debtors = self.X.shape[0]
-		# duplicate each value
-		list_ltv = np.repeat(list_ltv, int_n_debtors)
-		# put into X
-		X_lg['eng_loan_to_value'] = list_ltv
-
-		# get amt financed (original)
-		flt_amt_financed = X_lg['fltamountfinanced__app'].iloc[0]
-		# get down total (original)
-		flt_down_total = X_lg['fltapproveddowntotal__app'].iloc[0]
-
-		# calculate amount financed
-		X_lg['fltamountfinanced__app'] = X_lg['eng_loan_to_value'] * X_lg['fltapprovedpricewholesale__app']
-
-		# calculate down pmt
-		X_lg['fltapproveddowntotal__app'] = flt_amt_financed - X_lg['fltamountfinanced__app'] + flt_down_total
-
-		# filter X_lg where fltapproveddowntotal__app > flt_down_total
-		X_lg = X_lg[X_lg['fltapproveddowntotal__app'] > flt_down_total]
-
-		# get list_transformers
-		list_transformers = self.pipeline_shared.list_transformers
-
-		# get binner
-		cls_binner = list_transformers[5]
-		# bin
-		X_lg = cls_binner.transform(X_lg)
-
-		# get val replacer
-		cls_val_replacer = list_transformers[6]
-		# replace in case things are binned to 0
-		X_lg = cls_val_replacer.transform(X_lg)
-
-		# get feature engineering class
-		cls_feat_eng = list_transformers[7]
-		# FE
-		X_lg = cls_feat_eng.transform(X_lg)
-
-		# subset to LTV bounds
-		X_lg = X_lg[(X_lg['eng_loan_to_value']>0) & (X_lg['eng_loan_to_value']<=1.6)]
-
-		# concatenate original X
-		X_lg = pd.concat([self.X, X_lg])
-		# fill na (sample)
-		X_lg['sample'].fillna(0, inplace=True)
 
 		# get pd model
 		model_pd = self.pipeline_pd.model
 		# predict
-		X_lg['y_hat_pd'] = list(model_pd.predict_proba(X_lg[model_pd.feature_names_])[:,1])
+		self.y_hat_pd = list(model_pd.predict_proba(self.X[model_pd.feature_names_])[:,1])
 
 		# get lgd model
 		model_lgd = self.pipeline_lgd.model
 		# predictions pd and clip to make sure no values <0 or >1
-		X_lg['y_hat_lgd'] = list(np.clip(a=np.array(model_lgd.predict(X_lg[model_lgd.feature_names_])),
-										 a_min=0,
-										 a_max=1))
-		# get original y_hat_pd (for all debtors)
-		self.y_hat_pd = list(X_lg[X_lg['sample']==0]['y_hat_pd'])
-		# get original y_hat_lgd (for all debtors)
-		self.y_hat_lgd = list(X_lg[X_lg['sample']==0]['y_hat_lgd'])
+		self.y_hat_lgd = list(np.clip(a=np.array(model_lgd.predict(self.X[model_lgd.feature_names_])),
+									  a_min=0,
+									  a_max=1))
 
-		# group by sample so we cn get mean by account
-		X_lg_grouped = X_lg[['fltapproveddowntotal__app',
-							 'fltamountfinanced__app',
-							 'fltapprovedpricewholesale__app',
-							 'y_hat_pd',
-							 'y_hat_lgd',
-							 'sample']].groupby('sample', as_index=False).mean()
+		# calculate ecnl by multiplying lists
+		self.y_hat_pd_x_lgd = list(np.array(self.y_hat_pd) * np.array(self.y_hat_lgd))
 
-		# calculate ecnl
-		X_lg_grouped['ecnl'] = X_lg_grouped['y_hat_pd'] * X_lg_grouped['y_hat_lgd']
-		# calculate modified ecnl
-		X_lg_grouped['ecnl_mod'] = (1.95553 * X_lg_grouped['ecnl']) - 0.03281
+		# get modified ecnl
+		self.y_hat_pd_x_lgd_mod = list((1.95553 * np.array(self.y_hat_pd_x_lgd)) - 0.03281)
 
-		# get ecnl
-		self.y_hat_pd_x_lgd = list(X_lg_grouped[X_lg_grouped['sample']==0]['ecnl'])[0]
-		# get modified cnl
-		self.y_hat_pd_x_lgd_mod = list(X_lg_grouped[X_lg_grouped['sample']==0]['ecnl_mod'])[0]
-
-		# save to object at this point for testing
-		self.X_lg_grouped_pre_sub = X_lg_grouped.copy()
-
-		# subset ecnl to < original
-		X_lg_grouped = X_lg_grouped[(X_lg_grouped['ecnl'] < self.y_hat_pd_x_lgd) & (X_lg_grouped['fltapproveddowntotal__app'] >= flt_down_total)]
-
-		# get date from row_id
-		int_date = int(self.list_unique_id[0].split('_')[4])
-
-		# get the keys in dict_tiers
-		list_keys = list(self.dict_tiers.keys())
-
-		# if theres only 1 key
-		if len(list_keys) == 1:
-			# get max of list_keys
-			int_max_list_keys = np.max(list_keys)
-		elif len(list_keys) > 1:
-			# get keys <= int_date
-			list_keys = [key for key in list_keys if key <= int_date]
-			# get max of list_keys
-			int_max_list_keys = np.max(list_keys)
-		else:
-			raise ValueError('Tier dictionary is empty')
-
-		# get dict_tiers_subset from dict_tiers with key = int_max_list_keys
-		dict_tiers_subset = self.dict_tiers[int_max_list_keys]
-
-		# convert dict_tiers_subset to series and then sort by value ascending for iterating in the upcoming function
-		ser_tiers = pd.Series(dict_tiers_subset).sort_values(ascending=True, inplace=False)
-
-		# define function to map ecnl modified to tier
-		def ecnl_to_tier(ser_tiers, flt_ecnl):
-			# return declines right away
-			if flt_ecnl > np.max(ser_tiers):
-				return 'Decline'
-			else:
-				# iterate through values
-				for idx, val in ser_tiers.items():
-					# logic
-					if flt_ecnl <= val:
-						return idx
-
-		# apply function
-		X_lg_grouped['Tier'] = X_lg_grouped['ecnl_mod'].apply(lambda x: ecnl_to_tier(ser_tiers=ser_tiers, 
-																		     		 flt_ecnl=x))
-
-		# get indices of max ecnl_mod by tier
-		ser_idx_max = X_lg_grouped.groupby('Tier')['ecnl_mod'].idxmax()
-		# subset X_lg_grouped
-		X_lg_grouped = X_lg_grouped.loc[ser_idx_max]
-
-		# sort by ecnl_mod
-		X_lg_grouped.sort_values(by='ecnl_mod', ascending=True, inplace=True)
-
-		# save to object
-		self.X_lg_grouped = X_lg_grouped
-		# application date
-		self.int_date = int_date
-		# tiers used
-		self.dict_tiers_subset = dict_tiers_subset
 		# time
 		flt_sec_counter = time.perf_counter()-time_start
 		self.flt_sec_counter = flt_sec_counter
@@ -606,7 +475,7 @@ class ParsePayload:
 	# define adverse_action
 	def adverse_action(self, json_str_request):
 		# generate predictions
-		self.counter_offers(json_str_request=json_str_request, int_n_samples=100)
+		self.generate_predictions(json_str_request=json_str_request)
 		time_start = time.perf_counter()
 		# get list of feats in model
 		list_x_feats = self.pipeline_pd.model.feature_names_
@@ -658,7 +527,7 @@ class ParsePayload:
 		# if not getting AA (fast)
 		else:
 			# generate predictions 
-			self.counter_offers(json_str_request=json_str_request, int_n_samples=100)
+			self.generate_predictions(json_str_request=json_str_request)
 			# start time
 			time_start = time.perf_counter()
 			# create df
@@ -679,37 +548,14 @@ class ParsePayload:
 		# remove empty strings from list_errors_final
 		list_errors_final = [err for err in list_errors_final if err != '']
 
-		# if getting AA (slow)
-		if self.bool_aa:
-			# subset to cols we want
-			X_lg_grouped_sub = self.X_lg_grouped[['fltapproveddowntotal__app',
-											 	  'fltamountfinanced__app',
-											 	  'fltapprovedpricewholesale__app',
-											 	  'ecnl_mod',
-											 	  'Tier']]
-			# rename columns
-			X_lg_grouped_sub.columns = ['Cash Down',
-										'Amount Financed',
-										'Price Wholesale',
-										'ECNL Modified',
-										'Tier']
-			# create final output
-			output_final = {"Request_id": "",
-					        "Zaml_processing_id": "",
-							"Response": [{"Model_name":"prestige-GenXI",
-						                  "Model_version":"v2",
-										  "Results":list_output,
-										  "Errors":list_errors_final,
-										  "Counter-Offers":X_lg_grouped_sub.to_dict('records')}]}
-		# if not getting AA (fast)
-		else:
-			# create final output
-			output_final = {"Request_id": "",
-					        "Zaml_processing_id": "",
-							"Response": [{"Model_name":"prestige-GenXI",
-						                  "Model_version":"v2",
-										  "Results":list_output,
-										  "Errors":list_errors_final}]}
+		# create final output
+		output_final = {"Request_id": "",
+				        "Zaml_processing_id": "",
+						"Response": [{"Model_name":"prestige-GenXI",
+					                  "Model_version":"v2",
+									  "Results":list_output,
+									  "Errors":list_errors_final}]}
+
 		# save to object
 		self.output_final = output_final
 		# time
