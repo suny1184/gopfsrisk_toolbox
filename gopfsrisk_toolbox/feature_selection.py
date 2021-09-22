@@ -32,8 +32,13 @@ def ITER_IMP_THRESH_FEAT_SELECT(X_train, y_train, X_valid, y_valid, list_non_num
 	list_flt_metric = []
 	# while loop
 	while n_imp_thresh > 0:
+		# get number of feats
+		int_n_feats = len(list_features[:])
+		# logic to prevent infinite loop
+		if int_n_feats in list_int_n_feats:
+			break
 		# append to list
-		list_int_n_feats.append(len(list_features[:]))
+		list_int_n_feats.append(int_n_feats)
 		# append to list
 		list_list_features.append(list_features[:])
 		# if using constraints
