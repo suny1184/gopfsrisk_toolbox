@@ -39,6 +39,17 @@ def LOG_EVENTS(str_filename='./logs/db_pull.log'):
 	# return logger
 	return logger
 
+# define function for saving data frame as csv
+def DF_TO_CSV(df, str_filename, logger=None):
+	# if logging
+	if logger:
+		logger.warning(f'Writing df to {str_filename}')
+	# write to csv
+	df.to_csv(str_filename, index=False)
+	# if logging
+	if logger:
+		logger.warning(f'Wrote data to {str_filename}')
+
 # define function for moving file
 def MOVE_FILE(str_origin, str_destination, logger=None):
 	# move file
