@@ -437,7 +437,7 @@ class DropAllNaN(BaseEstimator, TransformerMixin):
 				# logic
 				if flt_prop_nan == 1:
 					# append to list
-					list_cols_allnan.append(flt_prop_nan)
+					list_cols_allnan.append(col)
 		else:
 			# get proportion missing per column
 			ser_propna = X[self.list_cols].isnull().sum()/X.shape[0]
