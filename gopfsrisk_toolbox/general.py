@@ -10,6 +10,7 @@ from sklearn.utils.class_weight import compute_class_weight
 import numpy as np
 import datetime as dt
 import git
+import shutil
 
 # define function for logging
 def LOG_EVENTS(str_filename='./logs/db_pull.log'):
@@ -37,6 +38,14 @@ def LOG_EVENTS(str_filename='./logs/db_pull.log'):
 	logger.addHandler(handler)
 	# return logger
 	return logger
+
+# define function for moving file
+def MOVE_FILE(str_origin, str_destination, logger=None):
+	# move file
+	shutil.move(str_origin, str_destination)
+	# logger
+	if logger:
+		logger.warning(f'Moved file from {str_origin} to {str_destination}')
 
 # define function for rm keys of dictionary not in list
 def RM_KEYS_NOT_IN_LIST(dict_, list_):
