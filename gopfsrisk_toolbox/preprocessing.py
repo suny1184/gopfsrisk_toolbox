@@ -37,7 +37,7 @@ class MyDummyCreator(BaseEstimator, TransformerMixin):
 			X.drop(list_cols, axis=1, inplace=True)
 		else:
 			# append suffix
-			list_cols_new = [f'{col}__NNHOT' for col in list_cols]
+			list_cols_new = [f'{col}__NNHOT' for col in list(X_dummy.columns)]
 			# assign
 			X_dummy.columns = list_cols_new
 		# c bind
