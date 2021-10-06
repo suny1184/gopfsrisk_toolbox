@@ -56,9 +56,8 @@ class MyDummyCreator(BaseEstimator, TransformerMixin):
 # class for min max scaling
 class MyMinMaxScaler(BaseEstimator, TransformerMixin):
 	# initialize class
-	def __init__(self, list_cols, bool_replace_original=True):
+	def __init__(self, list_cols):
 		self.list_cols = list_cols
-		self.bool_replace_original = bool_replace_original
 	# define fit
 	def fit(self, X, y=None):
 		# initialize class
@@ -75,17 +74,12 @@ class MyMinMaxScaler(BaseEstimator, TransformerMixin):
 		time_start = time.perf_counter()
 		# transform
 		X_scaled = pd.DataFrame(self.cls_minmaxscaler.transform(X[self.list_cols]), columns=self.list_cols)
-		# re-create data
-		if self.bool_replace_original:
-			# recreate X in place of original cols
-			X[self.list_cols] = X_scaled[self.list_cols]
-		else:
-			# add suffix
-			list_cols_new = [f'{col}__NN' for col in self.list_cols]
-			# assign cols
-			X_scaled.columns = list_cols_new
-			# concatenate
-			X[list_cols_new] = X_scaled[list_cols_new]
+		# add suffix
+		list_cols_new = [f'{col}__NN' for col in self.list_cols]
+		# assign cols
+		X_scaled.columns = list_cols_new
+		# concatenate
+		X[list_cols_new] = X_scaled
 		# get time
 		flt_time = time.perf_counter()-time_start
 		# print time
