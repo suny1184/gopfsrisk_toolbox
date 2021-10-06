@@ -81,7 +81,7 @@ class MyMinMaxScaler(BaseEstimator, TransformerMixin):
 		# match indices
 		X_scaled.index = X.index
 		# concat horizontally
-		X = pd.concat([X, X_scaled])
+		X = pd.concat([X, X_scaled], axis=1)
 		# get time
 		flt_time = time.perf_counter()-time_start
 		# print time
