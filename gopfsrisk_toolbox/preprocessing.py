@@ -19,6 +19,7 @@ class MyDummyCreator(BaseEstimator, TransformerMixin):
 	# initialize class
 	def __init__(self, list_cols, bool_replace_original=True):
 		self.list_cols = list_cols
+		self.bool_replace_original = bool_replace_original
 	# def fit
 	def fit(self, X, y=None):
 		pass
