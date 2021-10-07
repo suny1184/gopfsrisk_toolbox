@@ -2,6 +2,61 @@
 import numpy as np
 import time
 
+# fe for received originals
+class FEReceivedOriginalsAE:
+	# transform
+	def transform(self, X):
+		# start time
+		time_start = time.perf_counter()
+		# Quarter relative to year
+		X['date_quarter_year_sin'] = np.sin((X['date'].dt.quarter-1) * (2*np.pi/4))
+		# cos
+		X['date_quarter_year_cos'] = np.cos((X['date'].dt.quarter-1) * (2*np.pi/4))
+		# tan
+		X['date_quarter_year_tan'] = X['date_quarter_year_sin'] / X['date_quarter_year_cos']
+
+		# Month relative to year
+		# sin
+		X['date_month_year_sin'] = np.sin((X['date'].dt.month-1) * (2*np.pi/12))
+		# cos
+		X['date_month_year_cos'] = np.cos((X['date'].dt.month-1) * (2*np.pi/12))
+		# tan
+		X['date_month_year_tan'] = X['date_month_year_sin'] / X['date_month_year_cos']
+
+		# Day relative to week
+		# sin
+		X['date_day_week_sin'] = np.sin((X['date'].dt.dayofweek-1) * (2*np.pi/7))
+		# cos
+		X['date_day_week_cos'] = np.cos((X['date'].dt.dayofweek-1) * (2*np.pi/7))
+		# tan
+		X['date_day_week_tan'] = X['date_day_week_sin'] / X['date_day_week_cos']
+
+		# Day relative to month
+		# sin
+		X['date_day_month_sin'] = np.sin((X['date'].dt.day-1) * (2*np.pi/X['date'].dt.daysinmonth))
+		# cos
+		X['date_day_month_cos'] = np.cos((X['date'].dt.day-1) * (2*np.pi/X['date'].dt.daysinmonth))
+		# tan
+		X['date_day_month_tan'] = X['date_day_month_sin'] / X['date_day_month_cos']
+
+		# Day relative to year
+		# sin
+		X['date_day_year_sin'] = np.sin((X['date'].dt.dayofyear-1) * (2*np.pi/365))
+		# cos
+		X['date_day_year_cos'] = np.cos((X['date'].dt.dayofyear-1) * (2*np.pi/365))
+		# tan
+		X['date_day_year_tan'] = X['date_day_year_sin'] / X['date_day_year_cos']
+		# end time
+		time_end = time.perf_counter()
+		# delta
+		flt_sec = (time_end - time_start).seconds
+		# save to object
+		self.flt_sec = flt_sec
+		# message
+		print(f'Time to feature engineer: {flt_sec:0.5f} sec.')
+		# return
+		return X
+
 # create fe class
 class FeatureEngineeringAaronPDLGDLower:
 	# transform
