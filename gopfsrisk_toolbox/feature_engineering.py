@@ -9,47 +9,93 @@ class FEReceivedOriginalsAE:
 		# start time
 		time_start = time.perf_counter()
 		# Quarter relative to year
-		X['date_quarter_year_sin'] = np.sin((X['date'].dt.quarter-1) * (2*np.pi/4))
+		# sin
+		try:
+			X['date_quarter_year_sin'] = np.sin((X['date'].dt.quarter-1) * (2*np.pi/4))
+		except:
+			pass
 		# cos
-		X['date_quarter_year_cos'] = np.cos((X['date'].dt.quarter-1) * (2*np.pi/4))
+		try:
+			X['date_quarter_year_cos'] = np.cos((X['date'].dt.quarter-1) * (2*np.pi/4))
+		except:
+			pass
 		# tan
-		X['date_quarter_year_tan'] = X['date_quarter_year_sin'] / X['date_quarter_year_cos']
+		try:
+			X['date_quarter_year_tan'] = X['date_quarter_year_sin'] / X['date_quarter_year_cos']
+		except:
+			pass
 
 		# Month relative to year
 		# sin
-		X['date_month_year_sin'] = np.sin((X['date'].dt.month-1) * (2*np.pi/12))
+		try:
+			X['date_month_year_sin'] = np.sin((X['date'].dt.month-1) * (2*np.pi/12))
+		except:
+			pass
 		# cos
-		X['date_month_year_cos'] = np.cos((X['date'].dt.month-1) * (2*np.pi/12))
+		try:
+			X['date_month_year_cos'] = np.cos((X['date'].dt.month-1) * (2*np.pi/12))
+		except:
+			pass
 		# tan
-		X['date_month_year_tan'] = X['date_month_year_sin'] / X['date_month_year_cos']
+		try:
+			X['date_month_year_tan'] = X['date_month_year_sin'] / X['date_month_year_cos']
+		except:
+			pass
 
 		# Day relative to week
 		# sin
-		X['date_day_week_sin'] = np.sin((X['date'].dt.dayofweek-1) * (2*np.pi/7))
+		try:
+			X['date_day_week_sin'] = np.sin((X['date'].dt.dayofweek-1) * (2*np.pi/7))
+		except:
+			pass
 		# cos
-		X['date_day_week_cos'] = np.cos((X['date'].dt.dayofweek-1) * (2*np.pi/7))
+		try:
+			X['date_day_week_cos'] = np.cos((X['date'].dt.dayofweek-1) * (2*np.pi/7))
+		except:
+			pass
 		# tan
-		X['date_day_week_tan'] = X['date_day_week_sin'] / X['date_day_week_cos']
+		try:
+			X['date_day_week_tan'] = X['date_day_week_sin'] / X['date_day_week_cos']
+		except:
+			pass
 
 		# Day relative to month
 		# sin
-		X['date_day_month_sin'] = np.sin((X['date'].dt.day-1) * (2*np.pi/X['date'].dt.daysinmonth))
+		try:
+			X['date_day_month_sin'] = np.sin((X['date'].dt.day-1) * (2*np.pi/X['date'].dt.daysinmonth))
+		except:
+			pass
 		# cos
-		X['date_day_month_cos'] = np.cos((X['date'].dt.day-1) * (2*np.pi/X['date'].dt.daysinmonth))
+		try:
+			X['date_day_month_cos'] = np.cos((X['date'].dt.day-1) * (2*np.pi/X['date'].dt.daysinmonth))
+		except:
+			pass
 		# tan
-		X['date_day_month_tan'] = X['date_day_month_sin'] / X['date_day_month_cos']
+		try:
+			X['date_day_month_tan'] = X['date_day_month_sin'] / X['date_day_month_cos']
+		except:
+			pass
 
 		# Day relative to year
 		# sin
-		X['date_day_year_sin'] = np.sin((X['date'].dt.dayofyear-1) * (2*np.pi/365))
+		try:
+			X['date_day_year_sin'] = np.sin((X['date'].dt.dayofyear-1) * (2*np.pi/365))
+		except:
+			pass
 		# cos
-		X['date_day_year_cos'] = np.cos((X['date'].dt.dayofyear-1) * (2*np.pi/365))
+		try:
+			X['date_day_year_cos'] = np.cos((X['date'].dt.dayofyear-1) * (2*np.pi/365))
+		except:
+			pass
 		# tan
-		X['date_day_year_tan'] = X['date_day_year_sin'] / X['date_day_year_cos']
+		try:
+			X['date_day_year_tan'] = X['date_day_year_sin'] / X['date_day_year_cos']
+		except:
+			pass
 		# end time
 		time_end = time.perf_counter()
 		# delta
-		flt_sec = (time_end - time_start).seconds
+		flt_sec = time_end - time_start
 		# save to object
 		self.flt_sec = flt_sec
 		# message
