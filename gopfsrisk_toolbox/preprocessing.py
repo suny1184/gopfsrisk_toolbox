@@ -17,9 +17,8 @@ from sklearn.linear_model import BayesianRidge
 # class for one-hot encoding
 class MyDummyCreator(BaseEstimator, TransformerMixin):
 	# initialize class
-	def __init__(self, list_cols, bool_replace_original=True):
+	def __init__(self, list_cols):
 		self.list_cols = list_cols
-		self.bool_replace_original = bool_replace_original
 	# def fit
 	def fit(self, X, y=None):
 		pass
@@ -31,17 +30,14 @@ class MyDummyCreator(BaseEstimator, TransformerMixin):
 		list_cols = [col for col in self.list_cols if col in list(X.columns)]
 		# transform
 		X_dummy = pd.get_dummies(X[list_cols])
-		# logic for replacing
-		if self.bool_replace_original:
-			# drop original from X
-			X.drop(list_cols, axis=1, inplace=True)
-		else:
-			# append suffix
-			list_cols_new = [f'{col}__NNHOT' for col in list(X_dummy.columns)]
-			# assign
-			X_dummy.columns = list_cols_new
-		# c bind
-		X[list(X_dummy.columns)] = X_dummy[list(X_dummy.columns)]
+		# append suffix
+		list_cols_new = [f'{col}__NNHOT' for col in list(X_dummy.columns)]
+		# assign
+		X_dummy.columns = list_cols_new
+		# match idx
+		X_dummy.index = X.index
+		# concat horizontally
+		X = pd.concat([X, X_dummy], axis=1)
 		# save memory
 		del X_dummy
 		# get time
