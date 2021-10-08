@@ -21,7 +21,7 @@ class FEReceivedOriginalsAE:
 			pass
 		# tan
 		try:
-			X['date_quarter_year_tan__cyclic'] = X['date_quarter_year_sin'] / X['date_quarter_year_cos']
+			X['date_quarter_year_tan__cyclic'] = X['date_quarter_year_sin__cyclic'] / X['date_quarter_year_cos__cyclic']
 		except:
 			pass
 
@@ -38,7 +38,7 @@ class FEReceivedOriginalsAE:
 			pass
 		# tan
 		try:
-			X['date_month_year_tan__cyclic'] = X['date_month_year_sin'] / X['date_month_year_cos']
+			X['date_month_year_tan__cyclic'] = X['date_month_year_sin__cyclic'] / X['date_month_year_cos__cyclic']
 		except:
 			pass
 
@@ -55,7 +55,7 @@ class FEReceivedOriginalsAE:
 			pass
 		# tan
 		try:
-			X['date_day_week_tan__cyclic'] = X['date_day_week_sin'] / X['date_day_week_cos']
+			X['date_day_week_tan__cyclic'] = X['date_day_week_sin__cyclic'] / X['date_day_week_cos__cyclic']
 		except:
 			pass
 
@@ -72,7 +72,7 @@ class FEReceivedOriginalsAE:
 			pass
 		# tan
 		try:
-			X['date_day_month_tan__cyclic'] = X['date_day_month_sin'] / X['date_day_month_cos']
+			X['date_day_month_tan__cyclic'] = X['date_day_month_sin__cyclic'] / X['date_day_month_cos__cyclic']
 		except:
 			pass
 
@@ -89,7 +89,7 @@ class FEReceivedOriginalsAE:
 			pass
 		# tan
 		try:
-			X['date_day_year_tan__cyclic'] = X['date_day_year_sin'] / X['date_day_year_cos']
+			X['date_day_year_tan__cyclic'] = X['date_day_year_sin__cyclic'] / X['date_day_year_cos__cyclic']
 		except:
 			pass
 		# end time
