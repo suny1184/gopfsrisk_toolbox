@@ -8,6 +8,123 @@ class FEReceivedOriginalsAE:
 	def transform(self, X):
 		# start time
 		time_start = time.perf_counter()
+		# ----------------------------------------------------------------------------------------------
+		# INTRA-COLUMN FE
+		# ----------------------------------------------------------------------------------------------
+		# payment to value
+		try:
+			X['eng_payment_to_value'] = X['fltApprovedPayment__data'] / X['fltApprovedSalesPrice__data']
+		except:
+			pass
+		# payment to loan
+		try:
+			X['eng_payment_to_loan'] = X['fltApprovedPayment__data'] / X['fltAmountFinanced__data']
+		except:
+			pass
+
+		# down to value
+		try:
+			X['eng_down_to_value'] = X['fltDownCash__data'] / X['fltApprovedSalesPrice__data']
+		except:
+			pass
+		# down to loan
+		try:
+			X['eng_down_to_loan'] = X['fltDownCash__data'] / X['fltAmountFinanced__data']
+		except:
+			pass
+
+		# days to get approval
+		try:
+			X['eng_days_to_approval'] = X['DaysSinceApplication__data'] - X['DaysSinceApproval__data']
+		except:
+			pass
+
+		# wls price to sales price
+		try:
+			X['eng_wls_to_sales'] = X['fltApprovedPriceWholesale__data'] / X['fltApprovedSalesPrice__data']
+		except:
+			pass
+
+		# total payment to value
+		try:
+			X['eng_totalpaid_to_value'] = X['fltTotalPayment__data'] / X['fltApprovedSalesPrice__data']
+		except:
+			pass
+		# total payment to loan
+		try:
+			X['eng_totalpaid_to_loan'] = X['fltTotalPayment__data'] / X['fltAmountFinanced__data']
+		except:
+			pass
+
+		# range of income
+		try:
+			X['eng_rangeofincome'] = X['fltGrossMonthly__income_max'] - X['fltGrossMonthly__income_min']
+		except:
+			pass
+
+		# range of debt
+		try:
+			X['eng_rangeofdebt'] = X['fltMonthlyPayment__debt_max'] - X['fltMonthlyPayment__debt_min']
+		except:
+			pass
+
+		# debt to income
+		try:
+			X['eng_debt_to_income'] = X['fltMonthlyPayment__debt_sum'] / X['fltGrossMonthly__income_sum']
+		except:
+			pass
+
+		# subject record time range
+		try:
+			X['eng_subject_record_time_range'] = X['fltSubjectRecordTimeOldest__ln'] - X['fltSubjectRecordTimeNewest__ln']
+		except:
+			pass
+
+		# subject record 12 month time range
+		try:
+			X['eng_subject_record_time12month_range'] = X['fltSubjectRecordTimeOldest__ln'] - X['fltSubjectNewestRecord12Month__ln']
+		except:
+			pass
+
+		# avg activity index
+		try:
+			X['eng_avg_activity_index'] = X['fltSubjectActivityIndex03Month__ln'] + X['fltSubjectActivityIndex06Month__ln'] + X['fltSubjectActivityIndex12Month__ln'] / 3
+		except:
+			pass
+
+		# felonies per year of age
+		try:
+			X['eng_felonies_per_year'] = X['fltCriminalFelonyCount__ln'] / X['fltSubjectAge__ln']
+		except:
+			pass
+
+		# non-felonies per year
+		try:
+			X['eng_nonfelonies_per_year'] = X['fltCriminalNonFelonyCount__ln'] / X['fltSubjectAge__ln']
+		except:
+			pass
+
+		# total criminal activity
+		try:
+			X['eng_total_criminal_acts'] = X['fltCriminalFelonyCount__ln'] + X['fltCriminalNonFelonyCount__ln']
+		except:
+			pass
+
+		# lien to income
+		try:
+			X['eng_lien_to_income'] = X['fltLienJudgmentDollarTotal__ln'] / X['fltGrossMonthly__income_sum']
+		except:
+			pass
+
+		# bankruptcies per year
+		try:
+			X['eng_bk_per_year'] = X['fltBankruptcyCount__ln'] / X['fltSubjectAge__ln']
+		except:
+			pass
+
+		# ----------------------------------------------------------------------------------------------
+		# CYCLIC - date
+		# ----------------------------------------------------------------------------------------------
 		# Quarter relative to year
 		# sin
 		try:
@@ -90,6 +207,94 @@ class FEReceivedOriginalsAE:
 		# tan
 		try:
 			X['date_day_year_tan__cyclic'] = X['date_day_year_sin__cyclic'] / X['date_day_year_cos__cyclic']
+		except:
+			pass
+
+		# ----------------------------------------------------------------------------------------------
+		# CYCLIC - dtmStampCreation__ln
+		# ----------------------------------------------------------------------------------------------
+		# Quarter relative to year
+		# sin
+		try:
+			X['stmpcreation_quarter_year_sin__cyclic'] = np.sin((X['dtmStampCreation__ln'].dt.quarter-1) * (2*np.pi/4))
+		except:
+			pass
+		# cos
+		try:
+			X['stmpcreation_quarter_year_cos__cyclic'] = np.cos((X['dtmStampCreation__ln'].dt.quarter-1) * (2*np.pi/4))
+		except:
+			pass
+		# tan
+		try:
+			X['stmpcreation_quarter_year_tan__cyclic'] = X['stmpcreation_quarter_year_sin__cyclic'] / X['stmpcreation_quarter_year_cos__cyclic']
+		except:
+			pass
+
+		# Month relative to year
+		# sin
+		try:
+			X['stmpcreation_month_year_sin__cyclic'] = np.sin((X['dtmStampCreation__ln'].dt.month-1) * (2*np.pi/12))
+		except:
+			pass
+		# cos
+		try:
+			X['stmpcreation_month_year_cos__cyclic'] = np.cos((X['dtmStampCreation__ln'].dt.month-1) * (2*np.pi/12))
+		except:
+			pass
+		# tan
+		try:
+			X['stmpcreation_month_year_tan__cyclic'] = X['stmpcreation_month_year_sin__cyclic'] / X['stmpcreation_month_year_cos__cyclic']
+		except:
+			pass
+
+		# Day relative to week
+		# sin
+		try:
+			X['stmpcreation_day_week_sin__cyclic'] = np.sin((X['dtmStampCreation__ln'].dt.dayofweek-1) * (2*np.pi/7))
+		except:
+			pass
+		# cos
+		try:
+			X['stmpcreation_day_week_cos__cyclic'] = np.cos((X['dtmStampCreation__ln'].dt.dayofweek-1) * (2*np.pi/7))
+		except:
+			pass
+		# tan
+		try:
+			X['stmpcreation_day_week_tan__cyclic'] = X['stmpcreation_day_week_sin__cyclic'] / X['stmpcreation_day_week_cos__cyclic']
+		except:
+			pass
+
+		# Day relative to month
+		# sin
+		try:
+			X['stmpcreation_day_month_sin__cyclic'] = np.sin((X['dtmStampCreation__ln'].dt.day-1) * (2*np.pi/X['dtmStampCreation__ln'].dt.daysinmonth))
+		except:
+			pass
+		# cos
+		try:
+			X['stmpcreation_day_month_cos__cyclic'] = np.cos((X['dtmStampCreation__ln'].dt.day-1) * (2*np.pi/X['dtmStampCreation__ln'].dt.daysinmonth))
+		except:
+			pass
+		# tan
+		try:
+			X['stmpcreation_day_month_tan__cyclic'] = X['stmpcreation_day_month_sin__cyclic'] / X['stmpcreation_day_month_cos__cyclic']
+		except:
+			pass
+
+		# Day relative to year
+		# sin
+		try:
+			X['stmpcreation_day_year_sin__cyclic'] = np.sin((X['dtmStampCreation__ln'].dt.dayofyear-1) * (2*np.pi/365))
+		except:
+			pass
+		# cos
+		try:
+			X['stmpcreation_day_year_cos__cyclic'] = np.cos((X['dtmStampCreation__ln'].dt.dayofyear-1) * (2*np.pi/365))
+		except:
+			pass
+		# tan
+		try:
+			X['stmpcreation_day_year_tan__cyclic'] = X['stmpcreation_day_year_sin__cyclic'] / X['stmpcreation_day_year_cos__cyclic']
 		except:
 			pass
 		# end time
