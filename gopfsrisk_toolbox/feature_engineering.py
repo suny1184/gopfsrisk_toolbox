@@ -14,6 +14,8 @@ class FEReceivedOriginalsAE:
 		# days between dates
 		try:
 			X['eng_date_diff'] = (X['date'] - X['dtmStampCreation__ln']).days
+		except:
+			pass
 
 		# income to total payments
 		try:
