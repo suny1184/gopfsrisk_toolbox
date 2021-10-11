@@ -11,6 +11,10 @@ class FEReceivedOriginalsAE:
 		# ----------------------------------------------------------------------------------------------
 		# INTRA-COLUMN FE
 		# ----------------------------------------------------------------------------------------------
+		# days between dates
+		try:
+			X['eng_date_diff'] = (X['date'] - X['dtmStampCreation__ln']).days
+
 		# income to total payments
 		try:
 			X['eng_income_to_payments'] = X['fltGrossMonthly__income_sum'] / X['fltTotalPayment__data']
