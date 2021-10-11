@@ -13,7 +13,7 @@ class FEReceivedOriginalsAE:
 		# ----------------------------------------------------------------------------------------------
 		# days between dates
 		try:
-			X['eng_date_diff'] = (X['date'] - X['dtmStampCreation__ln']).days
+			X['eng_date_diff'] = (X['date'] - X['dtmStampCreation__ln']).dt.days
 		except:
 			pass
 
