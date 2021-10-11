@@ -11,6 +11,17 @@ class FEReceivedOriginalsAE:
 		# ----------------------------------------------------------------------------------------------
 		# INTRA-COLUMN FE
 		# ----------------------------------------------------------------------------------------------
+		# income to total payments
+		try:
+			X['eng_income_to_payments'] = X['fltGrossMonthly__income_sum'] / X['fltTotalPayment__data']
+		except:
+			pass
+		# debt to total payments
+		try:
+			X['eng_debt_to_payments'] = X['fltMonthlyPayment__debt_sum'] / X['fltTotalPayment__data']
+		except:
+			pass
+
 		# payment to value
 		try:
 			X['eng_payment_to_value'] = X['fltApprovedPayment__data'] / X['fltApprovedSalesPrice__data']
